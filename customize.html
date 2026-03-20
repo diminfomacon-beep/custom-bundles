@@ -3,207 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gift Catalog</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=AYCrwEjBMTIJctW65WTbEqCfEGx4IYVyLFU09iInrV8m4nLFonxGlAb6bD707bL-qaDSPUNfqJJzgoYS&currency=USD"></script>
+    <script type="text/javascript">
+      (function(){
+          emailjs.init("1LZbCPvH49G_r0ypB"); // Get this from EmailJS Dashboard
+      })();
+    </script>
+    <title>Customize Your Bundle Items</title>
     <style>
-        body {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f3f4f6; color: #1f2937; margin: 0; padding: 0;}
-        .container {max-width: 1000px; margin: 0 auto; padding: 40px 20px;}
-        h1 {color: #1e40af; text-align: center; margin-bottom: 40px;}
-        .category {margin-bottom: 20px; border-radius: 12px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow: hidden;}
-        .category-header {padding: 18px 25px; cursor: pointer; background: #fff; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; transition: background 0.2s;}
-        .category-header:hover {background: #f9fafb;}
-        .toggle-icon {color: #3b82f6; font-size: 1.5rem;}
-        .category-content {display: none; padding: 25px;}
-        .item-grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;}
-        .item-card {background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 15px; text-align: center; transition: transform 0.2s;}
-        .item-card:hover {transform: translateY(-3px); border-color: #3b82f6;}
-        .item-card img {width: 100%; border-radius: 8px; margin-bottom: 12px; height: 140px; object-fit: cover; background: #f3f4f6;}
-        .item-name {font-weight: 600; margin-bottom: 5px; font-size: 0.95rem;}
-        .item-price {color: #059669; font-weight: bold; margin-bottom: 12px;}
-        .add-btn {width: 100%; background: #3b82f6; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s;}
-        .add-btn.active {background: #059669;}
-        .add-btn.active::after {content: ' ✓';}
-        h3 {font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px; margin-bottom: 15px;}
+        body {font-family: 'Segoe UI', sans-serif; background:#CAE4DB; padding:20px; margin:0;}
+        .wrapper {max-width: 950px; margin: auto;}
+        .header {display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
+        .item-row {background: white; border-radius: 12px; padding: 25px; margin-bottom: 20px; display: grid; grid-template-columns: 250px 1fr auto; gap: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);}
         
-        /* Sidebar Bundle */
-        .bundle-panel {position: fixed; top: 20px; right: 20px; width: 320px; max-height: 85vh; background: #fff; border-radius: 15px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; flex-direction: column;}
-        .bundle-items {overflow-y: auto; flex-grow: 1; margin: 15px 0;}
-        .bundle-item {display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f3f4f6; font-size: 0.9rem;}
-        .remove-mini {background: #fee2e2; color: #ef4444; border: none; padding: 4px 8px; border-radius: 5px; cursor: pointer; font-size: 0.75rem;}
-        .bundle-total {font-size: 1.2rem; font-weight: bold; text-align: right; color: #111827; padding-top: 15px;}
-        #go-to-bundle {width: 100%; margin-top: 15px; padding: 14px; background: #1e40af; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem;}
-        #go-to-bundle:disabled {background: #d1d5db; cursor: not-allowed;}
+        /* Preview with Overlay logic */
+        .product-preview {width: 250px; height: 220px; background: #f9f9f9; border-radius: 8px; position: relative; display: flex; align-items: center; justify-content: center; border: 1px solid #eee; overflow: hidden;}
+        .base-img {max-width: 90%; max-height: 90%; object-fit: contain; opacity: 0.4;}
+        .user-img-overlay {position: absolute; max-width: 50%; max-height: 50%; object-fit: contain; z-index: 1; pointer-events: none;}
+        .preview-text {position: absolute; width: 80%; text-align: center; font-weight: bold; font-size: 1.1rem; z-index: 2; pointer-events: none; bottom: 20px;}
+        
+        .details h3 {margin: 0 0 5px 0; color: #1e40af;}
+        .price-tag {color:#059669; font-weight:bold; margin-bottom: 15px; display: block;}
+        label {display: block; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; color: #888; letter-spacing: 0.5px;}
+        input[type="text"], input[type="file"], textarea {width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; font-family: inherit; box-sizing: border-box;}
+        textarea {resize: vertical; min-height: 60px;}
+        .color-picker-wrap {display: flex; align-items: center; gap: 10px; margin-bottom: 15px;}
+        
+        .summary-bar {background: #2F6B64; color: white; padding: 20px 30px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; position: sticky; bottom: 20px; z-index: 100;}
+        .btn-main {background: #fbbf24; color: black; border: none; padding: 14px 30px; border-radius: 8px; font-weight: bold; cursor: pointer;}
+        .remove-btn {background: #fee2e2; color: #ef4444; border: none; padding: 8px; border-radius: 6px; cursor: pointer; height: fit-content;}
 
-        @media (max-width: 1100px) {
-            .bundle-panel {position: relative; top: 0; right: 0; width: 100%; margin-top: 30px; box-sizing: border-box;}
+        @media (max-width: 800px) {
+            .item-row {grid-template-columns: 1fr;}
+            .product-preview {width: 100%;}
         }
+        /* Full-screen loading overlay */
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    color: white;
+    text-align: center;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #fbbf24; /* Matches your yellow button */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text h2 { margin: 0; font-size: 1.5rem; }
+.loading-text p { opacity: 0.8; margin-top: 10px; }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>Create Your Custom Gift Bundle</h1>
-
-    <div class="category">
-        <div class="category-header"><span>New Baby & Milestone Gifts</span><span class="toggle-icon">+</span></div>
-        <div class="category-content">
-            <h3>Vinyl-Friendly</h3>
-            <div class="item-grid">
-                <div class="item-card" data-name="Onesie" data-price="12"><img src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=200&h=150" alt=""><div class="item-name">Onesie / Bodysuit</div><div class="item-price">$12</div><button class="add-btn">Add</button></div>
-                <div class="item-card" data-name="Baby Bottle" data-price="8"><img src="https://images.unsplash.com/photo-1555037015-1498966bdd7c?auto=format&fit=crop&w=200&h=150" alt=""><div class="item-name">Baby Bottle</div><div class="item-price">$8</div><button class="add-btn">Add</button></div>
-            </div>
-            <h3>Sublimation</h3>
-            <div class="item-grid">
-                <div class="item-card" data-name="Baby Blanket" data-price="20"><img src="https://images.unsplash.com/photo-1522771917563-ee75ff1f52f1?auto=format&fit=crop&w=200&h=150" alt=""><div class="item-name">Baby Blanket</div><div class="item-price">$20</div><button class="add-btn">Add</button></div>
-            </div>
-        </div>
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text">
+        <h2>Processing Order...</h2>
+        <p>Please do not close this window. <br> Sending your custom designs to the seller.</p>
+    </div>
+</div>
+<div class="wrapper">
+    <div class="header">
+        <button onclick="location.href='index.html'" style="cursor:pointer; padding: 8px 15px; border-radius: 6px; border: 1px solid #ddd; background: #fff;">← Back to Catalog</button>
+        <h2 style="margin:0">Customize Your Bundle</h2>
     </div>
 
-    <div class="category">
-        <div class="category-header"><span>Housewarming Gifts</span><span class="toggle-icon">+</span></div>
-        <div class="category-content">
-            <h3>Woodburning</h3>
-            <div class="item-grid">
-                <div class="item-card" data-name="Cutting Board" data-price="25"><img src="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?auto=format&fit=crop&w=200&h=150" alt=""><div class="item-name">Wooden Cutting Board</div><div class="item-price">$25</div><button class="add-btn">Add</button></div>
-            </div>
-        </div>
-    </div>
+    <div id="items-container"></div>
 
-    <div class="bundle-panel">
-        <h2 style="margin:0; font-size: 1.2rem;">My Selection</h2>
-        <div class="bundle-items" id="bundle-items">
-            </div>
-        <div class="bundle-total" id="bundle-total">Total: $0</div>
-        <button id="go-to-bundle" disabled>Customize My Bundle</button>
+    <div class="summary-bar">
+        <div>
+            <span style="opacity:0.8; font-size: 0.9rem;">Estimated Total:</span>
+            <div style="font-size: 1.8rem; font-weight: bold;">$<span id="total-price">0</span></div>
+        </div>
+        <div class="summary-bar">
+    <div>
+        <span style="opacity:0.8; font-size: 0.9rem;">Total Amount:</span>
+        <div style="font-size: 1.8rem; font-weight: bold;">$<span id="total-price">0</span></div>
+    </div>
+    <div id="paypal-button-container" style="width: 250px;"></div>
+</div>
     </div>
 </div>
 
 <script>
-    const headers = document.querySelectorAll('.category-header');
-    headers.forEach(header => {
-        header.addEventListener('click', () => {
-            const content = header.nextElementSibling;
-            const icon = header.querySelector('.toggle-icon');
-            const isOpen = content.style.display === "block";
-            content.style.display = isOpen ? "none" : "block";
-            icon.textContent = isOpen ? "+" : "−";
-        });
+let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
+
+function render() {
+    const container = document.getElementById('items-container');
+    const keys = Object.keys(bundle);
+    let total = 0;
+
+    if (keys.length === 0) {
+        container.innerHTML = "<h3>Bundle is empty</h3>";
+        return;
+    }
+
+    container.innerHTML = '';
+    keys.forEach(name => {
+        const item = bundle[name];
+        total += item.price * item.quantity;
+        
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.innerHTML = `
+            <div class="product-preview" id="preview-${name}">
+                <img src="${item.img}" class="base-img">
+                <img src="${item.userImage || ''}" class="user-img-overlay" style="display: ${item.userImage ? 'block' : 'none'}">
+                <div class="preview-text" style="color: ${item.textColor}">${item.customText || ''}</div>
+            </div>
+            <div class="details">
+                <h3>${name}</h3>
+                <label>Text</label>
+                <input type="text" value="${item.customText}" oninput="updateProp('${name}', 'customText', this.value, true)">
+                <label>Color</label>
+                <input type="color" value="${item.textColor}" onchange="updateProp('${name}', 'textColor', this.value, true)">
+                <label>Upload Image</label>
+                <input type="file" accept="image/*" onchange="handleImage(this, '${name}')">
+                <label>Notes</label>
+                <textarea oninput="updateProp('${name}', 'notes', this.value)">${item.notes || ''}</textarea>
+            </div>
+        `;
+        container.appendChild(row);
     });
+    document.getElementById('total-price').textContent = total;
+    initPayPal(total);
+}
 
-    let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
+// --- PAYPAL FUNCTION ---
+// --- PAYPAL INTEGRATION ---
+function initPayPal(totalAmount) {
+    document.getElementById('paypal-button-container').innerHTML = ''; 
+    paypal.Buttons({
+        createOrder: (data, actions) => {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: { value: totalAmount.toString() }
+                }]
+            });
+        },
+        onApprove: (data, actions) => {
+            // STEP 1: Show the loading overlay immediately
+            document.getElementById('loading-overlay').style.display = 'flex';
 
-    function updateUI() {
-        const list = document.getElementById('bundle-items');
-        const totalEl = document.getElementById('bundle-total');
-        const nextBtn = document.getElementById('go-to-bundle');
-        list.innerHTML = '';
-        let total = 0;
-        let count = 0;
-
-        for (const [name, item] of Object.entries(bundle)) {
-            const div = document.createElement('div');
-            div.className = 'bundle-item';
-            div.innerHTML = `<span>${name} (x${item.quantity})</span><button class="remove-mini" data-name="${name}">Remove</button>`;
-            list.appendChild(div);
-            total += item.price * item.quantity;
-            count++;
+            return actions.order.capture().then(function(orderData) {
+                // STEP 2: Proceed to send email
+                sendOrderEmail(orderData);
+            });
         }
+    }).render('#paypal-button-container');
+}
 
-        totalEl.textContent = `Total: $${total}`;
-        nextBtn.disabled = count === 0;
+// --- EMAILJS FUNCTION ---
+function sendOrderEmail(details) {
+    let orderSummary = Object.entries(bundle).map(([name, item]) => {
+        return `Item: ${name}\nText: ${item.customText}\nNotes: ${item.notes}\nQty: ${item.quantity}\n---`;
+    }).join('\n');
 
-        // Update add buttons state
-        document.querySelectorAll('.add-btn').forEach(btn => {
-            const name = btn.closest('.item-card').dataset.name;
-            if (bundle[name]) btn.classList.add('active');
-            else btn.classList.remove('active');
-        });
-
-        // Remove listeners
-        list.querySelectorAll('.remove-mini').forEach(btn => {
-            btn.onclick = () => {
-                delete bundle[btn.dataset.name];
-                save();
-            };
-        });
-    }
-
-    function save() {
-        localStorage.setItem('myBundle', JSON.stringify(bundle));
-        updateUI();
-    }
-
-    document.querySelectorAll('.add-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const card = btn.closest('.item-card');
-            const name = card.dataset.name;
-            const price = parseFloat(card.dataset.price);
-
-            if (bundle[name]) {
-                bundle[name].quantity++;
-            } else {
-                bundle[name] = { price, quantity: 1, type: 'vinyl', customText: '', textColor: '#1e40af' };
-            }
-            save();
-        });
-    });
-
-    document.getElementById('go-to-bundle').onclick = () => {
-        window.location.href = 'customize.html';
+    const templateParams = {
+        order_id: details.id,
+        customer_name: details.payer.name.given_name,
+        customer_email: details.payer.email_address,
+        message: orderSummary,
+        total_paid: details.purchase_units[0].amount.value
     };
 
-    updateUI();
-<
-    // ... (Keep the toggle and init logic from previous version)
-
-    function update() {
-        const list = document.getElementById('bundle-items');
-        const totalEl = document.getElementById('bundle-total');
-        const btn = document.getElementById('go-to-bundle');
-        list.innerHTML = '';
-        let total = 0;
-        let count = 0;
-
-        for (const [name, item] of Object.entries(bundle)) {
-            const d = document.createElement('div');
-            d.className = 'bundle-item';
-            d.innerHTML = `<span>${name} (x${item.quantity})</span><button class="remove-mini" onclick="removeItem('${name}')">×</button>`;
-            list.appendChild(d);
-            total += item.price * item.quantity;
-            count++;
-        }
-        totalEl.textContent = `Total: $${total}`;
-        btn.disabled = count === 0;
-
-        document.querySelectorAll('.add-btn').forEach(b => {
-            const n = b.closest('.item-card').dataset.name;
-            b.classList.toggle('active', !!bundle[n]);
-            b.textContent = bundle[n] ? "In Bundle" : "Add to Bundle";
+    emailjs.send('service_ezq1fuc', 'template_r4hpykx', templateParams)
+        .then(() => {
+            // SUCCESS: Clear storage and redirect
+            localStorage.clear();
+            window.location.href = "thank-you.html"; 
+        }, (error) => {
+            // ERROR: Hide overlay so they can see the error message
+            document.getElementById('loading-overlay').style.display = 'none';
+            alert('Payment went through, but there was an error sending the email. Please contact us with your PayPal Transaction ID: ' + details.id);
+            console.log('Email failed...', error);
         });
-        localStorage.setItem('myBundle', JSON.stringify(bundle));
-    }
-
-    document.querySelectorAll('.add-btn').forEach(btn => {
-        btn.onclick = () => {
-            const card = btn.closest('.item-card');
-            const name = card.dataset.name;
-            if (bundle[name]) {
-                bundle[name].quantity++;
-            } else {
-                bundle[name] = { 
-                    price: parseInt(card.dataset.price), 
-                    quantity: 1, 
-                    img: card.dataset.img, 
-                    customText: '', 
-                    textColor: '#000000',
-                    notes: '' // Added notes property
-                };
-            }
-            update();
-        };
-    });
-
-  document.getElementById('go-to-bundle').onclick = () => location.href = 'customize.html';
-    update();
-
+}
+// DELETE THIS AFTER TESTING:
+// emailjs.send'service_ezq1fuc', 'template_r4hpykx', {customer_name: "Test User", message: "Testing my template!"});
 </script>
 </body>
 </html>

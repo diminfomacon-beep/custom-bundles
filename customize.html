@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=AYCrwEjBMTIJctW65WTbEqCfEGx4IYVyLFU09iInrV8m4nLFonxGlAb6bD707bL-qaDSPUNfqJJzgoYS&currency=USD"></script>
+    <script type="text/javascript">
+      (function(){
+          emailjs.init("1LZbCPvH49G_r0ypB"); // Get this from EmailJS Dashboard
+      })();
+    </script>
+    <title>Customize Your Bundle</title>
+    <style>
+        body {font-family: 'Segoe UI', sans-serif; background:#f0f4f8; padding:20px; margin:0;}
+        .wrapper {max-width: 950px; margin: auto;}
+        .header {display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
+        .item-row {background: white; border-radius: 12px; padding: 25px; margin-bottom: 20px; display: grid; grid-template-columns: 250px 1fr auto; gap: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);}
+        
+        /* Preview with Overlay logic */
+        .product-preview {width: 250px; height: 220px; background: #f9f9f9; border-radius: 8px; position: relative; display: flex; align-items: center; justify-content: center; border: 1px solid #eee; overflow: hidden;}
+        .base-img {max-width: 90%; max-height: 90%; object-fit: contain; opacity: 0.4;}
+        .user-img-overlay {position: absolute; max-width: 50%; max-height: 50%; object-fit: contain; z-index: 1; pointer-events: none;}
+        .preview-text {position: absolute; width: 80%; text-align: center; font-weight: bold; font-size: 1.1rem; z-index: 2; pointer-events: none; bottom: 20px;}
+        
+        .details h3 {margin: 0 0 5px 0; color: #1e40af;}
+        .price-tag {color:#059669; font-weight:bold; margin-bottom: 15px; display: block;}
+        label {display: block; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; color: #888; letter-spacing: 0.5px;}
+        input[type="text"], input[type="file"], textarea {width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; font-family: inherit; box-sizing: border-box;}
+        textarea {resize: vertical; min-height: 60px;}
+        .color-picker-wrap {display: flex; align-items: center; gap: 10px; margin-bottom: 15px;}
+        
+        .summary-bar {background: #1e40af; color: white; padding: 20px 30px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; position: sticky; bottom: 20px; z-index: 100;}
+        .btn-main {background: #fbbf24; color: black; border: none; padding: 14px 30px; border-radius: 8px; font-weight: bold; cursor: pointer;}
+        .remove-btn {background: #fee2e2; color: #ef4444; border: none; padding: 8px; border-radius: 6px; cursor: pointer; height: fit-content;}
+
+        @media (max-width: 800px) {
+            .item-row {grid-template-columns: 1fr;}
+            .product-preview {width: 100%;}
+        }
+        /* Full-screen loading overlay */
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    color: white;
+    text-align: center;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #fbbf24; /* Matches your yellow button */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text h2 { margin: 0; font-size: 1.5rem; }
+.loading-text p { opacity: 0.8; margin-top: 10px; }
+    </style>
+</head>
+<body>
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text">
+        <h2>Processing Order...</h2>
+        <p>Please do not close this window. <br> Sending your custom designs to the seller.</p>
+    </div>
+</div>
+<div class="wrapper">
+    <div class="header">
+        <button onclick="location.href='index.html'" style="cursor:pointer; padding: 8px 15px; border-radius: 6px; border: 1px solid #ddd; background: #fff;">← Back to Catalog</button>
+        <h2 style="margin:0">Customize Your Bundle</h2>
+    </div>
+
+    <div id="items-container"></div>
+
+    <div class="summary-bar">
+        <div>
+            <span style="opacity:0.8; font-size: 0.9rem;">Estimated Total:</span>
+            <div style="font-size: 1.8rem; font-weight: bold;">$<span id="total-price">0</span></div>
+        </div>
+        <div class="summary-bar">
+    <div>
+        <span style="opacity:0.8; font-size: 0.9rem;">Total Amount:</span>
+        <div style="font-size: 1.8rem; font-weight: bold;">$<span id="total-price">0</span></div>
+    </div>
+    <div id="paypal-button-container" style="width: 250px;"></div>
+</div>
+    </div>
+</div>
+
+<script>
+let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
+
+function render() {
+    const container = document.getElementById('items-container');
+    const keys = Object.keys(bundle);
+    let total = 0;
+
+    if (keys.length === 0) {
+        container.innerHTML = "<h3>Bundle is empty</h3>";
+        return;
+    }
+
+    container.innerHTML = '';
+    keys.forEach(name => {
+        const item = bundle[name];
+        total += item.price * item.quantity;
+        
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.innerHTML = `
+            <div class="product-preview" id="preview-${name}">
+                <img src="${item.img}" class="base-img">
+                <img src="${item.userImage || ''}" class="user-img-overlay" style="display: ${item.userImage ? 'block' : 'none'}">
+                <div class="preview-text" style="color: ${item.textColor}">${item.customText || ''}</div>
+            </div>
+            <div class="details">
+                <h3>${name}</h3>
+                <label>Text</label>
+                <input type="text" value="${item.customText}" oninput="updateProp('${name}', 'customText', this.value, true)">
+                <label>Color</label>
+                <input type="color" value="${item.textColor}" onchange="updateProp('${name}', 'textColor', this.value, true)">
+                <label>Upload Image</label>
+                <input type="file" accept="image/*" onchange="handleImage(this, '${name}')">
+                <label>Notes</label>
+                <textarea oninput="updateProp('${name}', 'notes', this.value)">${item.notes || ''}</textarea>
+            </div>
+        `;
+        container.appendChild(row);
+    });
+    document.getElementById('total-price').textContent = total;
+    initPayPal(total);
+}
+
+// --- PAYPAL FUNCTION ---
+// --- PAYPAL INTEGRATION ---
+function initPayPal(totalAmount) {
+    document.getElementById('paypal-button-container').innerHTML = ''; 
+    paypal.Buttons({
+        createOrder: (data, actions) => {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: { value: totalAmount.toString() }
+                }]
+            });
+        },
+        onApprove: (data, actions) => {
+            // STEP 1: Show the loading overlay immediately
+            document.getElementById('loading-overlay').style.display = 'flex';
+
+            return actions.order.capture().then(function(orderData) {
+                // STEP 2: Proceed to send email
+                sendOrderEmail(orderData);
+            });
+        }
+    }).render('#paypal-button-container');
+}
+
+// --- EMAILJS FUNCTION ---
+function sendOrderEmail(details) {
+    let orderSummary = Object.entries(bundle).map(([name, item]) => {
+        return `Item: ${name}\nText: ${item.customText}\nNotes: ${item.notes}\nQty: ${item.quantity}\n---`;
+    }).join('\n');
+
+    const templateParams = {
+        order_id: details.id,
+        customer_name: details.payer.name.given_name,
+        customer_email: details.payer.email_address,
+        message: orderSummary,
+        total_paid: details.purchase_units[0].amount.value
+    };
+
+    emailjs.send('service_ezq1fuc', 'template_r4hpykx', templateParams)
+        .then(() => {
+            // SUCCESS: Clear storage and redirect
+            localStorage.clear();
+            window.location.href = "thank-you.html"; 
+        }, (error) => {
+            // ERROR: Hide overlay so they can see the error message
+            document.getElementById('loading-overlay').style.display = 'none';
+            alert('Payment went through, but there was an error sending the email. Please contact us with your PayPal Transaction ID: ' + details.id);
+            console.log('Email failed...', error);
+        });
+}
+</script>
+</body>
+</html>

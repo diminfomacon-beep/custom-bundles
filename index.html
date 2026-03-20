@@ -3,62 +3,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Confirmed!</title>
+    <title>Gift Catalog</title>
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #CAE4DB;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
+        body {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #9cbdb1; color: #1f2937; margin: 0; padding: 0;}
+        
+        /* Sticky Header */
+        .sticky-header {
+            position: fixed;
+            top: 0; left: 0; width: 100%; z-index: 1000;
+            background: #2F6B64; color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
-        .card {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            max-width: 400px;
+        .header-content { max-width: 1000px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        h1 { margin: 0; font-size: 1.4rem; }
+
+        .bundle-bar { background: #CAE4DB; color: #1f2937; border-bottom: 2px solid #e5e7eb; padding: 10px 0; }
+        .bundle-bar-content { max-width: 1000px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+        .bundle-header-title { font-weight: 800; text-transform: uppercase; font-size: 0.85rem; color: #2F6B64; cursor: pointer; text-decoration: underline; }
+        .total-display { font-size: 1.2rem; font-weight: bold; color: #059669; }
+
+        .btn-customize { background: #fbbf24; color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .btn-customize:hover { background: #f59e0b; }
+        .btn-customize:disabled { background: #d1d5db; cursor: not-allowed; }
+
+        /* Drawer */
+        #bundle-drawer { max-width: 1000px; margin: 0 auto; background: #CAE4DB; display: none; padding: 10px 20px; border-top: 1px solid #f3f4f6; max-height: 300px; overflow-y: auto; }
+        .drawer-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f9fafb; font-size: 0.9rem; align-items: center; }
+        .clear-btn { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+
+        /* Content Padding */
+        .container { max-width: 1000px; margin: 165px auto 40px; padding: 0 20px; }
+        .category { margin-bottom: 15px; border-radius: 12px; background: #CAE4DB; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .category-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; background: #CAE4DB; border-bottom: 1px solid #9cbdb1; font-weight: bold; transition: background 0.2s;}
+        .category-header:hover { background: #5e7a70; color: #fff}
+        .category-content { display: none; padding: 25px; }
+        
+        .item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .item-card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 15px; text-align: center; background: #fff; transition: transform 0.2s; }
+        .item-card:hover { transform: translateY(-3px); border-color: #2F6B64; }
+        .item-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
+        
+        .variety-select { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 0.85rem; background: #f9fafb; }
+        .add-btn { width: 100%; padding: 10px; border-radius: 8px; border: none; background: #2F6B64; color: white; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+        .add-btn:active { background: #2F6B64; transform: scale(0.98); }
+
+        /* Notification Toast */
+        #toast {
+            visibility: hidden; min-width: 250px; background-color: #CAE4DB; color: #000;
+            text-align: center; border-radius: 8px; padding: 16px; position: fixed;
+            z-index: 2000; left: 50%; bottom: 30px; transform: translateX(-50%);
+            font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        .checkmark {
-            font-size: 60px;
-            color: #2F6B64;
-            margin-bottom: 20px;
-        }
-        h1 { color: #1f2937; margin-bottom: 10px; }
-        p { color: #4b5563; line-height: 1.6; }
-        .btn {
-            display: inline-block;
-            margin-top: 25px;
-            padding: 12px 25px;
-            background: #2F6B64;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
-        }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+
+        .qty-circle { background: #f3f4f6; border: 1px solid #ccc; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+
+        @media (max-width: 600px) { .container { margin-top: 190px; } }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div class="checkmark">✔</div>
-    <h1>Order Received!</h1>
-    <p>Thank you for your purchase. We have received your custom designs and will begin working on your bundle shortly.</p>
-    <p style="font-size: 0.9rem; color: #9ca3af;">A confirmation email has been sent to your PayPal email address.</p>
-    <a href="#" onclick="goHome()" class="btn">Return to Shop</a>
+<div id="toast">Item added to bundle!</div>
 
-<script>
-    function goHome() {
-        // Clear the data so they can start a fresh bundle
-        localStorage.removeItem('myBundle'); 
-        // Redirect back to the catalog
-        window.location.href = 'index.html'; 
-    }
-</script>
+<div class="sticky-header">
+    <div class="header-content"><h1>Bundles & Gifts Catalog</h1></div>
+    <div class="bundle-bar">
+        <div class="bundle-bar-content">
+            <div class="bundle-info">
+                <span class="bundle-header-title" onclick="toggleDrawer()">Bundle Items (<span id="count">0</span>) ▾</span>
+                <span class="total-display" id="total-val">$0</span>
+            </div>
+            <button id="go-to-bundle" class="btn-customize" disabled>Customize Items</button>
+        </div>
+        <div id="bundle-drawer"></div>
+    </div>
 </div>
 
+<div class="container">
+    <div class="category">
+        <div class="category-header"><span>New Baby & Milestone</span><span>+</span></div>
+        <div class="category-content">
+            <div class="item-grid">
+                <div class="item-card" data-name="Onesie" data-price="12" data-img="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400">
+                    <img src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400">
+                    <div style="font-weight:600">Onesie</div>
+                    <div style="color:#059669; margin-bottom:8px">$12</div>
+                    <select class="variety-select">
+                        <option value="Newborn">Size: Newborn</option>
+                        <option value="0-3 Months">Size: 0-3 Months</option>
+                        <option value="3-6 Months">Size: 3-6 Months</option>
+                    </select>
+                    <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
+                </div>
+                </div>
+        </div>
+    </div>
+
+    <div class="category">
+        <div class="category-header"><span>Housewarming Gifts</span><span>+</span></div>
+        <div class="category-content">
+            <div class="item-grid">
+                <div class="item-card" data-name="Cutting Board" data-price="25" data-img="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
+                    <img src="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
+                    <div style="font-weight:600">Wooden Cutting Board</div>
+                    <div style="color:#059669; margin-bottom:8px">$25</div>
+                    <select class="variety-select">
+                        <option value="Bamboo">Wood: Bamboo</option>
+                        <option value="Walnut">Wood: Walnut</option>
+                    </select>
+                    <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
+                </div>
+                <div class="item-card" data-name="Cutting Board" data-price="25" data-img="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
+                    <img src="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
+                    <div style="font-weight:600">Wooden Cutting Board</div>
+                    <div style="color:#059669; margin-bottom:8px">$25</div>
+                    <select class="variety-select">
+                        <option value="Bamboo">Wood: Bamboo</option>
+                        <option value="Walnut">Wood: Walnut</option>
+                    </select>
+                    <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
+                </div>
+                <div class="item-card" data-name="Cutting Board" data-price="25" data-img="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
+                    <img src="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
+                    <div style="font-weight:600">Wooden Cutting Board</div>
+                    <div style="color:#059669; margin-bottom:8px">$25</div>
+                    <select class="variety-select">
+                        <option value="Bamboo">Wood: Bamboo</option>
+                        <option value="Walnut">Wood: Walnut</option>
+                    </select>
+                    <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
+                </div>
+                <div class="item-card" data-name="Cutting Board" data-price="25" data-img="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
+                    <img src="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
+                    <div style="font-weight:600">Wooden Cutting Board</div>
+                    <div style="color:#059669; margin-bottom:8px">$25</div>
+                    <select class="variety-select">
+                        <option value="Bamboo">Wood: Bamboo</option>
+                        <option value="Walnut">Wood: Walnut</option>
+                    </select>
+                    <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
+                </div>
+                <div class="item-card" data-name="Cutting Board" data-price="25" data-img="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
+                    <img src="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
+                    <div style="font-weight:600">Wooden Cutting Board</div>
+                    <div style="color:#059669; margin-bottom:8px">$25</div>
+                    <select class="variety-select">
+                        <option value="Bamboo">Wood: Bamboo</option>
+                        <option value="Walnut">Wood: Walnut</option>
+                    </select>
+                    <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
+                </div>
+                <div class="item-card" data-name="Cutting Board" data-price="25" data-img="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
+                    <img src="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
+                    <div style="font-weight:600">Wooden Cutting Board</div>
+                    <div style="color:#059669; margin-bottom:8px">$25</div>
+                    <select class="variety-select">
+                        <option value="Bamboo">Wood: Bamboo</option>
+                        <option value="Walnut">Wood: Walnut</option>
+                    </select>
+                    <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
+                </div>
+                <div class="item-card" data-name="Cutting Board" data-price="25" data-img="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
+                    <img src="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
+                    <div style="font-weight:600">Wooden Cutting Board</div>
+                    <div style="color:#059669; margin-bottom:8px">$25</div>
+                    <select class="variety-select">
+                        <option value="Bamboo">Wood: Bamboo</option>
+                        <option value="Walnut">Wood: Walnut</option>
+                    </select>
+                    <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // 1. Initialize bundle from LocalStorage or empty object
+    let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
+
+    function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = "show";
+        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+    }
+
+    // Toggle Categories
+    document.querySelectorAll('.category-header').forEach(h => {
+        h.onclick = () => {
+            const content = h.nextElementSibling;
+            const isClosing = content.style.display === "block";
+            content.style.display = isClosing ? "none" : "block";
+            h.querySelector('span:last-child').textContent = isClosing ? "+" : "−";
+        };
+    });
+
+    function toggleDrawer() {
+        const d = document.getElementById('bundle-drawer');
+        d.style.display = (d.style.display === "block") ? "none" : "block";
+    }
+
+    // Also update the 'Clear All' in index.html
+    function clearBundle() {
+        if(confirm("Clear all items from your bundle?")) {
+            bundle = {}; 
+            try {
+                localStorage.setItem('myBundle', JSON.stringify(bundle));
+            } catch (e) {
+                // Silently fail so the UI still clears
+            }
+            updateUI();
+            showToast("Bundle cleared");
+        }
+    }
+
+    function addToBundle(btn) {
+        const card = btn.closest('.item-card');
+        const name = card.dataset.name;
+        const price = parseInt(card.dataset.price);
+        const img = card.dataset.img;
+        const varietySelect = card.querySelector('.variety-select');
+        const variety = varietySelect ? varietySelect.value : "Standard";
+        
+        // Use a unique key based on name and variety
+        const uniqueKey = `${name} (${variety})`;
+
+        if (bundle[uniqueKey]) {
+            bundle[uniqueKey].quantity++;
+        } else {
+            bundle[uniqueKey] = { 
+                baseName: name, 
+                variety: variety, 
+                price: price, 
+                quantity: 1, 
+                img: img, 
+                customText: '', 
+                textColor: '#000000', 
+                fontFamily: "'Segoe UI', sans-serif", // Set a default font
+                notes: '' 
+            };
+        }
+        updateUI();
+        showToast(`Added ${uniqueKey} to bundle!`);
+    }
+
+    function changeQty(key, amt) {
+        if (!bundle[key]) return;
+        bundle[key].quantity += amt;
+        if (bundle[key].quantity <= 0) delete bundle[key];
+        updateUI();
+    }
+
+    function updateUI() {
+        const drawer = document.getElementById('bundle-drawer');
+        drawer.innerHTML = '';
+        let total = 0; 
+        let count = 0;
+
+        const keys = Object.keys(bundle);
+        
+        // Save to storage EVERY time the UI updates
+        localStorage.setItem('myBundle', JSON.stringify(bundle));
+
+        if (keys.length > 0) {
+            const clearBtn = document.createElement('button');
+            clearBtn.className = 'clear-btn';
+            clearBtn.textContent = "Clear All Items";
+            clearBtn.onclick = clearBundle;
+            drawer.appendChild(clearBtn);
+        }
+
+        keys.forEach(key => {
+            const item = bundle[key];
+            total += item.price * item.quantity;
+            count += item.quantity;
+
+            const div = document.createElement('div');
+            div.className = 'drawer-item';
+            div.innerHTML = `
+                <span><strong>${key}</strong></span>
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <button class="qty-circle" onclick="changeQty('${key}', -1)">−</button>
+                    <span>${item.quantity}</span>
+                    <button class="qty-circle" onclick="changeQty('${key}', 1)">+</button>
+                    <span style="font-weight:bold; width:50px; text-align:right;">$${item.price * item.quantity}</span>
+                </div>
+            `;
+            drawer.appendChild(div);
+        });
+
+        document.getElementById('total-val').textContent = `$${total}`;
+        document.getElementById('count').textContent = count;
+        document.getElementById('go-to-bundle').disabled = count === 0;
+    }
+
+    // THE FIX: Explicitly save before leaving the page
+    document.getElementById('go-to-bundle').onclick = () => {
+        if (Object.keys(bundle).length > 0) {
+            localStorage.setItem('myBundle', JSON.stringify(bundle));
+            window.location.href = './customize.html';
+        } else {
+            alert("Please add items to your bundle first!");
+        }
+    };
+
+    // Initial render
+    updateUI();
+</script>
+</script>
 </body>
 </html>

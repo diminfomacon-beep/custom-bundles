@@ -267,24 +267,18 @@ window.handleImageUpload = async (key, input) => {
 };
 
 window.clearDesign = (key) => {
-    if (confirm("Clear your custom design?")) {
-        // Step 1: Wipe the local data in the code
-        bundle[key].cloudinaryUrl = '';
-        bundle[key].customText = '';
-        
-        // Step 2: Try to save, but wrap it in a "Try/Catch" 
-        // This prevents the whole app from crashing if Google blocks it
-        try {
-            localStorage.setItem('myBundle', JSON.stringify(bundle));
-        } catch (e) {
-            console.log("LocalStorage blocked, but UI will still update.");
-        }
-        
-        // Step 3: Refresh the screen
-        render();
+    // No more confirm() popup - just do it!
+    bundle[key].cloudinaryUrl = '';
+    bundle[key].customText = '';
+    bundle[key].notes = '';
+    
+    try {
+        localStorage.setItem('myBundle', JSON.stringify(bundle));
+    } catch (e) {
+        console.warn("Storage restricted");
     }
+    render();
 };
-
 
 
 window.updateProp = (key, prop, value) => {

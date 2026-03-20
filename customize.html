@@ -118,6 +118,11 @@
             .summary-bar { padding: 10px 15px; }
             #paypal-button-container { width: 150px; }
         }
+        .btn-clear, .remove-btn, .add-btn {
+            position: relative;
+            z-index: 10;
+            pointer-events: auto !important;
+        }
     </style>
 </head>
 <body>
@@ -129,10 +134,9 @@
 
 <div class="wrapper">
     <div class="header">
-        <button onclick="location.href='index.html'" style="cursor:pointer; padding: 8px 15px; border-radius: 6px; border: 1px solid #ddd; background: #fff;">← Back</button>
+        <button onclick="goBackToCatalog()" style="cursor:pointer; padding: 8px 15px; border-radius: 6px; border: 1px solid #ddd; background: #fff; font-weight: bold;">← Back to Catalog</button>
         <h2 style="margin:0">Customize Your Bundle</h2>
     </div>
-
     <div id="bulk-actions">
         <div><strong>Bulk Design:</strong> Sync first item to all?</div>
         <button onclick="applyFirstToAll()" style="background: #2F6B64; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;">Apply to All</button>
@@ -264,12 +268,24 @@ window.handleImageUpload = async (key, input) => {
 
 window.clearDesign = (key) => {
     if (confirm("Clear your custom design?")) {
+        // Step 1: Wipe the local data in the code
         bundle[key].cloudinaryUrl = '';
         bundle[key].customText = '';
-        localStorage.setItem('myBundle', JSON.stringify(bundle));
+        
+        // Step 2: Try to save, but wrap it in a "Try/Catch" 
+        // This prevents the whole app from crashing if Google blocks it
+        try {
+            localStorage.setItem('myBundle', JSON.stringify(bundle));
+        } catch (e) {
+            console.log("LocalStorage blocked, but UI will still update.");
+        }
+        
+        // Step 3: Refresh the screen
         render();
     }
 };
+
+
 
 window.updateProp = (key, prop, value) => {
     bundle[key][prop] = value;
@@ -342,7 +358,22 @@ function sendOrderEmail(details) {
         window.location.href = "thank-you.html";
     });
 }
+window.goBackToCatalog = () => {
+    // Save any typed text or colors before leaving
+    try {
+        localStorage.setItem('myBundle', JSON.stringify(bundle));
+    } catch (e) {
+        console.warn("LocalStorage save failed, but moving back anyway.");
+    }
 
+    // Try moving back in history first (Best for Google Sites)
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        // Fallback if they opened the link directly in a new tab
+        window.location.href = 'index.html';
+    }
+};
 render();
 </script>
 </body>

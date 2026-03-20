@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customize Your Bundle</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Bebas+Neue&family=Montserrat:wght@700&family=Playfair+Display:ital,wght@1,700&family=Graduate&family=Cinzel:wght@700&family=Fredoka+One&family=Space+Mono&family=Shadows+Into+Light&display=swap" rel="stylesheet">    
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Bebas+Neue&family=Montserrat:wght@700&family=Playfair+Display:ital,wght@1,700&family=Graduate&family=Cinzel:wght@700&family=Fredoka+One&family=Space+Mono&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+    
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="https://www.paypal.com/sdk/js?client-id=AZfoLkPa3ut2MSEgAqM5ZINc3mDEHejbOhfjTWiBtdgvCSuBuhQ5Eobajkyxu5cSyTBuBfmwk9mTY4Vu&currency=USD"></script>
     
@@ -14,8 +15,8 @@
     </script>
 
     <style>
-        body {font-family: 'Segoe UI', Tahoma, sans-serif; background:#CAE4DB; padding:20px; margin:0; color: #1f2937;}
-        .wrapper {max-width: 950px; margin: auto;}
+        body {font-family: 'Segoe UI', Tahoma, sans-serif; background:#CAE4DB; padding:0; margin:0; color: #1f2937; padding-bottom: 120px;}
+        .wrapper {max-width: 950px; margin: auto; padding: 20px;}
         
         .header {display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
         
@@ -49,7 +50,7 @@
             flex: 2; background: #2F6B64; color: white; padding: 10px; border-radius: 6px; 
             font-size: 0.75rem; text-align: center; cursor: pointer; font-weight: bold; transition: 0.3s;
         }
-        .btn-upload.success { background: #059669; } /* Green when uploaded */
+        .btn-upload.success { background: #059669; }
         .btn-clear {
             flex: 1; background: #FEE84A; color: #000; border: none; padding: 8px; 
             border-radius: 20px; font-size: 0.75rem; cursor: pointer; font-weight: bold;
@@ -64,15 +65,47 @@
         }
         .swatch.active { outline: 2px solid #000; outline-offset: 2px; }
 
-        .details h3 {margin: 0 0 5px 0; color: #1e40af;}
+        .details h3 {margin: 0 0 5px 0; color: #2F6B64;}
         label {display: block; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; color: #000; letter-spacing: 0.5px;}
         
         input[type="text"], textarea, select {
             width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; 
             margin-bottom: 15px; font-family: inherit; box-sizing: border-box; background: white;
         }
+
+        /* STYLED FONT DROPDOWN */
+        select option { font-size: 1.1rem; padding: 5px; }
         
-        .summary-bar {background: #2F6B64; color: white; padding: 20px 30px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; position: sticky; bottom: 20px; z-index: 100;}
+        /* STICKY FOOTER AREA */
+        .sticky-footer-container {
+            position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000;
+        }
+
+        .summary-bar {
+            background: #2F6B64; color: white; padding: 15px 30px; 
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+        }
+
+        .studio-notification {
+            background: #fbbf24; color: #000; text-align: center; 
+            padding: 10px; font-weight: bold; font-size: 0.85rem;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        .bouncing-arrow {
+            font-size: 1.2rem; line-height: 1;
+            animation: bounce 1.2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(4px); }
+        }
+
+        /* SLIM PAYPAL */
+        #paypal-button-container { width: 200px; }
+
         .remove-btn {background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.75rem;}
 
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; }
@@ -82,6 +115,8 @@
         @media (max-width: 768px) {
             .item-row { grid-template-columns: 1fr; justify-items: center; }
             .preview-section, .product-preview { width: 100%; max-width: 320px; }
+            .summary-bar { padding: 10px 15px; }
+            #paypal-button-container { width: 150px; }
         }
     </style>
 </head>
@@ -104,10 +139,16 @@
     </div>
 
     <div id="items-container"></div>
+</div>
 
+<div class="sticky-footer-container">
     <div class="summary-bar">
-        <div><span style="opacity:0.8;">Total:</span><div style="font-size: 1.5rem; font-weight: bold;">$<span id="total-price">0</span></div></div>
-        <div id="paypal-button-container" style="width: 250px;"></div>
+        <div><span style="opacity:0.8; font-size: 0.8rem;">Total:</span><div style="font-size: 1.4rem; font-weight: bold;">$<span id="total-price">0</span></div></div>
+        <div id="paypal-button-container"></div>
+    </div>
+    <div class="studio-notification">
+        For more flexible customized designs visit the D.I.M. Design Studio
+        <div class="bouncing-arrow">🔻🔻🔻🔻🔻⬇️🔻🔻🔻🔻🔻</div>
     </div>
 </div>
 
@@ -122,19 +163,16 @@ const availableColors = [
 ];
 
 const fontOptions = [
-    // Original Fonts
-    { name: 'Standard (Sans)', family: "'Segoe UI', sans-serif" },
-    { name: 'Cursive (Pacifico)', family: "'Pacifico', cursive" },
-    { name: 'Bold (Bebas Neue)', family: "'Bebas Neue', sans-serif" },
-    { name: 'Modern (Montserrat)', family: "'Montserrat', sans-serif" },
-    { name: 'Elegant (Playfair)', family: "'Playfair Display', serif" },
-    
-    // NEW FONTS
-    { name: 'Varsity (Graduate)', family: "'Graduate', serif" },       // Great for jerseys/graduation gifts
-    { name: 'Luxury (Cinzel)', family: "'Cinzel', serif" },           // Perfect for high-end or wedding items
-    { name: 'Playful (Fredoka One)', family: "'Fredoka One', cursive" }, // Good for kids' items or water bottles
-    { name: 'Retro Tech (Space Mono)', family: "'Space Mono', monospace" }, // Trendy, "computer" look
-    { name: 'Sketch (Shadows Into Light)', family: "'Shadows Into Light', cursive" } // Casual, handwritten feel
+    { name: 'Standard', family: "'Segoe UI', sans-serif" },
+    { name: 'Cursive', family: "'Pacifico', cursive" },
+    { name: 'Bold', family: "'Bebas Neue', sans-serif" },
+    { name: 'Modern', family: "'Montserrat', sans-serif" },
+    { name: 'Elegant', family: "'Playfair Display', serif" },
+    { name: 'Varsity', family: "'Graduate', serif" },
+    { name: 'Luxury', family: "'Cinzel', serif" },
+    { name: 'Playful', family: "'Fredoka One', cursive" },
+    { name: 'Retro', family: "'Space Mono', monospace" },
+    { name: 'Sketch', family: "'Shadows Into Light', cursive" }
 ];
 
 function render() {
@@ -156,7 +194,9 @@ function render() {
         `).join('');
 
         const fontHtml = fontOptions.map(f => `
-            <option value="${f.family}" ${item.fontFamily === f.family ? 'selected' : ''}>${f.name}</option>
+            <option value="${f.family}" style="font-family: ${f.family}" ${item.fontFamily === f.family ? 'selected' : ''}>
+                ${f.name}
+            </option>
         `).join('');
 
         const row = document.createElement('div');
@@ -172,7 +212,7 @@ function render() {
                 </div>
                 <div class="design-controls">
                     <label class="btn-upload ${item.cloudinaryUrl ? 'success' : ''}">
-                        ${item.cloudinaryUrl ? '✓ Image Uploaded' : 'Upload Image'}
+                        ${item.cloudinaryUrl ? '✓ Uploaded' : 'Upload Image'}
                         <input type="file" class="hidden-file-input" accept="image/*" onchange="handleImageUpload('${key}', this)">
                     </label>
                     <button class="btn-clear" onclick="clearDesign('${key}')">Clear</button>
@@ -191,14 +231,14 @@ function render() {
                 <label>Custom Text</label>
                 <input type="text" value="${item.customText || ''}" placeholder="Enter name or phrase" oninput="updateProp('${key}', 'customText', this.value)">
                 <label>Notes</label>
-                <textarea oninput="updateProp('${key}', 'notes', this.value)">${item.notes || ''}</textarea>
+                <textarea oninput="updateProp('${key}', 'notes', this.value)" placeholder="Any special requests?">${item.notes || ''}</textarea>
             </div>
         `;
         container.appendChild(row);
     });
 
     totalPriceEl.textContent = total;
-    if (typeof initPayPal === "function" && total > 0) initPayPal(total);
+    if (total > 0) initPayPal(total);
 }
 
 window.handleImageUpload = async (key, input) => {
@@ -215,7 +255,6 @@ window.handleImageUpload = async (key, input) => {
         const data = await response.json();
         if (data.secure_url) {
             bundle[key].cloudinaryUrl = data.secure_url;
-            bundle[key].hasImage = true;
             localStorage.setItem('myBundle', JSON.stringify(bundle));
             render();
         }
@@ -235,8 +274,15 @@ window.clearDesign = (key) => {
 window.updateProp = (key, prop, value) => {
     bundle[key][prop] = value;
     localStorage.setItem('myBundle', JSON.stringify(bundle));
+    
+    // Immediate preview updates
     if (prop === 'customText') {
         document.getElementById(`text-layer-${key}`).textContent = value;
+    } else if (prop === 'textColor') {
+        document.getElementById(`text-layer-${key}`).style.color = value;
+        render(); // Refresh for active swatch state
+    } else if (prop === 'fontFamily') {
+        document.getElementById(`text-layer-${key}`).style.fontFamily = value;
     } else {
         render();
     }
@@ -252,12 +298,13 @@ window.removeItem = (key) => {
 
 window.applyFirstToAll = () => {
     const keys = Object.keys(bundle);
+    if (keys.length < 2) return;
     const source = bundle[keys[0]];
     keys.forEach(k => {
-        bundle[k].customText = source.customText || '';
-        bundle[k].textColor = source.textColor || '#000000';
-        bundle[k].fontFamily = source.fontFamily || fontOptions[0].family;
-        bundle[k].cloudinaryUrl = source.cloudinaryUrl || '';
+        bundle[k].customText = source.customText;
+        bundle[k].textColor = source.textColor;
+        bundle[k].fontFamily = source.fontFamily;
+        bundle[k].cloudinaryUrl = source.cloudinaryUrl;
     });
     localStorage.setItem('myBundle', JSON.stringify(bundle));
     render();
@@ -267,6 +314,14 @@ function initPayPal(total) {
     const container = document.getElementById('paypal-button-container');
     container.innerHTML = ''; 
     paypal.Buttons({
+        style: {
+            layout: 'horizontal',
+            color: 'gold',
+            shape: 'rect',
+            label: 'paypal',
+            tagline: false,
+            height: 35
+        },
         createOrder: (d, a) => a.order.create({ purchase_units: [{ amount: { value: total.toString() } }] }),
         onApprove: (d, a) => a.order.capture().then(det => sendOrderEmail(det))
     }).render('#paypal-button-container');

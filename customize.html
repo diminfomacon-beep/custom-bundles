@@ -15,9 +15,8 @@
     </script>
 
     <style>
-        body {font-family: 'Segoe UI', Tahoma, sans-serif; background:#CAE4DB; padding:0; margin:0; color: #1f2937; padding-bottom: 120px;}
+        body {font-family: 'Segoe UI', Tahoma, sans-serif; background:#CAE4DB; padding:0; margin:0; color: #1f2937; padding-bottom: 180px;}
         .wrapper {max-width: 950px; margin: auto; padding: 20px;}
-        
         .header {display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
         
         #bulk-actions {
@@ -25,14 +24,11 @@
             border: 2px dashed #2F6B64; display: none; align-items: center; justify-content: space-between;
         }
 
-        /* Responsive Grid */
         .item-row {
             background: #9cbdb1; border-radius: 12px; padding: 25px; margin-bottom: 20px; 
             display: grid; grid-template-columns: 300px 1fr; gap: 25px; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative;
         }
-
-        .preview-section { display: flex; flex-direction: column; gap: 12px; }
 
         .product-preview {
             width: 300px; height: 280px; background: #f9f9f9; border-radius: 8px; 
@@ -44,84 +40,53 @@
         .user-img-overlay { max-width: 55%; max-height: 55%; object-fit: contain; z-index: 2; margin-bottom: 10px; }
         .preview-text { width: 90%; text-align: center; font-weight: bold; font-size: 1.5rem; z-index: 2; word-wrap: break-word; line-height: 1.1; }
         
-        /* DESIGN CONTROLS */
         .design-controls { display: flex; gap: 8px; width: 100%; }
         .btn-upload {
             flex: 2; background: #2F6B64; color: white; padding: 10px; border-radius: 6px; 
-            font-size: 0.75rem; text-align: center; cursor: pointer; font-weight: bold; transition: 0.3s;
+            font-size: 0.75rem; text-align: center; cursor: pointer; font-weight: bold;
         }
         .btn-upload.success { background: #059669; }
+        
+        /* Fixed Buttons for Google Sites */
+        .btn-clear, .remove-btn {
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            position: relative;
+            z-index: 20;
+        }
+
         .btn-clear {
             flex: 1; background: #FEE84A; color: #000; border: none; padding: 8px; 
-            border-radius: 20px; font-size: 0.75rem; cursor: pointer; font-weight: bold;
+            border-radius: 20px; font-size: 0.75rem; font-weight: bold;
         }
-        .hidden-file-input { display: none; }
 
-        /* SWATCHES */
-        .swatch-container { display: flex; gap: 6px; margin-bottom: 15px; flex-wrap: wrap; }
-        .swatch {
-            width: 28px; height: 28px; border-radius: 4px; cursor: pointer;
-            border: 1px solid rgba(0,0,0,0.1); transition: transform 0.1s;
+        .remove-btn {
+            background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; 
+            padding: 8px 12px; border-radius: 6px; font-size: 1.1rem; font-weight: bold;
         }
+
+        .swatch-container { display: flex; gap: 6px; margin-bottom: 15px; flex-wrap: wrap; }
+        .swatch { width: 28px; height: 28px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); }
         .swatch.active { outline: 2px solid #000; outline-offset: 2px; }
 
         .details h3 {margin: 0 0 5px 0; color: #2F6B64;}
-        label {display: block; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; color: #000; letter-spacing: 0.5px;}
+        label {display: block; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; color: #000;}
         
         input[type="text"], textarea, select {
             width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; 
             margin-bottom: 15px; font-family: inherit; box-sizing: border-box; background: white;
         }
 
-        /* STYLED FONT DROPDOWN */
-        select option { font-size: 1.1rem; padding: 5px; }
-        
-        /* STICKY FOOTER AREA */
-        .sticky-footer-container {
-            position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000;
-        }
-
+        .sticky-footer-container { position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000; }
         .summary-bar {
             background: #2F6B64; color: white; padding: 15px 30px; 
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
         }
-
-        .studio-notification {
-            background: #fbbf24; color: #000; text-align: center; 
-            padding: 10px; font-weight: bold; font-size: 0.85rem;
-            display: flex; flex-direction: column; align-items: center;
-        }
-
-        .bouncing-arrow {
-            font-size: 1.2rem; line-height: 1;
-            animation: bounce 1.2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(4px); }
-        }
-
-        /* SLIM PAYPAL */
-        #paypal-button-container { width: 200px; }
-
-        .remove-btn {background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.75rem;}
-
-        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #fbbf24; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .studio-notification { background: #fbbf24; color: #000; text-align: center; padding: 10px; font-weight: bold; font-size: 0.85rem; }
 
         @media (max-width: 768px) {
-            .item-row { grid-template-columns: 1fr; justify-items: center; }
-            .preview-section, .product-preview { width: 100%; max-width: 320px; }
-            .summary-bar { padding: 10px 15px; }
+            .item-row { grid-template-columns: 1fr; }
             #paypal-button-container { width: 150px; }
-        }
-        .btn-clear, .remove-btn, .add-btn {
-            position: relative;
-            z-index: 10;
-            pointer-events: auto !important;
         }
     </style>
 </head>
@@ -134,12 +99,12 @@
 
 <div class="wrapper">
     <div class="header">
-        <button onclick="goBackToCatalog()" style="cursor:pointer; padding: 8px 15px; border-radius: 6px; border: 1px solid #ddd; background: #fff; font-weight: bold;">← Back to Catalog</button>
-        <h2 style="margin:0">Customize Your Bundle</h2>
+        <button id="back-btn" style="cursor:pointer; padding: 8px 15px; border-radius: 6px; border: 1px solid #ddd; background: #fff; font-weight: bold;">← Back to Catalog</button>
+        <h2 style="margin:0">Customize Bundle</h2>
     </div>
     <div id="bulk-actions">
-        <div><strong>Bulk Design:</strong> Sync first item to all?</div>
-        <button onclick="applyFirstToAll()" style="background: #2F6B64; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;">Apply to All</button>
+        <div><strong>Bulk Design:</strong> Sync first item?</div>
+        <button id="apply-all-btn" style="background: #2F6B64; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;">Apply to All</button>
     </div>
 
     <div id="items-container"></div>
@@ -158,6 +123,22 @@
 
 <script>
 let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
+
+// 1. GLOBAL CLICK LISTENER (The fix for Google Sites)
+document.addEventListener('click', function(e) {
+    const target = e.target;
+    const key = target.getAttribute('data-key');
+
+    if (target.classList.contains('remove-btn')) {
+        removeItem(key);
+    } else if (target.classList.contains('btn-clear')) {
+        clearDesign(key);
+    } else if (target.id === 'back-btn') {
+        goBackToCatalog();
+    } else if (target.id === 'apply-all-btn') {
+        applyFirstToAll();
+    }
+});
 
 const availableColors = [
     { name: 'Black', hex: '#000000' }, { name: 'White', hex: '#FFFFFF' }, { name: 'Red', hex: '#BE123C' },
@@ -188,54 +169,53 @@ function render() {
     container.innerHTML = '';
     document.getElementById('bulk-actions').style.display = keys.length > 1 ? 'flex' : 'none';
 
+    if (keys.length === 0) {
+        container.innerHTML = "<p style='text-align:center; padding:40px;'>Bundle is empty.</p>";
+        totalPriceEl.textContent = "0";
+        return;
+    }
+
     keys.forEach(key => {
         const item = bundle[key];
         total += item.price * item.quantity;
         
-        const colorHtml = availableColors.map(c => `
-            <div class="swatch ${item.textColor === c.hex ? 'active' : ''}" 
-                 style="background: ${c.hex}" onclick="updateProp('${key}', 'textColor', '${c.hex}')"></div>
-        `).join('');
-
-        const fontHtml = fontOptions.map(f => `
-            <option value="${f.family}" style="font-family: ${f.family}" ${item.fontFamily === f.family ? 'selected' : ''}>
-                ${f.name}
-            </option>
-        `).join('');
-
         const row = document.createElement('div');
         row.className = 'item-row';
         row.innerHTML = `
             <div class="preview-section">
                 <div class="product-preview">
                     <img src="${item.img}" class="base-img">
-                    <img id="img-overlay-${key}" class="user-img-overlay" src="${item.cloudinaryUrl || ''}" style="display: ${item.cloudinaryUrl ? 'block' : 'none'}">
-                    <div class="preview-text" id="text-layer-${key}" style="color: ${item.textColor || '#000000'}; font-family: ${item.fontFamily || fontOptions[0].family}">
+                    <img class="user-img-overlay" src="${item.cloudinaryUrl || ''}" style="display: ${item.cloudinaryUrl ? 'block' : 'none'}">
+                    <div class="preview-text" id="text-layer-${key}" style="color: ${item.textColor || '#000000'}; font-family: ${item.fontFamily}">
                         ${item.customText || ''}
                     </div>
                 </div>
                 <div class="design-controls">
                     <label class="btn-upload ${item.cloudinaryUrl ? 'success' : ''}">
-                        ${item.cloudinaryUrl ? '✓ Uploaded' : 'Upload Image'}
-                        <input type="file" class="hidden-file-input" accept="image/*" onchange="handleImageUpload('${key}', this)">
+                        ${item.cloudinaryUrl ? '✓' : 'Upload'}
+                        <input type="file" style="display:none" onchange="handleImageUpload('${key}', this)">
                     </label>
-                    <button class="btn-clear" onclick="clearDesign('${key}')">Clear</button>
+                    <button type="button" class="btn-clear" data-key="${key}">Clear</button>
                 </div>
             </div>
 
             <div class="details">
-                <div style="display:flex; justify-content:space-between;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
                     <h3>${key}</h3>
-                    <button class="remove-btn" onclick="removeItem('${key}')">❌</button>
+                    <button type="button" class="remove-btn" data-key="${key}">✕</button>
                 </div>
                 <label>Text Color</label>
-                <div class="swatch-container">${colorHtml}</div>
+                <div class="swatch-container">
+                    ${availableColors.map(c => `<div class="swatch ${item.textColor === c.hex ? 'active' : ''}" style="background: ${c.hex}" onclick="updateProp('${key}', 'textColor', '${c.hex}')"></div>`).join('')}
+                </div>
                 <label>Font Style</label>
-                <select onchange="updateProp('${key}', 'fontFamily', this.value)">${fontHtml}</select>
+                <select onchange="updateProp('${key}', 'fontFamily', this.value)">
+                    ${fontOptions.map(f => `<option value="${f.family}" ${item.fontFamily === f.family ? 'selected' : ''}>${f.name}</option>`).join('')}
+                </select>
                 <label>Custom Text</label>
-                <input type="text" value="${item.customText || ''}" placeholder="Enter name or phrase" oninput="updateProp('${key}', 'customText', this.value)">
+                <input type="text" value="${item.customText || ''}" oninput="updateProp('${key}', 'customText', this.value)">
                 <label>Notes</label>
-                <textarea oninput="updateProp('${key}', 'notes', this.value)" placeholder="Any special requests?">${item.notes || ''}</textarea>
+                <textarea oninput="updateProp('${key}', 'notes', this.value)">${item.notes || ''}</textarea>
             </div>
         `;
         container.appendChild(row);
@@ -245,107 +225,72 @@ function render() {
     if (total > 0) initPayPal(total);
 }
 
-window.handleImageUpload = async (key, input) => {
-    const file = input.files[0];
-    if (!file) return;
-    document.getElementById('loading-overlay').style.display = 'flex';
-    
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'Custom_Bundle_Preset');
-    
-    try {
-        const response = await fetch(`https://api.cloudinary.com/v1_1/dpsmcu07f/image/upload`, { method: 'POST', body: formData });
-        const data = await response.json();
-        if (data.secure_url) {
-            bundle[key].cloudinaryUrl = data.secure_url;
-            localStorage.setItem('myBundle', JSON.stringify(bundle));
-            render();
-        }
-    } catch (e) { alert("Upload failed."); }
-    document.getElementById('loading-overlay').style.display = 'none';
-};
+function removeItem(key) {
+    delete bundle[key];
+    saveAndRefresh();
+    if (Object.keys(bundle).length === 0) window.location.href = 'index.html';
+}
 
-window.clearDesign = (key) => {
-    // No more confirm() popup - just do it!
+function clearDesign(key) {
     bundle[key].cloudinaryUrl = '';
     bundle[key].customText = '';
-    bundle[key].notes = '';
-    
-    try {
-        localStorage.setItem('myBundle', JSON.stringify(bundle));
-    } catch (e) {
-        console.warn("Storage restricted");
-    }
-    render();
-};
+    saveAndRefresh();
+}
 
+function saveAndRefresh() {
+    localStorage.setItem('myBundle', JSON.stringify(bundle));
+    render();
+}
 
 window.updateProp = (key, prop, value) => {
     bundle[key][prop] = value;
     localStorage.setItem('myBundle', JSON.stringify(bundle));
-    
-    // Immediate preview updates
     if (prop === 'customText') {
         document.getElementById(`text-layer-${key}`).textContent = value;
-    } else if (prop === 'textColor') {
-        document.getElementById(`text-layer-${key}`).style.color = value;
-        render(); // Refresh for active swatch state
-    } else if (prop === 'fontFamily') {
-        document.getElementById(`text-layer-${key}`).style.fontFamily = value;
     } else {
         render();
     }
 };
 
-window.removeItem = (key) => {
-    // REMOVED THE confirm() POPUP to prevent Google Sites from blocking it
-    
-    // 1. Delete the item from the bundle object
-    delete bundle[key];
-    
-    // 2. Save the new state (with error handling for Google Sites)
+window.handleImageUpload = async (key, input) => {
+    const file = input.files[0];
+    if (!file) return;
+    document.getElementById('loading-overlay').style.display = 'flex';
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'Custom_Bundle_Preset');
     try {
-        localStorage.setItem('myBundle', JSON.stringify(bundle));
-    } catch (e) {
-        console.warn("Storage restricted, updating UI only.");
-    }
-
-    // 3. Re-draw the page
-    render();
-
-    // 4. If the bundle is now empty, send them back to the catalog
-    if (Object.keys(bundle).length === 0) {
-        window.location.href = 'index.html';
-    }
+        const response = await fetch(`https://api.cloudinary.com/v1_1/dpsmcu07f/image/upload`, { method: 'POST', body: formData });
+        const data = await response.json();
+        if (data.secure_url) {
+            bundle[key].cloudinaryUrl = data.secure_url;
+            saveAndRefresh();
+        }
+    } catch (e) { alert("Upload failed."); }
+    document.getElementById('loading-overlay').style.display = 'none';
 };
 
-window.applyFirstToAll = () => {
-    const keys = Object.keys(bundle);
-    if (keys.length < 2) return;
-    const source = bundle[keys[0]];
-    keys.forEach(k => {
-        bundle[k].customText = source.customText;
-        bundle[k].textColor = source.textColor;
-        bundle[k].fontFamily = source.fontFamily;
-        bundle[k].cloudinaryUrl = source.cloudinaryUrl;
-    });
+function goBackToCatalog() {
     localStorage.setItem('myBundle', JSON.stringify(bundle));
-    render();
-};
+    window.location.href = 'index.html';
+}
+
+function applyFirstToAll() {
+    const keys = Object.keys(bundle);
+    const s = bundle[keys[0]];
+    keys.forEach(k => {
+        bundle[k].customText = s.customText;
+        bundle[k].textColor = s.textColor;
+        bundle[k].fontFamily = s.fontFamily;
+    });
+    saveAndRefresh();
+}
 
 function initPayPal(total) {
     const container = document.getElementById('paypal-button-container');
     container.innerHTML = ''; 
     paypal.Buttons({
-        style: {
-            layout: 'horizontal',
-            color: 'gold',
-            shape: 'rect',
-            label: 'paypal',
-            tagline: false,
-            height: 35
-        },
+        style: { layout: 'horizontal', height: 35 },
         createOrder: (d, a) => a.order.create({ purchase_units: [{ amount: { value: total.toString() } }] }),
         onApprove: (d, a) => a.order.capture().then(det => sendOrderEmail(det))
     }).render('#paypal-button-container');
@@ -366,22 +311,7 @@ function sendOrderEmail(details) {
         window.location.href = "thank-you.html";
     });
 }
-window.goBackToCatalog = () => {
-    // Save any typed text or colors before leaving
-    try {
-        localStorage.setItem('myBundle', JSON.stringify(bundle));
-    } catch (e) {
-        console.warn("LocalStorage save failed, but moving back anyway.");
-    }
 
-    // Try moving back in history first (Best for Google Sites)
-    if (window.history.length > 1) {
-        window.history.back();
-    } else {
-        // Fallback if they opened the link directly in a new tab
-        window.location.href = 'index.html';
-    }
-};
 render();
 </script>
 </body>

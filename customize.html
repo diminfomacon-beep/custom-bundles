@@ -299,10 +299,24 @@ window.updateProp = (key, prop, value) => {
 };
 
 window.removeItem = (key) => {
-    if(confirm(`Remove ${key}?`)) {
-        delete bundle[key];
+    // REMOVED THE confirm() POPUP to prevent Google Sites from blocking it
+    
+    // 1. Delete the item from the bundle object
+    delete bundle[key];
+    
+    // 2. Save the new state (with error handling for Google Sites)
+    try {
         localStorage.setItem('myBundle', JSON.stringify(bundle));
-        render();
+    } catch (e) {
+        console.warn("Storage restricted, updating UI only.");
+    }
+
+    // 3. Re-draw the page
+    render();
+
+    // 4. If the bundle is now empty, send them back to the catalog
+    if (Object.keys(bundle).length === 0) {
+        window.location.href = 'index.html';
     }
 };
 

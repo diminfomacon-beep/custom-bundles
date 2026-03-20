@@ -157,21 +157,6 @@
 </div>
 
 <script>
-
-// 1. GLOBAL CLICK LISTENER (Bypasses Google Sites Sandbox issues)
-document.addEventListener('click', function (e) {
-    // Check if we clicked a Remove button
-    if (e.target && e.target.classList.contains('remove-btn')) {
-        const key = e.target.getAttribute('data-key');
-        removeItem(key);
-    }
-    // Check if we clicked a Clear button
-    if (e.target && e.target.classList.contains('btn-clear')) {
-        const key = e.target.getAttribute('data-key');
-        clearDesign(key);
-    }
-});
-
 let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
 
 const availableColors = [
@@ -201,45 +186,57 @@ function render() {
     let total = 0;
 
     container.innerHTML = '';
-    
-    if (keys.length === 0) {
-        container.innerHTML = "<div style='text-align:center; padding:50px; background:white; border-radius:12px;'><h3>Your bundle is empty</h3><a href='index.html' style='color:#2F6B64'>Return to Shop</a></div>";
-        totalPriceEl.textContent = "0";
-        return;
-    }
+    document.getElementById('bulk-actions').style.display = keys.length > 1 ? 'flex' : 'none';
 
     keys.forEach(key => {
         const item = bundle[key];
         total += item.price * item.quantity;
         
+        const colorHtml = availableColors.map(c => `
+            <div class="swatch ${item.textColor === c.hex ? 'active' : ''}" 
+                 style="background: ${c.hex}" onclick="updateProp('${key}', 'textColor', '${c.hex}')"></div>
+        `).join('');
+
+        const fontHtml = fontOptions.map(f => `
+            <option value="${f.family}" style="font-family: ${f.family}" ${item.fontFamily === f.family ? 'selected' : ''}>
+                ${f.name}
+            </option>
+        `).join('');
+
         const row = document.createElement('div');
         row.className = 'item-row';
-        
-        // NOTE: We use classNames and data-keys instead of inline onclicks
         row.innerHTML = `
             <div class="preview-section">
                 <div class="product-preview">
                     <img src="${item.img}" class="base-img">
-                    <img class="user-img-overlay" src="${item.cloudinaryUrl || ''}" style="display: ${item.cloudinaryUrl ? 'block' : 'none'}">
-                    <div class="preview-text" style="color: ${item.textColor || '#000000'}; font-family: ${item.fontFamily}">
+                    <img id="img-overlay-${key}" class="user-img-overlay" src="${item.cloudinaryUrl || ''}" style="display: ${item.cloudinaryUrl ? 'block' : 'none'}">
+                    <div class="preview-text" id="text-layer-${key}" style="color: ${item.textColor || '#000000'}; font-family: ${item.fontFamily || fontOptions[0].family}">
                         ${item.customText || ''}
                     </div>
                 </div>
                 <div class="design-controls">
                     <label class="btn-upload ${item.cloudinaryUrl ? 'success' : ''}">
-                        ${item.cloudinaryUrl ? '✓' : 'Upload'}
-                        <input type="file" class="hidden-file-input" onchange="handleImageUpload('${key}', this)">
+                        ${item.cloudinaryUrl ? '✓ Uploaded' : 'Upload Image'}
+                        <input type="file" class="hidden-file-input" accept="image/*" onchange="handleImageUpload('${key}', this)">
                     </label>
-                    <button type="button" class="btn-clear" data-key="${key}">Clear</button>
+                    <button class="btn-clear" onclick="clearDesign('${key}')">Clear</button>
                 </div>
             </div>
 
             <div class="details">
-                <div style="display:flex; justify-content:space-between; align-items: flex-start;">
-                    <h3 style="margin:0;">${key}</h3>
-                    <button type="button" class="remove-btn" data-key="${key}">✕</button>
+                <div style="display:flex; justify-content:space-between;">
+                    <h3>${key}</h3>
+                    <button class="remove-btn" onclick="removeItem('${key}')">❌</button>
                 </div>
-                </div>
+                <label>Text Color</label>
+                <div class="swatch-container">${colorHtml}</div>
+                <label>Font Style</label>
+                <select onchange="updateProp('${key}', 'fontFamily', this.value)">${fontHtml}</select>
+                <label>Custom Text</label>
+                <input type="text" value="${item.customText || ''}" placeholder="Enter name or phrase" oninput="updateProp('${key}', 'customText', this.value)">
+                <label>Notes</label>
+                <textarea oninput="updateProp('${key}', 'notes', this.value)" placeholder="Any special requests?">${item.notes || ''}</textarea>
+            </div>
         `;
         container.appendChild(row);
     });
@@ -248,29 +245,6 @@ function render() {
     if (total > 0) initPayPal(total);
 }
 
-function removeItem(key) {
-    delete bundle[key];
-    saveAndRefresh();
-}
-
-function clearDesign(key) {
-    bundle[key].cloudinaryUrl = '';
-    bundle[key].customText = '';
-    saveAndRefresh();
-}
-
-function saveAndRefresh() {
-    try {
-        localStorage.setItem('myBundle', JSON.stringify(bundle));
-    } catch (e) { console.error("Storage blocked"); }
-    
-    // If empty, go back to shop
-    if (Object.keys(bundle).length === 0) {
-        window.location.assign('index.html');
-    } else {
-        render();
-    }
-}
 window.handleImageUpload = async (key, input) => {
     const file = input.files[0];
     if (!file) return;
@@ -286,11 +260,24 @@ window.handleImageUpload = async (key, input) => {
         if (data.secure_url) {
             bundle[key].cloudinaryUrl = data.secure_url;
             localStorage.setItem('myBundle', JSON.stringify(bundle));
-            saveAndRefresh();
             render();
         }
     } catch (e) { alert("Upload failed."); }
     document.getElementById('loading-overlay').style.display = 'none';
+};
+
+window.clearDesign = (key) => {
+    // No more confirm() popup - just do it!
+    bundle[key].cloudinaryUrl = '';
+    bundle[key].customText = '';
+    bundle[key].notes = '';
+    
+    try {
+        localStorage.setItem('myBundle', JSON.stringify(bundle));
+    } catch (e) {
+        console.warn("Storage restricted");
+    }
+    render();
 };
 
 
@@ -311,17 +298,27 @@ window.updateProp = (key, prop, value) => {
     }
 };
 
+window.removeItem = (key) => {
+    if(confirm(`Remove ${key}?`)) {
+        delete bundle[key];
+        localStorage.setItem('myBundle', JSON.stringify(bundle));
+        render();
+    }
+};
 
-function applyFirstToAll() {
+window.applyFirstToAll = () => {
     const keys = Object.keys(bundle);
-    const s = bundle[keys[0]];
+    if (keys.length < 2) return;
+    const source = bundle[keys[0]];
     keys.forEach(k => {
-        bundle[k].customText = s.customText;
-        bundle[k].textColor = s.textColor;
-        bundle[k].fontFamily = s.fontFamily;
+        bundle[k].customText = source.customText;
+        bundle[k].textColor = source.textColor;
+        bundle[k].fontFamily = source.fontFamily;
+        bundle[k].cloudinaryUrl = source.cloudinaryUrl;
     });
-    saveAndRefresh();
-}
+    localStorage.setItem('myBundle', JSON.stringify(bundle));
+    render();
+};
 
 function initPayPal(total) {
     const container = document.getElementById('paypal-button-container');
@@ -355,10 +352,22 @@ function sendOrderEmail(details) {
         window.location.href = "thank-you.html";
     });
 }
-function goBackToCatalog() {
-    localStorage.setItem('myBundle', JSON.stringify(bundle));
-    window.location.href = 'index.html';
-}
+window.goBackToCatalog = () => {
+    // Save any typed text or colors before leaving
+    try {
+        localStorage.setItem('myBundle', JSON.stringify(bundle));
+    } catch (e) {
+        console.warn("LocalStorage save failed, but moving back anyway.");
+    }
+
+    // Try moving back in history first (Best for Google Sites)
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        // Fallback if they opened the link directly in a new tab
+        window.location.href = 'index.html';
+    }
+};
 render();
 </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>D.I.M. Custom Bundle Catalog</title>
+    <title>Gift Catalog</title>
     <style>
         body {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f3f4f6; color: #1f2937; margin: 0; padding: 0;}
         
@@ -69,7 +69,7 @@
 <div id="toast">Item added to bundle!</div>
 
 <div class="sticky-header">
-    <div class="header-content"><h1>D.I.M. Custom Bundle Catalog</h1></div>
+    <div class="header-content"><h1>D.I.M. Gift Bundle Shop</h1></div>
     <div class="bundle-bar">
         <div class="bundle-bar-content">
             <div class="bundle-info">
@@ -180,8 +180,8 @@
         </div>
     </div>
 </div>
-
 <script>
+    // 1. Initialize bundle from LocalStorage or empty object
     let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
 
     function showToast(message) {
@@ -191,6 +191,7 @@
         setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
     }
 
+    // Toggle Categories
     document.querySelectorAll('.category-header').forEach(h => {
         h.onclick = () => {
             const content = h.nextElementSibling;
@@ -208,6 +209,7 @@
     function clearBundle() {
         if(confirm("Clear all items from your bundle?")) {
             bundle = {};
+            localStorage.removeItem('myBundle'); // Physically wipe the storage
             updateUI();
             showToast("Bundle cleared");
         }
@@ -218,16 +220,25 @@
         const name = card.dataset.name;
         const price = parseInt(card.dataset.price);
         const img = card.dataset.img;
-        const variety = card.querySelector('.variety-select').value;
+        const varietySelect = card.querySelector('.variety-select');
+        const variety = varietySelect ? varietySelect.value : "Standard";
+        
+        // Use a unique key based on name and variety
         const uniqueKey = `${name} (${variety})`;
 
         if (bundle[uniqueKey]) {
             bundle[uniqueKey].quantity++;
         } else {
             bundle[uniqueKey] = { 
-                baseName: name, variety: variety, price: price, 
-                quantity: 1, img: img, customText: '', 
-                textColor: '#000000', notes: '' 
+                baseName: name, 
+                variety: variety, 
+                price: price, 
+                quantity: 1, 
+                img: img, 
+                customText: '', 
+                textColor: '#000000', 
+                fontFamily: "'Segoe UI', sans-serif", // Set a default font
+                notes: '' 
             };
         }
         updateUI();
@@ -235,6 +246,7 @@
     }
 
     function changeQty(key, amt) {
+        if (!bundle[key]) return;
         bundle[key].quantity += amt;
         if (bundle[key].quantity <= 0) delete bundle[key];
         updateUI();
@@ -243,9 +255,14 @@
     function updateUI() {
         const drawer = document.getElementById('bundle-drawer');
         drawer.innerHTML = '';
-        let total = 0; let count = 0;
+        let total = 0; 
+        let count = 0;
 
         const keys = Object.keys(bundle);
+        
+        // Save to storage EVERY time the UI updates
+        localStorage.setItem('myBundle', JSON.stringify(bundle));
+
         if (keys.length > 0) {
             const clearBtn = document.createElement('button');
             clearBtn.className = 'clear-btn';
@@ -276,11 +293,21 @@
         document.getElementById('total-val').textContent = `$${total}`;
         document.getElementById('count').textContent = count;
         document.getElementById('go-to-bundle').disabled = count === 0;
-        localStorage.setItem('myBundle', JSON.stringify(bundle));
     }
 
-    document.getElementById('go-to-bundle').onclick = () => window.location.href = 'customize.html';
+    // THE FIX: Explicitly save before leaving the page
+    document.getElementById('go-to-bundle').onclick = () => {
+        if (Object.keys(bundle).length > 0) {
+            localStorage.setItem('myBundle', JSON.stringify(bundle));
+            window.location.href = 'customize.html';
+        } else {
+            alert("Please add items to your bundle first!");
+        }
+    };
+
+    // Initial render
     updateUI();
+</script>
 </script>
 </body>
 </html>

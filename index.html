@@ -69,7 +69,7 @@
 <div id="toast">Item added to bundle!</div>
 
 <div class="sticky-header">
-    <div class="header-content"><h1>Bundles & Gifts Catalog</h1></div>
+    <div class="header-content"><h1>Gift Bundle Catalog</h1></div>
     <div class="bundle-bar">
         <div class="bundle-bar-content">
             <div class="bundle-info">
@@ -206,10 +206,15 @@
         d.style.display = (d.style.display === "block") ? "none" : "block";
     }
 
+    // Also update the 'Clear All' in index.html
     function clearBundle() {
         if(confirm("Clear all items from your bundle?")) {
-            bundle = {};
-            localStorage.removeItem('myBundle'); // Physically wipe the storage
+            bundle = {}; 
+            try {
+                localStorage.setItem('myBundle', JSON.stringify(bundle));
+            } catch (e) {
+                // Silently fail so the UI still clears
+            }
             updateUI();
             showToast("Bundle cleared");
         }

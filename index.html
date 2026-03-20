@@ -208,16 +208,15 @@
 
     // Also update the 'Clear All' in index.html
     function clearBundle() {
-        if(confirm("Clear all items from your bundle?")) {
-            bundle = {}; 
-            try {
-                localStorage.setItem('myBundle', JSON.stringify(bundle));
-            } catch (e) {
-                // Silently fail so the UI still clears
-            }
-            updateUI();
-            showToast("Bundle cleared");
+        // Direct clear to avoid Google Sites blocking the popup
+        bundle = {};
+        try {
+            localStorage.removeItem('myBundle');
+        } catch (e) {
+            localStorage.setItem('myBundle', JSON.stringify({}));
         }
+        updateUI();
+        showToast("Bundle cleared");
     }
 
     function addToBundle(btn) {

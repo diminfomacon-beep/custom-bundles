@@ -299,7 +299,7 @@
     document.getElementById('go-to-bundle').onclick = () => {
         if (Object.keys(bundle).length > 0) {
             localStorage.setItem('myBundle', JSON.stringify(bundle));
-            window.location.href = 'customize.html';
+            window.location.href = './customize.html';
         } else {
             alert("Please add items to your bundle first!");
         }

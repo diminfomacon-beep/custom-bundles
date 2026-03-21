@@ -92,25 +92,7 @@
 <div id="promo-banner" style="background: #fbbf24; color: #000; text-align: center; padding: 12px; font-weight: bold; font-size: 0.9rem; border-bottom: 2px solid #d97706; margin-top: 155px;">
     🎁 Bundle & Save: 2 Items (5%) | 3-5 (10%) | 6-10 (15%) | 11+ (20%)
 </div>
-<div class="container">
-    <div class="category">
-        <div class="category-header"><span>New Baby & Milestone</span><span>+</span></div>
-        <div class="category-content">
-            <div class="item-grid">
-                <div class="item-card" data-name="Onesie" data-price="12" data-img="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400">
-                    <img src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400">
-                    <div style="font-weight:600">Onesie</div>
-                    <div style="color:#059669; margin-bottom:8px">$12</div>
-                    <select class="variety-select">
-                        <option value="Newborn">Size: Newborn</option>
-                        <option value="0-3 Months">Size: 0-3 Months</option>
-                        <option value="3-6 Months">Size: 3-6 Months</option>
-                    </select>
-                    <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
-                </div>
-                </div>
-        </div>
-    </div>
+<div class="container" id="catalog-container"></div>
 
     <div class="category">
         <div class="category-header"><span>Housewarming Gifts</span><span>+</span></div>
@@ -231,18 +213,22 @@
 
     function addToBundle(btn) {
     const card = btn.closest('.item-card');
-    const productId = card.getAttribute('data-id'); // Ensure your HTML has data-id="AP-ATSVM1"
+    const productId = card.getAttribute('data-id'); 
+    
+    // 1. Find the select element
     const varietySelect = card.querySelector('.variety-select');
+    
+    // 2. Get the value (fixed the double 'const variety' error here)
     const variety = varietySelect ? varietySelect.value : "Standard";
     
-    // Unique key allows multiple versions of the same product (e.g., Small vs Large)
+    // 3. Create the unique key
     const uniqueKey = `${productId}-${variety}`;
 
     let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
 
     if (!bundle[uniqueKey]) {
         bundle[uniqueKey] = {
-            productId: productId, // CRITICAL: This links to productList.js
+            productId: productId, 
             variety: variety,
             quantity: 1,
             customText: '',
@@ -254,10 +240,13 @@
         bundle[uniqueKey].quantity++;
     }
 
+    // 4. Save and Update
     localStorage.setItem('myBundle', JSON.stringify(bundle));
-    updateUI(); 
+    
+    // Ensure these functions exist in your index.html
+    if (typeof updateUI === "function") updateUI(); 
+    if (typeof showToast === "function") showToast(); 
 }
-
     function changeQty(key, amt) {
         if (!bundle[key]) return;
         bundle[key].quantity += amt;
@@ -268,46 +257,52 @@
    function updateUI() {
     const drawer = document.getElementById('bundle-drawer');
     const banner = document.getElementById('promo-banner');
-    drawer.innerHTML = '';
-    
-    let subtotal = 0; 
-    let itemCount = 0;
-
+    const bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
     const keys = Object.keys(bundle);
-    
-    // Save to storage
-    localStorage.setItem('myBundle', JSON.stringify(bundle));
 
-    if (keys.length > 0) {
-        const clearBtn = document.createElement('button');
-        clearBtn.className = 'clear-btn';
-        clearBtn.textContent = "Clear All Items";
-        clearBtn.onclick = clearBundle;
-        drawer.appendChild(clearBtn);
-    }
+    drawer.innerHTML = '';
+    let subtotal = 0;
+    let itemCount = 0;
 
     keys.forEach(key => {
         const item = bundle[key];
-        subtotal += (item.price * item.quantity);
-        itemCount += item.quantity; // Sum total number of items
+        // FIND THE ORIGINAL PRODUCT DATA
+        const productInfo = productList.find(p => p.id === item.productId);
+        
+        if (!productInfo) return; // Safety check
+
+        // CALCULATE INDIVIDUAL PRICE
+        // Find if the variety has an 'extra' cost
+        let extraCost = 0;
+        const variation = (productInfo.sizes || productInfo.variations || [])
+                          .find(v => v.label === item.variety);
+        if (variation) extraCost = variation.extra;
+
+        const currentPrice = productInfo.basePrice + extraCost;
+        const rowTotal = currentPrice * item.quantity;
+
+        subtotal += rowTotal;
+        itemCount += item.quantity;
 
         const row = document.createElement('div');
         row.className = 'drawer-item';
         row.innerHTML = `
             <div>
-                <strong>${item.baseName}</strong> <br>
+                <strong>${productInfo.name}</strong> <br>
                 <small>${item.variety}</small>
             </div>
             <div style="display:flex; align-items:center; gap:10px;">
                 <div class="qty-circle" onclick="changeQty('${key}', -1)">-</div>
                 <span>${item.quantity}</span>
                 <div class="qty-circle" onclick="changeQty('${key}', 1)">+</div>
-                <span style="min-width:50px; text-align:right;">$${(item.price * item.quantity)}</span>
+                <span style="min-width:50px; text-align:right;">$${rowTotal.toFixed(2)}</span>
             </div>
         `;
         drawer.appendChild(row);
     });
 
+    // --- DISCOUNT CALCULATION (Your existing logic is good) ---
+    // ... keep the rest of your code here ...
     // --- DISCOUNT CALCULATION ---
     let discountPercent = 0;
     let nextTier = "";
@@ -350,7 +345,89 @@
 
     // Initial render
     updateUI();
-</script>
+document.addEventListener('DOMContentLoaded', () => {
+    renderCatalog();
+});
+
+function renderCatalog() {
+    const container = document.getElementById('catalog-container');
+    
+    // 1. Group products by category
+    const grouped = productList.reduce((acc, product) => {
+        // Safe check for your 'ccategory' typo in the JS file
+        const cat = product.category || product.ccategory || "Other";
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(product);
+        return acc;
+    }, {});
+
+    // 2. Generate HTML for each category
+    let html = '';
+    for (const category in grouped) {
+        html += `
+        <div class="category">
+            <div class="category-header" onclick="this.parentElement.classList.toggle('active')">
+                <span>${category}</span>
+                <span>+</span>
+            </div>
+            <div class="category-content" style="display: block;">
+                <div class="item-grid">
+                    ${grouped[category].map(product => renderProductCard(product)).join('')}
+                </div>
+            </div>
+        </div>`;
+    }
+    container.innerHTML = html;
+}
+function showToast() {
+    const toast = document.getElementById("toast");
+    toast.style.display = "block";
+    setTimeout(() => {
+        toast.style.display = "none";
+    }, 2000);
+}
+
+function renderProductCard(p) {
+    // Generate variety options based on sizes or variations in your JS
+    let options = '';
+    if (p.sizes) {
+        options = p.sizes.map(s => `<option value="${s.label}">${s.label} (+$${s.extra})</option>`).join('');
+    } else if (p.variations) {
+        options = p.variations.map(v => `<option value="${v.label}">${v.label} (+$${v.extra})</option>`).join('');
+    } else {
+        options = `<option value="Standard">Standard</option>`;
+    }
+
+    return `
+        <div class="item-card" data-id="${p.id}">
+            <img src="${p.images[0]}" alt="${p.name}">
+            <div style="font-weight:600; margin-top:10px;">${p.name}</div>
+            <div style="color:#059669; margin-bottom:8px">$${p.basePrice.toFixed(2)}</div>
+            <select class="variety-select">
+                ${options}
+            </select>
+            <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
+        </div>
+    `;
+}
+
+document.getElementById('go-to-bundle').addEventListener('click', () => {
+    window.location.href = 'customize.html';
+});
+
+function changeQty(key, delta) {
+    let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
+    if (!bundle[key]) return;
+
+    bundle[key].quantity += delta;
+
+    if (bundle[key].quantity <= 0) {
+        delete bundle[key];
+    }
+
+    localStorage.setItem('myBundle', JSON.stringify(bundle));
+    updateUI();
+}
 </script>
 </body>
 </html>

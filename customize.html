@@ -13,6 +13,7 @@
     <script type="text/javascript">
       (function(){ emailjs.init("1LZbCPvH49G_r0ypB"); })();
     </script>
+    <script src="productList.js"></script>
 
     <style>
         body {font-family: 'Segoe UI', Tahoma, sans-serif; background:#CAE4DB; padding:0; margin:0; color: #1f2937; padding-bottom: 220px;}
@@ -108,6 +109,8 @@
 
 <div class="sticky-footer-container">
     <div class="summary-bar">
+        <div id="discount-line" style="font-size: 0.9rem; font-weight: bold; margin-bottom: 5px; display: none;"></div>
+        
         <div class="total-line">
             <span style="opacity:0.9; font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px;">Total:</span>
             <span style="font-size: 1.5rem;">$<span id="total-price">0</span></span>
@@ -143,10 +146,9 @@ function render() {
     const container = document.getElementById('items-container');
     const totalPriceEl = document.getElementById('total-price');
     const keys = Object.keys(bundle);
-    let total = 0;
+    let subtotal = 0;
 
     container.innerHTML = '';
-    document.getElementById('bulk-actions').style.display = keys.length > 1 ? 'flex' : 'none';
 
     if (keys.length === 0) {
         container.innerHTML = "<p style='text-align:center; padding:50px;'>Your bundle is empty.</p>";
@@ -154,65 +156,99 @@ function render() {
         return;
     }
 
-    keys.forEach(key => {
-        const item = bundle[key];
-        total += (Number(item.price) || 0) * (Number(item.quantity) || 1);
-        if (!item.fontSize) item.fontSize = 24;
+    // --- CATEGORY & ITEM RENDERING ---
+    const activeCategories = [...new Set(keys.map(key => {
+        const p = window.availableProducts.find(prod => prod.id === key);
+        return p ? p.category : "Other";
+    }))];
 
-        const row = document.createElement('div');
-        row.className = 'item-row';
-        row.innerHTML = `
-            <div class="preview-section">
-                <div class="product-preview">
-                    <img src="${item.img}" class="base-img">
-                    <img id="img-overlay-${key}" class="user-img-overlay" src="${item.cloudinaryUrl || ''}" style="display: ${item.cloudinaryUrl ? 'block' : 'none'}">
-                    <div class="preview-text" id="text-layer-${key}" style="color: ${item.textColor || '#000000'}; font-family: ${item.fontFamily || fontOptions[0].family}; font-size: ${item.fontSize}px;">
-                        ${item.customText || ''}
+    activeCategories.forEach(catName => {
+        const catHeader = document.createElement('h2');
+        catHeader.style.cssText = "color: #2F6B64; border-bottom: 2px solid #2F6B64; margin: 30px 0 15px 0; padding-bottom: 5px; text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px;";
+        catHeader.textContent = catName;
+        container.appendChild(catHeader);
+
+        keys.forEach(key => {
+            const item = bundle[key];
+            const productInfo = productList.find(p => p.id === item.productId);            
+            if (!productInfo || productInfo.category !== catName) return;
+
+            const currentVar = productInfo.variations ? (productInfo.variations.find(v => v.label === item.variety) || productInfo.variations[0]) : null;
+            const currentStyle = productInfo.styles ? (productInfo.styles.find(s => s.label === item.style) || productInfo.styles[0]) : null;
+            const currentSize = productInfo.sizes ? (productInfo.sizes.find(sz => sz.label === item.size) || productInfo.sizes[0]) : null;
+
+            let itemPrice = Number(productInfo.basePrice) || 0;
+            if (currentVar) itemPrice += (Number(currentVar.extra) || 0);
+            if (currentStyle) itemPrice += (Number(currentStyle.extra) || 0);
+            if (currentSize) itemPrice += (Number(currentSize.extra) || 0);
+            
+            subtotal += itemPrice * (Number(item.quantity) || 1);
+
+            const displayImg = currentStyle ? currentStyle.image : (currentVar ? currentVar.image : productInfo.images[0]);
+
+            const row = document.createElement('div');
+            row.className = 'item-row';
+            row.innerHTML = `
+                <div class="preview-section">
+                    <div class="product-preview">
+                        <img src="${displayImg}" class="base-img">
+                        <img id="img-overlay-${key}" class="user-img-overlay" src="${item.cloudinaryUrl || ''}" style="display: ${item.cloudinaryUrl ? 'block' : 'none'}">
+                        <div class="preview-text" id="text-layer-${key}" style="color: ${item.textColor || '#000000'}; font-family: ${item.fontFamily || fontOptions[0].family}; font-size: ${item.fontSize || 24}px;">
+                            ${item.customText || ''}
+                        </div>
                     </div>
                 </div>
-                <div class="design-controls">
-                    <label class="btn-upload ${item.cloudinaryUrl ? 'success' : ''}">
-                        ${item.cloudinaryUrl ? '✓' : 'Upload'}
-                        <input type="file" style="display:none;" accept="image/*" onchange="handleImageUpload('${key}', this)">
-                    </label>
-                    <button class="btn-clear" onclick="clearDesign('${key}')">Clear</button>
-                </div>
-            </div>
-
-            <div class="details">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h3 style="margin:0;">${key}</h3>
-                    <button class="remove-btn" onclick="removeItem('${key}')">✕</button>
-                </div>
-                <label>Text Color</label>
-                <div class="swatch-container">
-                    ${availableColors.map(c => `<div class="swatch ${item.textColor === c.hex ? 'active' : ''}" style="background: ${c.hex}" onclick="updateProp('${key}', 'textColor', '${c.hex}')"></div>`).join('')}
-                </div>
-                
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div>
-                        <label>Font Style</label>
-                        <select onchange="updateProp('${key}', 'fontFamily', this.value)">
-                            ${fontOptions.map(f => `<option value="${f.family}" style="font-family: ${f.family}" ${item.fontFamily === f.family ? 'selected' : ''}>${f.name}</option>`).join('')}
-                        </select>
+                <div class="details">
+                    <h3 style="margin:0; color: #2F6B64;">${productInfo.name}</h3>
+                    <p style="font-size: 0.75rem; color: #666; margin: 5px 0 15px 0;">${productInfo.description}</p>
+                    ${productInfo.sizes ? `<label>Size</label><div class="swatch-container">${productInfo.sizes.map(s => `<div class="swatch ${item.size === s.label ? 'active' : ''}" style="background:#fff; width:40px; height:30px; display:flex; align-items:center; justify-content:center; border:1px solid #ccc; font-size:11px; cursor:pointer;" onclick="updateProp('${key}', 'size', '${s.label}')">${s.label}</div>`).join('')}</div>` : ''}
+                    ${(productInfo.styles || productInfo.variations) ? `<label>${productInfo.styles ? 'Design Style' : 'Color/Variety'}</label><div class="swatch-container">${(productInfo.styles || productInfo.variations).map(opt => `<div class="swatch ${(item.style === opt.label || item.variety === opt.label) ? 'active' : ''}" style="background: ${opt.hex || '#ffffff'}; color: ${getContrastColor(opt.hex || '#ffffff')}; width: auto; padding: 6px 12px; border: 1px solid #ccc; font-size: 10px; font-weight: bold; cursor: pointer;" onclick="updateProp('${key}', '${productInfo.styles ? 'style' : 'variety'}', '${opt.label}')">${opt.label} ${opt.extra > 0 ? '(+$'+opt.extra+')' : ''}</div>`).join('')}</div>` : ''}
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top:15px;">
+                        <div><label>Text Color</label><input type="color" value="${item.textColor || '#000000'}" onchange="updateProp('${key}', 'textColor', this.value)" style="width:100%; height:32px; cursor:pointer; border:1px solid #ddd; padding:0; background:none;"></div>
+                        <div><label>Font Style</label><select onchange="updateProp('${key}', 'fontFamily', this.value)" style="height:32px; font-size:12px; width:100%;">${fontOptions.map(f => `<option value="${f.family}" ${item.fontFamily === f.family ? 'selected' : ''}>${f.name}</option>`).join('')}</select></div>
                     </div>
-                    <div>
-                        <label>Size: ${item.fontSize}px</label>
-                        <input type="range" min="12" max="50" value="${item.fontSize}" onchange="updateProp('${key}', 'fontSize', this.value)">
-                    </div>
+                    <label style="margin-top:12px;">Custom Text</label><input type="text" value="${item.customText || ''}" placeholder="Type your text..." oninput="updateProp('${key}', 'customText', this.value)" style="margin-bottom:10px;">
+                    <button class="remove-btn" onclick="removeItem('${key}')" style="width:100%; background:#fee2e2; color:#ef4444; border:1px solid #fecaca; padding:8px; border-radius:6px; font-weight:bold; cursor:pointer;">Remove From Bundle</button>
                 </div>
-
-                <label>Custom Text</label>
-                <input type="text" value="${item.customText || ''}" oninput="updateProp('${key}', 'customText', this.value)">
-                <label>Notes</label>
-                <textarea oninput="updateProp('${key}', 'notes', this.value)" placeholder="Special requests...">${item.notes || ''}</textarea>
-            </div>
-        `;
-        container.appendChild(row);
+            `;
+            container.appendChild(row);
+        });
     });
 
-    totalPriceEl.textContent = total;
-    if (total > 0 && typeof paypal !== 'undefined') initPayPal(total);
+    // --- NEW DISCOUNT LOGIC ---
+    let discountPercent = 0;
+    const itemCount = keys.length;
+
+    if (itemCount === 2) discountPercent = 0.05;
+    else if (itemCount >= 3 && itemCount <= 5) discountPercent = 0.10;
+    else if (itemCount >= 6 && itemCount <= 10) discountPercent = 0.15;
+    else if (itemCount >= 11) discountPercent = 0.20;
+
+    const discountAmount = subtotal * discountPercent;
+    const finalTotal = subtotal - discountAmount;
+
+    // --- UPDATING THE UI SUMMARY ---
+    // We add a line for the discount if one exists
+    const discountDisplay = document.getElementById('discount-line');
+    if (discountPercent > 0) {
+        discountDisplay.innerHTML = `<span style="color:#FEE84A;">Bundle Discount (${(discountPercent * 100)}%): -$${discountAmount.toFixed(2)}</span>`;
+        discountDisplay.style.display = 'block';
+    } else {
+        discountDisplay.style.display = 'none';
+    }
+
+    totalPriceEl.textContent = finalTotal.toFixed(2);
+    if (finalTotal > 0 && typeof paypal !== 'undefined') initPayPal(finalTotal);
+}
+
+function getContrastColor(hexColor) {
+    if (!hexColor || hexColor === 'transparent') return '#000000';
+    const hex = hexColor.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return (yiq >= 128) ? '#000000' : '#ffffff';
 }
 
 window.removeItem = (key) => {
@@ -231,15 +267,18 @@ window.clearDesign = (key) => {
 };
 
 window.updateProp = (key, prop, value) => {
+    // Update the data in the bundle
     bundle[key][prop] = value;
+    
+    // Save to browser memory
     localStorage.setItem('myBundle', JSON.stringify(bundle));
     
+    // If they changed the text, update the preview layer instantly
     if (prop === 'customText') {
-        document.getElementById(`text-layer-${key}`).textContent = value;
-    } else if (prop === 'fontSize') {
-        document.getElementById(`text-layer-${key}`).style.fontSize = value + 'px';
-        render(); 
+        const textLayer = document.getElementById(`text-layer-${key}`);
+        if (textLayer) textLayer.textContent = value;
     } else {
+        // For everything else (Variety swap, Color swap), re-render the row
         render();
     }
 };
@@ -275,8 +314,16 @@ function initPayPal(total) {
 }
 
 function sendOrderEmail(details) {
-    let orderSummary = Object.entries(bundle).map(([name, item]) => {
-        return `ITEM: ${name} | QTY: ${item.quantity}\nTEXT: ${item.customText}\nCOLOR: ${item.textColor}\nFONT: ${item.fontFamily}\nSIZE: ${item.fontSize}px\nLINK: ${item.cloudinaryUrl || 'None'}\n---`;
+    let orderSummary = Object.entries(bundle).map(([id, item]) => {
+    const productInfo = window.availableProducts.find(p => p.id === id) || { name: id };
+    return `
+ITEM: ${productInfo.name}
+SIZE: ${item.size || 'N/A'}
+STYLE/VARIETY: ${item.style || item.variety || 'Standard'}
+TEXT: ${item.customText}
+FONT: ${item.fontFamily}
+IMAGE LINK: ${item.cloudinaryUrl || 'No image uploaded'}
+---`;
     }).join('\n');
 
     emailjs.send('service_ezq1fuc', 'template_r4hpykx', {

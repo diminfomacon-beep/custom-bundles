@@ -596,44 +596,85 @@
     }
 
     function updateUI() {
-        const drawer = document.getElementById('bundle-drawer');
-        const bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
-        const keys = Object.keys(bundle);
+    const drawer = document.getElementById('bundle-drawer');
+    const banner = document.getElementById('promo-banner');
+    const bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
+    const keys = Object.keys(bundle);
 
-        drawer.innerHTML = '';
-        let subtotal = 0;
-        let itemCount = 0;
+    drawer.innerHTML = '';
+    let subtotal = 0;
+    let itemCount = 0;
 
-        keys.forEach(key => {
-            const item = bundle[key];
-            const productInfo = productList.find(p => p.id === item.productId);
-            if (!productInfo) return;
+    keys.forEach(key => {
+        const item = bundle[key];
+        const productInfo = productList.find(p => p.id === item.productId);
+        if (!productInfo) return;
 
-            const options = [...(productInfo.sizes || []), ...(productInfo.variations || [])];
-            const variation = options.find(v => v.label === item.variety);
-            const extra = variation ? variation.extra : 0;
-            const price = (productInfo.basePrice + extra) * item.quantity;
+        // Combine sizes and variations to find the correct extra cost
+        const options = [...(productInfo.sizes || []), ...(productInfo.variations || [])];
+        const variation = options.find(v => v.label === item.variety);
+        const extra = variation ? variation.extra : 0;
+        const lineItemTotal = (productInfo.basePrice + extra) * item.quantity;
 
-            subtotal += price;
-            itemCount += item.quantity;
+        subtotal += lineItemTotal;
+        itemCount += item.quantity;
 
-            drawer.innerHTML += `
-                <div class="drawer-item">
-                    <div><strong>${productInfo.name}</strong><br><small>${item.variety}</small></div>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <div class="qty-circle" onclick="changeQty('${key}', -1)">-</div>
-                        <span>${item.quantity}</span>
-                        <div class="qty-circle" onclick="changeQty('${key}', 1)">+</div>
-                        <span>$${price.toFixed(2)}</span>
-                    </div>
-                </div>`;
-        });
+        drawer.innerHTML += `
+            <div class="drawer-item">
+                <div><strong>${productInfo.name}</strong><br><small>${item.variety}</small></div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="qty-circle" onclick="changeQty('${key}', -1)">-</div>
+                    <span>${item.quantity}</span>
+                    <div class="qty-circle" onclick="changeQty('${key}', 1)">+</div>
+                    <span style="min-width:60px; text-align:right;">$${lineItemTotal.toFixed(2)}</span>
+                </div>
+            </div>`;
+    });
 
-        document.getElementById('total-val').textContent = `$${subtotal.toFixed(2)}`;
-        document.getElementById('count').textContent = itemCount;
-        document.getElementById('go-to-bundle').disabled = (itemCount === 0);
+    // --- LIVE DISCOUNT CALCULATION ---
+    let discountPercent = 0;
+    let nextTierMsg = "";
+
+    if (itemCount === 2) {
+        discountPercent = 0.05;
+        nextTierMsg = "Add 1 more for 10% off!";
+    } else if (itemCount >= 3 && itemCount <= 5) {
+        discountPercent = 0.10;
+        nextTierMsg = itemCount < 5 ? "Add more for 10% off!" : "Add 1 more for 15% off!";
+    } else if (itemCount >= 6 && itemCount <= 10) {
+        discountPercent = 0.15;
+        nextTierMsg = itemCount < 10 ? "Add more for 15% off!" : "Add 1 more for 20% off!";
+    } else if (itemCount >= 11) {
+        discountPercent = 0.20;
+        nextTierMsg = "MAX DISCOUNT REACHED! 🎉";
+    } else if (itemCount === 1) {
+        nextTierMsg = "Add 1 more item for 5% off!";
     }
 
+    const discountAmount = subtotal * discountPercent;
+    const finalTotal = subtotal - discountAmount;
+
+    // Update Promo Banner Text
+    if (itemCount > 0) {
+        banner.innerHTML = `🔥 Bundle Status: ${itemCount} Items | Discount: ${Math.round(discountPercent * 100)}% | ${nextTierMsg}`;
+    } else {
+        banner.innerHTML = `🎁 Bundle & Save: 2 Items (5%) | 3-5 (10%) | 6-10 (15%) | 11+ (20%)`;
+    }
+
+    // Update Sticky Bar Price Display
+    const totalValEl = document.getElementById('total-val');
+    if (discountPercent > 0) {
+        totalValEl.innerHTML = `
+            <span style="text-decoration: line-through; color: #666; font-size: 0.85rem; margin-right: 5px;">$${subtotal.toFixed(2)}</span>
+            <span style="color: #059669;">$${finalTotal.toFixed(2)}</span>
+        `;
+    } else {
+        totalValEl.textContent = `$${subtotal.toFixed(2)}`;
+    }
+            
+    document.getElementById('count').textContent = itemCount;
+    document.getElementById('go-to-bundle').disabled = (itemCount === 0);
+}
     // --- 4. CATALOG GENERATION (FIXED) ---
     function renderCatalog() {
         const container = document.getElementById('catalog-container');

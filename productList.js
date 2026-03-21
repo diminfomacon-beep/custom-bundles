@@ -1,4 +1,3 @@
-// productList.js
 const productList = [
             // ***************CATEGORY - Apparel & Wearables******************    
     {

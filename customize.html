@@ -150,17 +150,19 @@
         }
 
         
-        .summary-bar {
+       .summary-bar {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
+            bottom: 20px;       /* distance from bottom */
+            right: 20px;         /* distance from left */
+            width: auto;        /* shrink to content */
+            max-width: 300px;   /* optional: prevent it from getting too wide */
             background: #2F6B64;
             color: white;
-            padding: 15px 0 25px 0;
-            text-align: center;
+            padding: 15px 20px; /* you can reduce padding to make it less tall */
+            border-radius: 12px; /* rounded corners look nice */
+            text-align: left;    /* align text nicely */
             z-index: 1000;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             font-family: 'Segoe UI', sans-serif;
         }
         .studio-notification {
@@ -217,11 +219,15 @@
             cursor: pointer;
         }
         
-        #paypal-button-container {
+        #paypal-wrapper {
             display: flex;
-            justify-content: center;
-            max-width: 300px;
-            margin: 0 auto;
+            justify-content: flex-start; /* keep it left-aligned */
+            margin-top: 10px;
+        }
+
+        #paypal-button-container {
+            max-width: 200px; /* fit nicely inside sticky box */
+            width: 100%;
         }
         
         </style>

@@ -6,87 +6,256 @@
     <title>Customize Your Bundle</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Bebas+Neue&family=Montserrat:wght@700&family=Playfair+Display:ital,wght@1,700&family=Graduate&family=Cinzel:wght@700&family=Fredoka+One&family=Space+Mono&family=Shadows+Into+Light&display=swap" rel="stylesheet">
-    
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="https://www.paypal.com/sdk/js?client-id=AYCrwEjBMTIJctW65WTbEqCfEGx4IYVyLFU09iInrV8m4nLFonxGlAb6bD707bL-qaDSPUNfqJJzgoYS&currency=USD"></script>
+    <script type="text/javascript">(function(){ emailjs.init("1LZbCPvH49G_r0ypB"); })();</script>
     
-    <script type="text/javascript">
-      (function(){ emailjs.init("1LZbCPvH49G_r0ypB"); })();
-    </script>
 
     <style>
-        body {font-family: 'Segoe UI', Tahoma, sans-serif; background:#CAE4DB; padding:0; margin:0; color: #1f2937; padding-bottom: 220px;}
+        body {font-family: 'Segoe UI', sans-serif; background:#CAE4DB; margin:0; padding-bottom: 250px;}
         .wrapper {max-width: 950px; margin: auto; padding: 20px;}
-        .header {display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
         
+        /* Apply to All Bar */
+        #bulk-actions {
+            background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 20px; 
+            border: 2px dashed #2F6B64; display: flex; align-items: center; justify-content: space-between;
+        }
+
         .item-row {
-            background: #9cbdb1; border-radius: 12px; padding: 25px; margin-bottom: 20px; 
-            display: grid; grid-template-columns: 300px 1fr; gap: 25px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative;
+            background: #9cbdb1; border-radius: 12px; padding: 25px; margin-bottom: 30px; 
+            display: grid; grid-template-columns: 320px 1fr; gap: 25px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: relative;
         }
 
+        /* Top Right "X" Button */
+        .remove-x {
+            position: absolute; top: 10px; right: 10px; background: #fee2e2; color: #ef4444;
+            border: 1px solid #fecaca; width: 30px; height: 30px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer;
+        }
+
+        /* Gray preview background so white products pop */
+     
         .product-preview {
-            width: 300px; height: 280px; background: #f9f9f9; border-radius: 8px; 
-            position: relative; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; border: 1px solid #eee; overflow: hidden; padding: 10px;
-        }
-        
-        .base-img { position: absolute; width: 90%; height: 90%; object-fit: contain; opacity: 0.25; z-index: 0; }
-        .user-img-overlay { max-width: 55%; max-height: 55%; object-fit: contain; z-index: 2; margin-bottom: 10px; }
-        .preview-text { width: 90%; text-align: center; font-weight: bold; z-index: 2; word-wrap: break-word; line-height: 1.1; transition: 0.1s font-size; }
-        
-        .swatch-container { display: flex; gap: 6px; margin-bottom: 15px; flex-wrap: wrap; }
-        .swatch { width: 28px; height: 28px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); }
-        .swatch.active { outline: 2px solid #000; outline-offset: 2px; }
-
-        .details h3 {margin: 0 0 5px 0; color: #2F6B64;}
-        label {display: block; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; color: #000;}
-        
-        input[type="text"], select {
-            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; 
-            margin-bottom: 15px; font-family: inherit; box-sizing: border-box; background: white;
+            width: 300px;
+            height: 300px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            position: relative;
+            /* This handles the vertical stacking */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 10px;
         }
 
-        .sticky-footer-container { position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000; }
+        .base-img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            z-index: 1;
+            opacity: 0.5; /* Keeps the product visible behind the design */
+        }
+
+        .user-img-overlay {
+            position: relative; /* Changed from absolute to participate in flex flow */
+            max-width: 60%;
+            max-height: 60%;
+            object-fit: contain;
+            order: 1;
+            z-index: 2;
+            margin-bottom: 10px; /* Space between image and text */
+        }
+
+        .preview-text {
+            position: relative; /* Changed from absolute to participate in flex flow */
+            width: 90%;
+            margin: 0 auto;
+            order:2;
+            text-align: center;
+            z-index: 3;
+            word-wrap: break-word;
+            line-height: 1.2;
+            pointer-events: none;
+        }
+
+       
+
+        #total-display {
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+
+        /* Square Color Swatches */
+        .color-swatches { display: flex; gap: 5px; margin: 10px 0; flex-wrap: wrap; }
+        .color-sq { width: 25px; height: 25px; cursor: pointer; border: 1px solid #ccc; }
+        .color-sq.active { outline: 2px solid #000; }
+
+        /* Larger Font Dropdown with Previews */
+        select.font-selector { width: 100%; padding: 12px; font-size: 16px; border-radius: 6px; margin-bottom: 10px; }
+        
+        textarea { width: 100%; border-radius: 6px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; resize: vertical; }
+
+        .btn-upload { background: #2F6B64; color: white; padding: 10px; border: none; border-radius: 6px; cursor: pointer;  margin-bottom: 10px; font-weight: bold; }
+        .btn-clear {
+                    flex: 1; background: #FEE84A; color: #000; border: none; padding: 8px; 
+                    border-radius: 20px; font-size: 0.75rem; cursor: pointer; font-weight: bold;
+                }
+        /* 2. Make the "Pills" look like clickable buttons */
+        .option-pill {
+            background: white;
+            padding: 6px 12px;
+            border: 1px solid #2F6B64;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+
+        /* 3. Highlight the selected pill */
+        .option-pill.active {
+            background: #2F6B64;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* 4. Make the Font Selector big enough for the text */
+        .font-selector {
+            padding: 12px !important;
+            font-size: 16px !important;
+            height: auto !important;
+        }
+
+        .variation-dropdown, .style-dropdown {
+            background-color: #ffffff;
+            cursor: pointer;
+            font-size: 14px;
+            color: #374151;
+            transition: border-color 0.2s;
+        }
+
+        .variation-dropdown:focus, .style-dropdown:focus {
+            border-color: #2F6B64;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(47, 107, 100, 0.2);
+        }
+        
+        .sticky-footer-container {
+            position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000;
+        }
+
+        
         .summary-bar {
-            background: #2F6B64; color: white; padding: 20px; 
-            display: flex; flex-direction: column; align-items: center; gap: 10px;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #2F6B64;
+            color: white;
+            padding: 15px 0 25px 0;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.3);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .studio-notification {
+            background: #fbbf24; color: #000; text-align: center; 
+            padding: 10px; font-weight: bold; font-size: 0.85rem;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        .bouncing-arrow {
+            font-size: 1.2rem; line-height: 1;
+            animation: bounce 1.2s infinite;
+        }
+         @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(4px); }
+        }
+         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #fbbf24; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @media (max-width: 768px) {
+            .item-row { grid-template-columns: 1fr; justify-items: center; }
+            .preview-section, .product-preview { width: 100%; max-width: 320px; }
+            .summary-bar { padding: 10px 15px; }
+            #paypal-button-container { width: 150px; }
+        }
+        .details input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        .preview-section input[type="number"] {
+            width: 60px;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+
+       .details select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            background-color: #fff;
+            cursor: pointer;
         }
         
-        .total-line { display: flex; align-items: baseline; gap: 10px; font-weight: bold; }
-        .remove-btn { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        #paypal-button-container { width: 100%; max-width: 250px; }
-
-        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #fbbf24; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+        #paypal-button-container {
+            display: flex;
+            justify-content: center;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        </style>
 </head>
 <body>
-
-<div id="loading-overlay"><div class="spinner"></div><p>Processing...</p></div>
-
-<div class="wrapper">
-    <div class="header">
-        <button onclick="goBackToCatalog()" style="cursor:pointer; padding: 8px 15px; border-radius: 6px; border: 1px solid #ddd; background: #fff; font-weight: bold;">← Back to Catalog</button>
-        <h2 style="margin:0">Customize Bundle</h2>
-    </div>
-    <div id="items-container"></div>
-</div>
-
-<div class="sticky-footer-container">
-    <div class="summary-bar">
-        <div id="discount-line" style="font-size: 0.9rem; font-weight: bold; margin-bottom: 5px; display: none;"></div>
-        <div class="total-line">
-            <span style="opacity:0.9; font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px;">Total:</span>
-            <span style="font-size: 1.5rem;">$<span id="total-price">0</span></span>
+        <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p>Processing Designs...</p>
         </div>
-        <div id="paypal-button-container"></div>
+
+
+    <div class="wrapper">
+        <div class="header">
+            <button onclick="goBackToCatalog()" style="cursor:pointer; padding: 8px 15px; border-radius: 6px; border: 1px solid #ddd; background: #fff; font-weight: bold;">← Back to Catalog</button>
+            <h2 style="margin:0">Customize Your Bundle</h2>
+        </div>
+        <div id="items-container"></div>
     </div>
-</div>
+
+    <div class="sticky-footer-container">
+        <div class="summary-bar">
+            <div style="font-size:12px; opacity:0.8;">Bundle Discount Tier Applied</div>
+            <div id="total-display" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 10px; color: rgb(209, 222, 233); ">Total: $0.00</div>
+            <div id="paypal-button-container" style="width: auto; margin: auto;"></div>
+            </div>
+        <div class="studio-notification">
+                For more flexible custom designs visit the D.I.M. Design Studio
+                <div class="bouncing-arrow">🔻🔻🔻🔻🔻⬇️🔻🔻🔻🔻🔻</div>
+        </div>
+    </div>
 
 <script>
+// --- PRODUCT LIST (Make sure this matches your Index exactly) ---
+
 // --- EMBEDDED PRODUCT LIST ---
 const productList = [
             // ***************CATEGORY - Apparel & Wearables******************    
@@ -546,8 +715,6 @@ const productList = [
       basePrice: 17.99
     }
 ];
-
-// Logic starts here
 let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
 
 const fontOptions = [
@@ -563,168 +730,251 @@ const fontOptions = [
     { name: 'Sketch', family: "'Shadows Into Light', cursive" }
 ];
 
+const colorSwatches = ['#000000','#FFFFFF','#BE123C','#1E3A8A', '#14532D','#2563EB','#E2918F','#D4AF37','#C0C0C0','#DB2777','#A78BFA','#EA580C'];
+
+// --- 3. THE RENDER ENGINE ---
 function render() {
     const container = document.getElementById('items-container');
-    const totalPriceEl = document.getElementById('total-price');
-    const keys = Object.keys(bundle);
-    let subtotal = 0;
-
+    if (!container) return;
     container.innerHTML = '';
+    
+    let subtotal = 0;
+    let itemCount = 0;
 
-    if (keys.length === 0) {
-        container.innerHTML = "<p style='text-align:center; padding:50px;'>Your bundle is empty.</p>";
-        totalPriceEl.textContent = "0";
+    const entries = Object.entries(bundle);
+    if (entries.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:50px;"><h2>Your bundle is empty</h2><a href="index.html" style="color:#2F6B64;">Return to Catalog</a></div>';
         return;
     }
 
-    // Determine unique categories in the current bundle
-    const activeCategories = [...new Set(keys.map(key => {
-        const item = bundle[key];
+    entries.forEach(([key, item]) => {
         const p = productList.find(prod => prod.id === item.productId);
-        return p ? p.category : "Other";
-    }))];
+        if(!p) return;
 
-    activeCategories.forEach(catName => {
-        const catHeader = document.createElement('h2');
-        catHeader.style.cssText = "color: #2F6B64; border-bottom: 2px solid #2F6B64; margin: 30px 0 15px 0; padding-bottom: 5px; text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px;";
-        catHeader.textContent = catName;
-        container.appendChild(catHeader);
+        // Logic for Variation/Style selection
+        const selectedVar = p.variations ? p.variations.find(v => v.label === item.variety) : null;
+        const selectedStyle = p.styles ? p.styles.find(s => s.label === item.style) : null;
+        
+        let extra = 0;
+        if (selectedVar) extra += selectedVar.extra;
+        if (selectedStyle) extra += selectedStyle.extra;
+        const itemPrice = p.basePrice + extra;
+        const itemSubtotal = itemPrice * item.quantity;
+        
+        // Dynamic Image Update
+        const displayImg = selectedStyle?.image || selectedVar?.image || p.images[0];
 
-        keys.forEach(key => {
-            const item = bundle[key];
-            const productInfo = productList.find(p => p.id === item.productId);            
-            if (!productInfo || productInfo.category !== catName) return;
+        subtotal += ((p.basePrice + extra) * item.quantity);
+        itemCount += item.quantity;
 
-            const currentVar = productInfo.variations ? (productInfo.variations.find(v => v.label === item.variety) || productInfo.variations[0]) : null;
-            const currentStyle = productInfo.styles ? (productInfo.styles.find(s => s.label === item.style) || productInfo.styles[0]) : null;
-            const currentSize = productInfo.sizes ? (productInfo.sizes.find(sz => sz.label === item.size) || productInfo.sizes[0]) : null;
-
-            let itemPrice = Number(productInfo.basePrice) || 0;
-            if (currentVar) itemPrice += (Number(currentVar.extra) || 0);
-            if (currentStyle) itemPrice += (Number(currentStyle.extra) || 0);
-            if (currentSize) itemPrice += (Number(currentSize.extra) || 0);
-            
-            subtotal += itemPrice * (Number(item.quantity) || 1);
-
-            const displayImg = currentStyle ? currentStyle.image : (currentVar ? currentVar.image : productInfo.images[0]);
-
-            const row = document.createElement('div');
-            row.className = 'item-row';
-            row.innerHTML = `
-                <div class="preview-section">
-                    <div class="product-preview">
-                        <img src="${displayImg}" class="base-img">
-                        <img id="img-overlay-${key}" class="user-img-overlay" src="${item.cloudinaryUrl || ''}" style="display: ${item.cloudinaryUrl ? 'block' : 'none'}">
-                        <div class="preview-text" id="text-layer-${key}" style="color: ${item.textColor || '#000000'}; font-family: ${item.fontFamily || fontOptions[0].family}; font-size: 24px;">
-                            ${item.customText || ''}
-                        </div>
-                    </div>
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.setAttribute('data-key', key);
+        row.innerHTML = `
+            <div class="remove-x" onclick="removeItem('${key}')">X</div>
+            <div class="preview-section">
+                <div class="product-preview">
+                    <img src="${displayImg}" class="base-img">
+                    ${item.localImage ? `<img src="${item.localImage}" class="user-img-overlay">` : ''}
+                    <div class="preview-text" style=" color:${item.textColor || '#000'}; font-family:${item.fontFamily || 'sans-serif'}; font-size:${item.fontSize || 22}px;">${item.customText ?? ''}</div>
                 </div>
-                <div class="details">
-                    <h3 style="margin:0; color: #2F6B64;">${productInfo.name}</h3>
-                    <p style="font-size: 0.75rem; color: #666; margin: 5px 0 15px 0;">${productInfo.description}</p>
-                    ${productInfo.sizes ? `<label>Size</label><div class="swatch-container">${productInfo.sizes.map(s => `<div class="swatch ${item.size === s.label ? 'active' : ''}" style="background:#fff; width:40px; height:30px; display:flex; align-items:center; justify-content:center; border:1px solid #ccc; font-size:11px; cursor:pointer;" onclick="updateProp('${key}', 'size', '${s.label}')">${s.label}</div>`).join('')}</div>` : ''}
-                    ${(productInfo.styles || productInfo.variations) ? `<label>${productInfo.styles ? 'Design Style' : 'Color/Variety'}</label><div class="swatch-container">${(productInfo.styles || productInfo.variations).map(opt => `<div class="swatch ${(item.style === opt.label || item.variety === opt.label) ? 'active' : ''}" style="background: #ffffff; color: #000; width: auto; padding: 6px 12px; border: 1px solid #ccc; font-size: 10px; font-weight: bold; cursor: pointer;" onclick="updateProp('${key}', '${productInfo.styles ? 'style' : 'variety'}', '${opt.label}')">${opt.label} ${opt.extra > 0 ? '(+$'+opt.extra+')' : ''}</div>`).join('')}</div>` : ''}
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top:15px;">
-                        <div><label>Text Color</label><input type="color" value="${item.textColor || '#000000'}" onchange="updateProp('${key}', 'textColor', this.value)" style="width:100%; height:32px; cursor:pointer; border:1px solid #ddd; padding:0; background:none;"></div>
-                        <div><label>Font Style</label><select onchange="updateProp('${key}', 'fontFamily', this.value)" style="height:32px; font-size:12px; width:100%;">${fontOptions.map(f => `<option value="${f.family}" ${item.fontFamily === f.family ? 'selected' : ''}>${f.name}</option>`).join('')}</select></div>
-                    </div>
-                    <label style="margin-top:12px;">Custom Text</label><input type="text" value="${item.customText || ''}" placeholder="Type your text..." oninput="updateProp('${key}', 'customText', this.value)" style="margin-bottom:10px;">
-                    <button class="remove-btn" onclick="removeItem('${key}')" style="width:100%; background:#fee2e2; color:#ef4444; border:1px solid #fecaca; padding:8px; border-radius:6px; font-weight:bold; cursor:pointer;">Remove From Bundle</button>
+                <input type="file" id="file-input-${key}" style="display: none;" accept="image/*" onchange="handleImageUpload('${key}', this)">
+                <button class="btn-upload" onclick="document.getElementById('file-input-${key}').click()" style="width: auto; margin-top: 10px;">
+                    ${item.localImage ? '✓ Image Loaded' : 'Upload Image'}
+                </button>
+                <button class="btn-clear" onclick="clearDesign('${key}')">Clear Design</button>
+                <div>
+                    <label>Quantity</label>
+                    <input type="number" min="1" value="${item.quantity || 1}" oninput="updateQuantity('${key}', this.value)">
                 </div>
-            `;
-            container.appendChild(row);
-        });
+                <div style="font-weight:bold; color:#000000; margin-top:5px;">
+                        Item Total: $${itemSubtotal.toFixed(2)}
+                </div>
+                </div>
+            </div>
+            <div class="details" style="font-size: 16px; color:#000; font-weight: bold;">
+               <div>
+                    <h2 style="margin:0 0 5px 0; color:#000000;">${p.name}</h2>
+                    <div style="font-size:16px; font-weight: bold; margin-bottom:10px;">
+                        $${itemPrice.toFixed(2)} each
+                    </div>
+                    <div Style="font-size: 12px; color: blue;">(Discount calculated in final Total)</div>
+                    
+                    <hr>
+                    <label>Option</label>
+                    ${p.variations ? `
+                            <select onchange="updateProp('${key}', 'variety', this.value)">
+                                ${p.variations.map(v => `<option value="${v.label}" ${item.variety === v.label ? 'selected' : ''}>${v.label} (+$${v.extra.toFixed(2)})</option>`).join('')}
+                            </select>
+                        ` : ''}
+
+                        ${p.styles ? `
+                            
+                            <select onchange="updateProp('${key}', 'style', this.value)">
+                                ${p.styles.map(s => `<option value="${s.label}" ${item.style === s.label ? 'selected' : ''}>${s.label} (+$${s.extra.toFixed(2)})</option>`).join('')}
+                            </select>
+                        ` : ''}
+                </div>
+                <div><label>Add Text</label></div>
+                <div><input type="text" value="${item.customText ?? ''}" oninput="updateProp('${key}', 'customText', this.value)" placeholder="Enter text here..."></div>
+                <div><label>Text Color</label></div>
+                <div class="color-swatches">${colorSwatches.map(c => `<div class="color-sq ${item.textColor === c ? 'active' : ''}" style="background:${c}" onclick="updateProp('${key}', 'textColor', '${c}')"></div>`).join('')}</div>
+                <div style="font-size:16px; margin-bottom:10px;"><label>Font Size</label>
+                <input type="range" min="10" max="80" value="${item.fontSize || 22}" oninput="updateProp('${key}', 'fontSize', this.value)">${item.fontSize || 22}px</div>
+                <div><label>Font Style</label>
+                <select onchange="updateProp('${key}', 'fontFamily', this.value)">${fontOptions.map(f => `<option value="${f.family}" style="font-family:${f.family}" ${item.fontFamily === f.family ? 'selected' : ''}>${f.name}</option>`).join('')}</select></div>
+                <div><label>Special Instructions</label>
+                <textarea rows="3" oninput="updateProp('${key}', 'notes', this.value)">${item.notes || ''}</textarea></div>
+            </div>
+        `;
+      
+        console.log("ITEM:", item);
+        container.appendChild(row);
     });
+    
+    // --- Totals Display ---
+    let discPercent = 0;
+    if (itemCount === 2) discPercent = 0.05;
+    else if (itemCount >= 3 && itemCount <= 5) discPercent = 0.10;
+    else if (itemCount >= 6 && itemCount <= 10) discPercent = 0.15;
+    else if (itemCount >= 11) discPercent = 0.20;
+        
+    const finalTotal = subtotal * (1 - discPercent);
+    const savings = subtotal - finalTotal;
+    let nextTierMsg = "";
 
-    // --- DISCOUNT LOGIC ---
-    let discountPercent = 0;
-    const totalQty = Object.values(bundle).reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
+    if (itemCount === 1) nextTierMsg = "Add 1 more item to get 5% OFF";
+    else if (itemCount === 2) nextTierMsg = "Add 1 more item to get 10% OFF";
+    else if (itemCount >= 3 && itemCount <= 4) nextTierMsg = "Add more items to get 15% OFF";
+    else if (itemCount >= 6 && itemCount <= 9) nextTierMsg = "Add more items to get 20% OFF";
+   document.getElementById('total-display').innerHTML = `
+    <div style="font-size:14px;">
+        Items: ${itemCount}
+    </div>
 
-    if (totalQty === 2) discountPercent = 0.05;
-    else if (totalQty >= 3 && totalQty <= 5) discountPercent = 0.10;
-    else if (totalQty >= 6 && totalQty <= 10) discountPercent = 0.15;
-    else if (totalQty >= 11) discountPercent = 0.20;
+    ${discPercent > 0 ? `
+        <div style="font-size:14px; color:#bbf7d0;">
+            Discount Applied: ${(discPercent * 100)}% OFF
+        </div>
+        <div style="font-size:13px; color:#bbf7d0;">
+            You Save: $${savings.toFixed(2)}
+        </div>
+        <div style="text-decoration:line-through; font-size:13px; opacity:0.7;">
+            Subtotal: $${subtotal.toFixed(2)}
+        </div>
+    ` : ''}
 
-    const discountAmount = subtotal * discountPercent;
-    const finalTotal = subtotal - discountAmount;
-
-    const discountDisplay = document.getElementById('discount-line');
-    if (discountPercent > 0) {
-        discountDisplay.innerHTML = `<span style="color:#FEE84A;">Bundle Discount (${(discountPercent * 100)}%): -$${discountAmount.toFixed(2)}</span>`;
-        discountDisplay.style.display = 'block';
-    } else {
-        discountDisplay.style.display = 'none';
-    }
-
-    totalPriceEl.textContent = finalTotal.toFixed(2);
-    if (finalTotal > 0 && typeof paypal !== 'undefined') initPayPal(finalTotal);
+    <div style="font-size:24px; font-weight:bold; margin-top:5px;">
+        Total: $${finalTotal.toFixed(2)}
+    </div>
+         ${nextTierMsg ? `
+    <div style="font-size:12px; opacity:0.8; margin-top:5px;">
+        ${nextTierMsg}
+    </div>
+` : ''}
+`;
+    initPayPal(finalTotal.toFixed(2));
 }
+    
+// --- 4. CORE FUNCTIONS ---
+window.updateProp = (key, prop, val) => {
+    if (prop === 'fontSize') val = parseInt(val);
 
-function getContrastColor(hexColor) {
-    if (!hexColor || hexColor === 'transparent') return '#000000';
-    const hex = hexColor.replace('#', '');
-    const r = parseInt(hex.substr(0, 2), 16);
-    const g = parseInt(hex.substr(2, 2), 16);
-    const b = parseInt(hex.substr(4, 2), 16);
-    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-    return (yiq >= 128) ? '#000000' : '#ffffff';
-}
-
-window.removeItem = (key) => {
-    delete bundle[key];
+    bundle[key][prop] = val;
     localStorage.setItem('myBundle', JSON.stringify(bundle));
-    render();
-    if (Object.keys(bundle).length === 0) window.location.href = 'index.html';
-};
 
-window.updateProp = (key, prop, value) => {
-    bundle[key][prop] = value;
-    localStorage.setItem('myBundle', JSON.stringify(bundle));
-    if (prop === 'customText') {
-        const textLayer = document.getElementById(`text-layer-${key}`);
-        if (textLayer) textLayer.textContent = value;
+    const card = document.querySelector(`[data-key="${key}"]`);
+
+    if (prop === 'customText' && card) {
+        card.querySelector('.preview-text').textContent = val;
+    } else if (prop === 'fontSize' && card) {
+        card.querySelector('.preview-text').style.fontSize = val + "px";
     } else {
         render();
     }
 };
 
+window.handleImageUpload = (key, input) => {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        bundle[key].localImage = e.target.result; 
+        localStorage.setItem('myBundle', JSON.stringify(bundle));
+        render();
+    };
+    reader.readAsDataURL(file);
+};
+
+window.clearDesign = (key) => {
+    bundle[key].customText = "";
+    bundle[key].localImage = null;
+    localStorage.setItem('myBundle', JSON.stringify(bundle));
+    render();
+};
+
+window.removeItem = (key) => {
+    delete bundle[key];
+    localStorage.setItem('myBundle', JSON.stringify(bundle));
+    if (Object.keys(bundle).length === 0) window.location.href = 'index.html';
+    render();
+};
+window.updateQuantity = (key, val) => {
+    let qty = parseInt(val);
+
+    // Prevent invalid values
+    if (isNaN(qty) || qty < 1) qty = 1;
+
+    bundle[key].quantity = qty;
+
+    localStorage.setItem('myBundle', JSON.stringify(bundle));
+    render();
+};
+
+// --- 5. CHECKOUT FUNCTIONS ---
+async function processCloudinaryUploads() {
+    for (let key in bundle) {
+        if (bundle[key].localImage) {
+            const formData = new FormData();
+            formData.append('file', bundle[key].localImage);
+            formData.append('upload_preset', 'Custom_Bundle_Preset'); 
+            try {
+                const res = await fetch(`https://api.cloudinary.com/v1_1/dpsmcu07f/image/upload`, { method: 'POST', body: formData });
+                const data = await res.json();
+                bundle[key].cloudinaryUrl = data.secure_url;
+            } catch (e) { console.error("Cloudinary Error:", e); }
+        }
+    }
+}
+
 function initPayPal(total) {
     const container = document.getElementById('paypal-button-container');
     if (!container) return;
-    container.innerHTML = ''; 
+    container.innerHTML = '';
     paypal.Buttons({
-        style: { layout: 'horizontal', height: 35, color: 'gold', shape: 'rect' },
-        createOrder: (d, a) => a.order.create({ purchase_units: [{ amount: { value: total.toString() } }] }),
-        onApprove: (d, a) => a.order.capture().then(det => sendOrderEmail(det))
+        style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal', tagline: false },
+        fundingSource: paypal.FUNDING.PAYPAL,
+        createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: total } }] }),
+        onApprove: (data, actions) => actions.order.capture().then(details => sendOrderEmail(details))
     }).render('#paypal-button-container');
 }
 
-function sendOrderEmail(details) {
-    let orderSummary = Object.entries(bundle).map(([key, item]) => {
-    const productInfo = productList.find(p => p.id === item.productId) || { name: "Unknown" };
-    return `
-ITEM: ${productInfo.name}
-SIZE: ${item.size || 'N/A'}
-STYLE/VARIETY: ${item.style || item.variety || 'Standard'}
-TEXT: ${item.customText || 'None'}
----`;
-    }).join('\n');
-
+async function sendOrderEmail(details) {
+    await processCloudinaryUploads();
+    let summary = Object.entries(bundle).map(([k, v]) => `ITEM: ${v.productId}\nTEXT: ${v.customText || 'N/A'}\nLINK: ${v.cloudinaryUrl || 'No Image'}\n---`).join('\n');
+    
     emailjs.send('service_ezq1fuc', 'template_r4hpykx', {
         order_id: details.id,
         customer_name: details.payer.name.given_name,
-        message: orderSummary,
+        message: summary,
         total_paid: details.purchase_units[0].amount.value
     }).then(() => {
-        localStorage.removeItem('myBundle');
+        localStorage.clear();
         window.location.href = "thank-you.html";
     });
 }
 
-function goBackToCatalog() { window.location.href = 'index.html'; }
-
-// Run render immediately
+// Kickstart the page
 render();
 </script>
 </body>

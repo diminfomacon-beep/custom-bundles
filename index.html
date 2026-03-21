@@ -87,43 +87,29 @@
 <div class="container" id="catalog-container"></div>
 
 <script>
-    // --- 1. EMBEDDED PRODUCT LIST ---
+  <script>
+    // --- 1. EMBEDDED PRODUCT LIST (Keep this exact list) ---
     const productList = [
         {
           id: "AP-APSVM1",
           name: "Adult White Polyester Graphic T-Shirt",
           category: "Apparel & Wearables",
-          description: "Lightweight white polyester t-shirt designed for vibrant custom prints.",
           basePrice: 15.99,
           images:["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"],
-          sizes:[{label:"S", extra:0}, {label:"M", extra:0}, {label:"L", extra:0}, {label:"XL", extra:0}, {label:"2XL", extra:0}, {label:"3XL", extra:0}],
-          styles:[
-            {label:"Logo Front", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
-            {label:"Large Front", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
-            {label:"Large Back", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
-            {label:"Logo Front & Large Back", extra:6, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"}
-          ]
+          sizes:[{label:"S", extra:0}, {label:"M", extra:0}, {label:"L", extra:0}, {label:"XL", extra:0}, {label:"2XL", extra:0}, {label:"3XL", extra:0}]
         },
         {
           id: "AP-ACSVM2",
           name: "Adult Cotton T-Shirt",
           category: "Apparel & Wearables",
-          description: "Premium polyester shirt with multiple design styles.",
           basePrice: 15.99,
           images:["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"],
-          sizes:[{label:"S", extra:0}, {label:"M", extra:0}, {label:"L", extra:0}, {label:"XL", extra:0}, {label:"2XL", extra:0}, {label:"3XL", extra:0}],
-          styles:[
-            {label:"Logo Front", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
-            {label:"Large Front", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"},
-            {label:"Large Back", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"},
-            {label:"Logo Front & Large Back", extra:6, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"}
-          ]
+          sizes:[{label:"S", extra:0}, {label:"M", extra:0}, {label:"L", extra:0}, {label:"XL", extra:0}, {label:"2XL", extra:0}, {label:"3XL", extra:0}]
         },
         {
           id: "BA-TV3001",
           name: "Tote Bag",
           category: "Apparel & Wearables", 
-          description: "13.5x13.5x4 inch customizable tote bag.",
           basePrice: 10.99,
           variations: [
             { label: "Black", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632228_2.png"},
@@ -135,7 +121,6 @@
           id: "TU-SV1601",
           name: "20oz Skinny Tumbler", 
           category: "Drinkware & Kitchenware",
-          description: "Skinny 20oz tumbler in various finishes.",
           basePrice: 17.99,
           variations: [
             { label: "Skinny White", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20oz%20Skinny%20Tumbler.png" },
@@ -146,7 +131,6 @@
           id: "MU-CCCVN1",
           name: "Ceramic Coffee Mug - 15oz", 
           category: "Drinkware & Kitchenware",
-          description: "Classic ceramic mug available in white or heat-changing black.",
           basePrice: 7.99,
           variations: [
             {label: "White", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15CERAMICMUG1.png"},
@@ -157,7 +141,6 @@
           id: "TU-BSV201",
           name: "40oz Big Swig Tumbler", 
           category: "Drinkware & Kitchenware",
-          description: "Large 40oz holographic tumbler.",
           basePrice: 26.99,
           variations: [
             { label: "White", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBBIGSWIG1.png"},
@@ -167,22 +150,20 @@
     ];
 
     // --- 2. CORE UI FUNCTIONS ---
-    
-    function showToast(message = "Item added to bundle!") {
+    function showToast(message) {
         const toast = document.getElementById("toast");
-        toast.textContent = message;
+        toast.textContent = message || "Item added!";
         toast.classList.add("show");
         setTimeout(() => { toast.classList.remove("show"); }, 2000);
     }
 
-    function toggleDrawer() {
+    window.toggleDrawer = function() {
         const d = document.getElementById('bundle-drawer');
         d.style.display = (d.style.display === "block") ? "none" : "block";
     }
 
     // --- 3. BUNDLE LOGIC ---
-
-    function addToBundle(btn) {
+    window.addToBundle = function(btn) {
         const card = btn.closest('.item-card');
         const productId = card.getAttribute('data-id'); 
         const varietySelect = card.querySelector('.variety-select');
@@ -195,34 +176,28 @@
             bundle[uniqueKey] = {
                 productId: productId, 
                 variety: variety,
-                quantity: 1,
-                customText: "",
-                textColor: "#000000",
-                fontFamily: "'Segoe UI', sans-serif"
+                quantity: 1
             };
         } else {
             bundle[uniqueKey].quantity++;
         }
 
         localStorage.setItem('myBundle', JSON.stringify(bundle));
-        showToast();
+        showToast("Added to bundle!");
         updateUI(); 
     }
 
-    function changeQty(key, delta) {
+    window.changeQty = function(key, delta) {
         let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
         if (!bundle[key]) return;
-
         bundle[key].quantity += delta;
         if (bundle[key].quantity <= 0) delete bundle[key];
-
         localStorage.setItem('myBundle', JSON.stringify(bundle));
         updateUI();
     }
 
     function updateUI() {
         const drawer = document.getElementById('bundle-drawer');
-        const banner = document.getElementById('promo-banner');
         const bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
         const keys = Object.keys(bundle);
 
@@ -235,94 +210,67 @@
             const productInfo = productList.find(p => p.id === item.productId);
             if (!productInfo) return;
 
-            let extraCost = 0;
             const options = [...(productInfo.sizes || []), ...(productInfo.variations || [])];
             const variation = options.find(v => v.label === item.variety);
-            if (variation) extraCost = variation.extra;
+            const extra = variation ? variation.extra : 0;
+            const price = (productInfo.basePrice + extra) * item.quantity;
 
-            const currentPrice = productInfo.basePrice + extraCost;
-            const rowTotal = currentPrice * item.quantity;
-
-            subtotal += rowTotal;
+            subtotal += price;
             itemCount += item.quantity;
 
-            const row = document.createElement('div');
-            row.className = 'drawer-item';
-            row.innerHTML = `
-                <div>
-                    <strong>${productInfo.name}</strong> <br>
-                    <small>${item.variety}</small>
-                </div>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <div class="qty-circle" onclick="changeQty('${key}', -1)">-</div>
-                    <span>${item.quantity}</span>
-                    <div class="qty-circle" onclick="changeQty('${key}', 1)">+</div>
-                    <span style="min-width:60px; text-align:right;">$${rowTotal.toFixed(2)}</span>
-                </div>
-            `;
-            drawer.appendChild(row);
+            drawer.innerHTML += `
+                <div class="drawer-item">
+                    <div><strong>${productInfo.name}</strong><br><small>${item.variety}</small></div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div class="qty-circle" onclick="changeQty('${key}', -1)">-</div>
+                        <span>${item.quantity}</span>
+                        <div class="qty-circle" onclick="changeQty('${key}', 1)">+</div>
+                        <span>$${price.toFixed(2)}</span>
+                    </div>
+                </div>`;
         });
 
-        // --- DISCOUNT CALCULATION ---
-        let discountPercent = 0;
-        let nextTier = "";
-
-        if (itemCount === 2) {
-            discountPercent = 0.05;
-            nextTier = "Add 1 more for 10% off!";
-        } else if (itemCount >= 3 && itemCount <= 5) {
-            discountPercent = 0.10;
-            nextTier = itemCount < 5 ? "Add more for 10% off!" : "Add 1 more for 15% off!";
-        } else if (itemCount >= 6 && itemCount <= 10) {
-            discountPercent = 0.15;
-            nextTier = "Add more for 15% off!";
-        } else if (itemCount >= 11) {
-            discountPercent = 0.20;
-            nextTier = "MAX DISCOUNT REACHED! 🎉";
-        } else if (itemCount === 1) {
-            nextTier = "Add 1 more item for 5% off!";
-        }
-
-        const finalTotal = subtotal * (1 - discountPercent);
-
-        if (itemCount > 0) {
-            banner.innerHTML = `🔥 Bundle Status: ${itemCount} Items | Discount: ${Math.round(discountPercent * 100)}% | ${nextTier}`;
-        } else {
-            banner.innerHTML = `🎁 Bundle & Save: 2 Items (5%) | 3-5 (10%) | 6-10 (15%) | 11+ (20%)`;
-        }
-
-        document.getElementById('total-val').innerHTML = 
-            discountPercent > 0 
-            ? `<span style="text-decoration: line-through; color: #666; font-size: 0.8rem;">$${subtotal.toFixed(2)}</span> $${finalTotal.toFixed(2)}` 
-            : `$${subtotal.toFixed(2)}`;
-            
+        document.getElementById('total-val').textContent = `$${subtotal.toFixed(2)}`;
         document.getElementById('count').textContent = itemCount;
-        document.getElementById('go-to-bundle').disabled = itemCount === 0;
+        document.getElementById('go-to-bundle').disabled = (itemCount === 0);
     }
 
-    // --- 4. CATALOG GENERATION ---
-
+    // --- 4. CATALOG GENERATION (FIXED) ---
     function renderCatalog() {
         const container = document.getElementById('catalog-container');
-        
-        const grouped = productList.reduce((acc, product) => {
-            const cat = product.category || "Other";
-            if (!acc[cat]) acc[cat] = [];
-            acc[cat].push(product);
-            return acc;
-        }, {});
+        if (!container) return;
+
+        // Grouping items by category
+        const grouped = {};
+        productList.forEach(p => {
+            const cat = p.category || "General";
+            if (!grouped[cat]) grouped[cat] = [];
+            grouped[cat].push(p);
+        });
 
         let html = '';
-        for (const category in grouped) {
+        for (const catName in grouped) {
             html += `
             <div class="category">
-                <div class="category-header" onclick="const c = this.nextElementSibling; c.style.display = c.style.display === 'none' ? 'block' : 'none';">
-                    <span>${category}</span>
+                <div class="category-header" onclick="const c = this.nextElementSibling; c.style.display = (c.style.display === 'none' ? 'block' : 'none');">
+                    <span>${catName}</span>
                     <span>▾</span>
                 </div>
                 <div class="category-content">
                     <div class="item-grid">
-                        ${grouped[category].map(product => renderProductCard(product)).join('')}
+                        ${grouped[catName].map(p => `
+                            <div class="item-card" data-id="${p.id}">
+                                <img src="${p.images ? p.images[0] : ''}" onerror="this.src='https://via.placeholder.com/150'">
+                                <div style="font-weight:600; margin-top:10px;">${p.name}</div>
+                                <div style="color:#059669; margin-bottom:8px">$${p.basePrice.toFixed(2)}</div>
+                                <select class="variety-select">
+                                    ${p.sizes ? p.sizes.map(s => `<option value="${s.label}">${s.label} (+$${s.extra})</option>`).join('') : ''}
+                                    ${p.variations ? p.variations.map(v => `<option value="${v.label}">${v.label} (+$${v.extra})</option>`).join('') : ''}
+                                    ${(!p.sizes && !p.variations) ? '<option value="Standard">Standard</option>' : ''}
+                                </select>
+                                <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
+                            </div>
+                        `).join('')}
                     </div>
                 </div>
             </div>`;
@@ -330,37 +278,14 @@
         container.innerHTML = html;
     }
 
-    function renderProductCard(p) {
-        let options = '';
-        if (p.sizes) {
-            options = p.sizes.map(s => `<option value="${s.label}">${s.label} (+$${s.extra})</option>`).join('');
-        } else if (p.variations) {
-            options = p.variations.map(v => `<option value="${v.label}">${v.label} (+$${v.extra})</option>`).join('');
-        } else {
-            options = `<option value="Standard">Standard</option>`;
-        }
-
-        return `
-            <div class="item-card" data-id="${p.id}">
-                <img src="${p.images[0]}" alt="${p.name}">
-                <div style="font-weight:600; margin-top:10px;">${p.name}</div>
-                <div style="color:#059669; margin-bottom:8px">$${p.basePrice.toFixed(2)}</div>
-                <select class="variety-select">${options}</select>
-                <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
-            </div>
-        `;
-    }
-
-    // --- 5. INITIALIZATION ---
-
-    document.getElementById('go-to-bundle').addEventListener('click', () => {
-        window.location.href = 'customize.html';
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
+    // --- 5. START ---
+    document.getElementById('go-to-bundle').onclick = () => window.location.href = 'customize.html';
+    
+    // Run everything once the page is ready
+    window.onload = () => {
         renderCatalog();
         updateUI();
-    });
+    };
 </script>
 </body>
 </html>

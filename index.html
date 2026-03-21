@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gift Catalog</title>
-    <script src="https://diminfomacon-beep.github.io/custom-bundles/productList.js"></script>
     <style>
         body {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #9cbdb1; color: #1f2937; margin: 0; padding: 0;}
         
@@ -42,7 +41,7 @@
         .category { margin-bottom: 15px; border-radius: 12px; background: #CAE4DB; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .category-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; background: #CAE4DB; border-bottom: 1px solid #9cbdb1; font-weight: bold; }
         .category-header:hover { background: #bedad0; }
-        .category-content { display: block; padding: 25px; } /* Default open for generated content */
+        .category-content { display: block; padding: 25px; } 
         
         .item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
         .item-card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 15px; text-align: center; background: #fff; }
@@ -85,11 +84,89 @@
     🎁 Bundle & Save: 2 Items (5%) | 3-5 (10%) | 6-10 (15%) | 11+ (20%)
 </div>
 
-<div class="container" id="catalog-container">
-    </div>
+<div class="container" id="catalog-container"></div>
 
 <script>
-    // --- 1. CORE DATA FUNCTIONS ---
+    // --- 1. EMBEDDED PRODUCT LIST ---
+    const productList = [
+        {
+          id: "AP-APSVM1",
+          name: "Adult White Polyester Graphic T-Shirt",
+          category: "Apparel & Wearables",
+          description: "Lightweight white polyester t-shirt designed for vibrant custom prints.",
+          basePrice: 15.99,
+          images:["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"],
+          sizes:[{label:"S", extra:0}, {label:"M", extra:0}, {label:"L", extra:0}, {label:"XL", extra:0}, {label:"2XL", extra:0}, {label:"3XL", extra:0}],
+          styles:[
+            {label:"Logo Front", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
+            {label:"Large Front", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
+            {label:"Large Back", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
+            {label:"Logo Front & Large Back", extra:6, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"}
+          ]
+        },
+        {
+          id: "AP-ACSVM2",
+          name: "Adult Cotton T-Shirt",
+          category: "Apparel & Wearables",
+          description: "Premium polyester shirt with multiple design styles.",
+          basePrice: 15.99,
+          images:["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"],
+          sizes:[{label:"S", extra:0}, {label:"M", extra:0}, {label:"L", extra:0}, {label:"XL", extra:0}, {label:"2XL", extra:0}, {label:"3XL", extra:0}],
+          styles:[
+            {label:"Logo Front", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
+            {label:"Large Front", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"},
+            {label:"Large Back", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"},
+            {label:"Logo Front & Large Back", extra:6, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"}
+          ]
+        },
+        {
+          id: "BA-TV3001",
+          name: "Tote Bag",
+          category: "Apparel & Wearables", 
+          description: "13.5x13.5x4 inch customizable tote bag.",
+          basePrice: 10.99,
+          variations: [
+            { label: "Black", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632228_2.png"},
+            { label: "White", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632230_31.png"},
+            { label: "Natural", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632229_31.png"}
+          ]
+        },
+        {
+          id: "TU-SV1601",
+          name: "20oz Skinny Tumbler", 
+          category: "Drinkware & Kitchenware",
+          description: "Skinny 20oz tumbler in various finishes.",
+          basePrice: 17.99,
+          variations: [
+            { label: "Skinny White", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20oz%20Skinny%20Tumbler.png" },
+            { label: "Glow Skinny", extra:3, image: "https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBGLOW1_cee74f28-51c3-4bb9-b14a-0455a7897ec7.png"}
+          ]
+        },
+        {
+          id: "MU-CCCVN1",
+          name: "Ceramic Coffee Mug - 15oz", 
+          category: "Drinkware & Kitchenware",
+          description: "Classic ceramic mug available in white or heat-changing black.",
+          basePrice: 7.99,
+          variations: [
+            {label: "White", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15CERAMICMUG1.png"},
+            {label: "Black Heat Changing", extra:1, image: "https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ceramic%20mug.png"}
+          ]
+        },
+        {
+          id: "TU-BSV201",
+          name: "40oz Big Swig Tumbler", 
+          category: "Drinkware & Kitchenware",
+          description: "Large 40oz holographic tumbler.",
+          basePrice: 26.99,
+          variations: [
+            { label: "White", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBBIGSWIG1.png"},
+            { label: "Holographic", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBHOLOBIGSWIG1.png"}
+          ]
+        }
+    ];
+
+    // --- 2. CORE UI FUNCTIONS ---
     
     function showToast(message = "Item added to bundle!") {
         const toast = document.getElementById("toast");
@@ -103,7 +180,7 @@
         d.style.display = (d.style.display === "block") ? "none" : "block";
     }
 
-    // --- 2. BUNDLE LOGIC ---
+    // --- 3. BUNDLE LOGIC ---
 
     function addToBundle(btn) {
         const card = btn.closest('.item-card');
@@ -118,7 +195,10 @@
             bundle[uniqueKey] = {
                 productId: productId, 
                 variety: variety,
-                quantity: 1
+                quantity: 1,
+                customText: "",
+                textColor: "#000000",
+                fontFamily: "'Segoe UI', sans-serif"
             };
         } else {
             bundle[uniqueKey].quantity++;
@@ -155,10 +235,9 @@
             const productInfo = productList.find(p => p.id === item.productId);
             if (!productInfo) return;
 
-            // Find price including variation extra cost
             let extraCost = 0;
-            const variation = (productInfo.sizes || productInfo.variations || [])
-                              .find(v => v.label === item.variety);
+            const options = [...(productInfo.sizes || []), ...(productInfo.variations || [])];
+            const variation = options.find(v => v.label === item.variety);
             if (variation) extraCost = variation.extra;
 
             const currentPrice = productInfo.basePrice + extraCost;
@@ -221,17 +300,13 @@
         document.getElementById('go-to-bundle').disabled = itemCount === 0;
     }
 
-    // --- 3. CATALOG GENERATION ---
+    // --- 4. CATALOG GENERATION ---
 
     function renderCatalog() {
         const container = document.getElementById('catalog-container');
-        if (!window.productList) {
-            container.innerHTML = "<p style='text-align:center; padding:20px;'>Error: productList.js not found.</p>";
-            return;
-        }
-
+        
         const grouped = productList.reduce((acc, product) => {
-            const cat = product.category || product.ccategory || "Other";
+            const cat = product.category || "Other";
             if (!acc[cat]) acc[cat] = [];
             acc[cat].push(product);
             return acc;
@@ -276,7 +351,7 @@
         `;
     }
 
-    // --- 4. INITIALIZATION ---
+    // --- 5. INITIALIZATION ---
 
     document.getElementById('go-to-bundle').addEventListener('click', () => {
         window.location.href = 'customize.html';

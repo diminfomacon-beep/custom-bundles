@@ -13,7 +13,7 @@
     <script type="text/javascript">
       (function(){ emailjs.init("1LZbCPvH49G_r0ypB"); })();
     </script>
-    <script src="productList.js"></script>
+    <script src="https://diminfomacon-beep.github.io/custom-bundles/productList.js"></script>
 
     <style>
         body {font-family: 'Segoe UI', Tahoma, sans-serif; background:#CAE4DB; padding:0; margin:0; color: #1f2937; padding-bottom: 220px;}
@@ -157,10 +157,11 @@ function render() {
     }
 
     // --- CATEGORY & ITEM RENDERING ---
-    const activeCategories = [...new Set(keys.map(key => {
-        const p = window.availableProducts.find(prod => prod.id === key);
-        return p ? p.category : "Other";
-    }))];
+ // Change this line inside render():
+const activeCategories = [...new Set(keys.map(key => {
+    const p = productList.find(prod => prod.id === bundle[key].productId); // Fix applied here
+    return p ? p.category : "Other";
+}))];
 
     activeCategories.forEach(catName => {
         const catHeader = document.createElement('h2');

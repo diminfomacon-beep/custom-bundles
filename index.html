@@ -3,729 +3,979 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gift Catalog</title>
+    <title>Customize Your Bundle</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Bebas+Neue&family=Montserrat:wght@700&family=Playfair+Display:ital,wght@1,700&family=Graduate&family=Cinzel:wght@700&family=Fredoka+One&family=Space+Mono&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AYCrwEjBMTIJctW65WTbEqCfEGx4IYVyLFU09iInrV8m4nLFonxGlAb6bD707bL-qaDSPUNfqJJzgoYS&currency=USD"></script>
+    <script type="text/javascript">(function(){ emailjs.init("1LZbCPvH49G_r0ypB"); })();</script>
+    
+
     <style>
-        body {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #9cbdb1; color: #1f2937; margin: 0; padding: 0;}
+        body {font-family: 'Segoe UI', sans-serif; background:#CAE4DB; margin:0; padding-bottom: 250px;}
+        .wrapper {max-width: 950px; margin: auto; padding: 20px;}
         
-        /* Sticky Header */
-        .sticky-header {
+        /* Apply to All Bar */
+        #bulk-actions {
+            background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 20px; 
+            border: 2px dashed #2F6B64; display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .item-row {
+            background: #9cbdb1; border-radius: 12px; padding: 25px; margin-bottom: 30px; 
+            display: grid; grid-template-columns: 320px 1fr; gap: 25px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: relative;
+        }
+
+        /* Top Right "X" Button */
+        .remove-x {
+            position: absolute; top: 10px; right: 10px; background: #fee2e2; color: #ef4444;
+            border: 1px solid #fecaca; width: 30px; height: 30px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer;
+        }
+
+        /* Gray preview background so white products pop */
+     
+        .product-preview {
+            width: 300px;
+            height: 300px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            position: relative;
+            /* This handles the vertical stacking */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 10px;
+        }
+
+        .base-img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            z-index: 1;
+            opacity: 0.5; /* Keeps the product visible behind the design */
+        }
+
+        .user-img-overlay {
+            position: relative; /* Changed from absolute to participate in flex flow */
+            max-width: 60%;
+            max-height: 60%;
+            object-fit: contain;
+            order: 1;
+            z-index: 2;
+            margin-bottom: 10px; /* Space between image and text */
+        }
+
+        .preview-text {
+            position: relative; /* Changed from absolute to participate in flex flow */
+            width: 90%;
+            margin: 0 auto;
+            order:2;
+            text-align: center;
+            z-index: 3;
+            word-wrap: break-word;
+            line-height: 1.2;
+            pointer-events: none;
+        }
+
+       
+
+        #total-display {
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+
+        /* Square Color Swatches */
+        .color-swatches { display: flex; gap: 5px; margin: 10px 0; flex-wrap: wrap; }
+        .color-sq { width: 25px; height: 25px; cursor: pointer; border: 1px solid #ccc; }
+        .color-sq.active { outline: 2px solid #000; }
+
+        /* Larger Font Dropdown with Previews */
+        select.font-selector { width: 100%; padding: 12px; font-size: 16px; border-radius: 6px; margin-bottom: 10px; }
+        
+        textarea { width: 100%; border-radius: 6px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; resize: vertical; }
+
+        .btn-upload { background: #2F6B64; color: white; padding: 10px; border: none; border-radius: 6px; cursor: pointer;  margin-bottom: 10px; font-weight: bold; }
+        .btn-clear {
+                    flex: 1; background: #FEE84A; color: #000; border: none; padding: 8px; 
+                    border-radius: 20px; font-size: 0.75rem; cursor: pointer; font-weight: bold;
+                }
+        /* 2. Make the "Pills" look like clickable buttons */
+        .option-pill {
+            background: white;
+            padding: 6px 12px;
+            border: 1px solid #2F6B64;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+
+        /* 3. Highlight the selected pill */
+        .option-pill.active {
+            background: #2F6B64;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* 4. Make the Font Selector big enough for the text */
+        .font-selector {
+            padding: 12px !important;
+            font-size: 16px !important;
+            height: auto !important;
+        }
+
+        .variation-dropdown, .style-dropdown {
+            background-color: #ffffff;
+            cursor: pointer;
+            font-size: 14px;
+            color: #374151;
+            transition: border-color 0.2s;
+        }
+
+        .variation-dropdown:focus, .style-dropdown:focus {
+            border-color: #2F6B64;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(47, 107, 100, 0.2);
+        }
+        
+        .sticky-footer-container {
+            position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000;
+        }
+
+        
+        .summary-bar {
             position: fixed;
-            top: 0; left: 0; width: 100%; z-index: 1000;
-            background: #2F6B64; color: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #2F6B64;
+            color: white;
+            padding: 15px 0 25px 0;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.3);
+            font-family: 'Segoe UI', sans-serif;
         }
-        .header-content { max-width: 1000px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        h1 { margin: 0; font-size: 1.4rem; }
-
-        .bundle-bar { background: #CAE4DB; color: #1f2937; border-bottom: 2px solid #e5e7eb; padding: 10px 0; }
-        .bundle-bar-content { max-width: 1000px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
-        .bundle-header-title { font-weight: 800; text-transform: uppercase; font-size: 0.85rem; color: #2F6B64; cursor: pointer; text-decoration: underline; }
-        .total-display { font-size: 1.2rem; font-weight: bold; color: #059669; }
-
-        .btn-customize { background: #fbbf24; color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;}
-        .btn-customize:hover { background: #f59e0b; }
-        .btn-customize:disabled { background: #d1d5db; cursor: not-allowed; }
-
-        /* Drawer */
-        #bundle-drawer { max-width: 1000px; margin: 0 auto; background: #CAE4DB; display: none; padding: 10px 20px; border-top: 1px solid #f3f4f6; max-height: 300px; overflow-y: auto; }
-        .drawer-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f9fafb; font-size: 0.9rem; align-items: center; }
-
-        /* Promo Banner */
-        #promo-banner {
+        .studio-notification {
             background: #fbbf24; color: #000; text-align: center; 
-            padding: 12px; font-weight: bold; font-size: 0.9rem; 
-            border-bottom: 2px solid #d97706; margin-top: 145px;
+            padding: 10px; font-weight: bold; font-size: 0.85rem;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        .container { max-width: 1000px; margin: 20px auto 40px; padding: 0 20px; }
-        .category { margin-bottom: 15px; border-radius: 12px; background: #CAE4DB; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .category-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; background: #CAE4DB; border-bottom: 1px solid #9cbdb1; font-weight: bold; }
-        .category-header:hover { background: #bedad0; }
-        .category-content { display: block; padding: 25px; } 
-        
-        .item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-        .item-card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 15px; text-align: center; background: #fff; }
-        .item-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
-        
-        .variety-select { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 0.85rem; }
-        .add-btn { width: 100%; padding: 10px; border-radius: 8px; border: none; background: #2F6B64; color: white; cursor: pointer; font-weight: bold; }
-
-        #toast {
-            visibility: hidden; min-width: 250px; background-color: #333; color: #fff;
-            text-align: center; border-radius: 8px; padding: 16px; position: fixed;
-            z-index: 2000; left: 50%; bottom: 30px; transform: translateX(-50%);
+        .bouncing-arrow {
+            font-size: 1.2rem; line-height: 1;
+            animation: bounce 1.2s infinite;
         }
-        #toast.show { visibility: visible; }
+         @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(4px); }
+        }
+         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #fbbf24; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .qty-circle { background: #fff; border: 1px solid #ccc; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        @media (max-width: 768px) {
+            .item-row { grid-template-columns: 1fr; justify-items: center; }
+            .preview-section, .product-preview { width: 100%; max-width: 320px; }
+            .summary-bar { padding: 10px 15px; }
+            #paypal-button-container { width: 150px; }
+        }
+        .details input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
 
-        @media (max-width: 600px) { #promo-banner { margin-top: 160px; } }
-    </style>
+        .preview-section input[type="number"] {
+            width: 60px;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+
+       .details select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        
+        #paypal-button-container {
+            display: flex;
+            justify-content: center;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        </style>
 </head>
 <body>
-
-<div id="toast">Item added to bundle!</div>
-
-<div class="sticky-header">
-    <div class="header-content"><h1>Bundles & Gifts Catalog</h1></div>
-    <div class="bundle-bar">
-        <div class="bundle-bar-content">
-            <div class="bundle-info">
-                <span class="bundle-header-title" onclick="toggleDrawer()">Bundle Items (<span id="count">0</span>) ▾</span>
-                <span class="total-display" id="total-val">$0</span>
-            </div>
-            <button id="go-to-bundle" class="btn-customize" disabled>Customize Items</button>
+        <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p>Processing Designs...</p>
         </div>
-        <div id="bundle-drawer"></div>
+
+
+    <div class="wrapper">
+        <div class="header">
+            <button onclick="goBackToCatalog()" style="cursor:pointer; padding: 8px 15px; border-radius: 6px; border: 1px solid #ddd; background: #fff; font-weight: bold;">← Back to Catalog</button>
+            <h2 style="margin:0">Customize Your Bundle</h2>
+        </div>
+        <div id="items-container"></div>
     </div>
-</div>
 
-<div id="promo-banner">
-    🎁 Bundle & Save: 2 Items (5%) | 3-5 (10%) | 6-10 (15%) | 11+ (20%)
-</div>
-
-<div class="container" id="catalog-container"></div>
+    <div class="sticky-footer-container">
+        <div class="summary-bar">
+            <div style="font-size:12px; opacity:0.8;">Bundle Discount Tier Applied</div>
+            <div id="total-display" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 10px; color: rgb(209, 222, 233); ">Total: $0.00</div>
+            <div id="paypal-button-container" style="width: auto; margin: auto;"></div>
+            </div>
+        <div class="studio-notification">
+                For more flexible custom designs visit the D.I.M. Design Studio
+                <div class="bouncing-arrow">🔻🔻🔻🔻🔻⬇️🔻🔻🔻🔻🔻</div>
+        </div>
+    </div>
 
 <script>
- 
-    // --- 1. EMBEDDED PRODUCT LIST (Keep this exact list) ---
-    const productList = [
+// --- PRODUCT LIST (Make sure this matches your Index exactly) ---
+
+// --- EMBEDDED PRODUCT LIST ---
+const productList = [
             // ***************CATEGORY - Apparel & Wearables******************    
-        {
-          id: "AP-APSVM1",
-          name: "Adult White Polyester Graphic T-Shirt",
-          category: "Apparel & Wearables",
-          description: "Lightweight white polyester t-shirt designed for vibrant custom prints, perfect for logos, artwork, and personalized designs.",
-          basePrice: 15.99,
+    {
+      id: "AP-APSVM1",
+      name: "Adult White Polyester Graphic T-Shirt",
+      category: "Apparel & Wearables",
+      description: "Lightweight white polyester t-shirt designed for vibrant custom prints, perfect for logos, artwork, and personalized designs.",
+      basePrice: 15.99,
+
+      images:["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"],
+
+      sizes:[
+      {label:"S", extra:0},
+      {label:"M", extra:0},
+      {label:"L", extra:0},
+      {label:"XL", extra:0},
+      {label:"2XL", extra:0},
+      {label:"3XL", extra:0}
+      ],
+
+      styles:[
+      {label:"Logo Front", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
+      {label:"Large Front", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
+      {label:"Large Back", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
+      {label:"Logo Front & Large Back", extra:6, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"}
+      ]
+    },
+
+    {
+      id: "AP-ACSVM2",
+      name: "Adult Cotton T-Shirt",
+      category: "Apparel & Wearables",
+      description: "Premium polyester shirt with multiple design styles.",
+      basePrice: 15.99,
+
+      images:["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"],
+
+      sizes:[
+      {label:"S", extra:0},
+      {label:"M", extra:0},
+      {label:"L", extra:0},
+      {label:"XL", extra:0},
+      {label:"2XL", extra:0},
+      {label:"3XL", extra:0}
+      ],
+
+      styles:[
+      {label:"Logo Front", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
+      {label:"Large Front", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"},
+      {label:"Large Back", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"},
+      {label:"Logo Front & Large Back", extra:6, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"}
+      ]
+    },
     
-          images:["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"],
-    
-          sizes:[
-          {label:"S", extra:0},
-          {label:"M", extra:0},
-          {label:"L", extra:0},
-          {label:"XL", extra:0},
-          {label:"2XL", extra:0},
-          {label:"3XL", extra:0}
-          ],
-    
-          styles:[
-          {label:"Logo Front", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
-          {label:"Large Front", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
-          {label:"Large Back", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
-          {label:"Logo Front & Large Back", extra:6, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"}
-          ]
-        },
-    
-        {
-          id: "AP-ACSVM2",
-          name: "Adult Cotton T-Shirt",
-          category: "Apparel & Wearables",
-          description: "Premium polyester shirt with multiple design styles.",
-          basePrice: 15.99,
-    
-          images:["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"],
-    
-          sizes:[
-          {label:"S", extra:0},
-          {label:"M", extra:0},
-          {label:"L", extra:0},
-          {label:"XL", extra:0},
-          {label:"2XL", extra:0},
-          {label:"3XL", extra:0}
-          ],
-    
-          styles:[
-          {label:"Logo Front", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
-          {label:"Large Front", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"},
-          {label:"Large Back", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"},
-          {label:"Logo Front & Large Back", extra:6, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"}
-          ]
-        },
+    {
+      id: "BA-TV3001",
+      name: "Tote Bag",
+      category: "Apparel & Wearables", 
+      description: "13.5 inches x 13.5 inches x 4 inches customizable tote bag, available in multiple colors.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632229_31.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632228_2.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632230_31.png"], 
+      basePrice: 10.99,
+      variations: [
+        { label: "Black", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632228_2.png"},
+        { label: "White", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632230_31.png"},
+        { label: "Natural", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632229_31.png"}
+      ]
+    },
+
+    {
+      id: "AP-BOV401",
+      name: "Baby Onesie", 
+      category: "Apparel & Wearables",
+      description: "Personalized baby body suit to capture those precious moments. Perfect for gifting.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/onesie.png"],
+      basePrice: 10.99,
+      variations: [
+        { label: "6-9 months", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/onesie.png"},
+        { label: "9-12 months", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/onesie.png"},
+        { label: "12-18 months", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/onesie.png"},
+        { label: "18-24 months", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/onesie.png"}
+      ]
+    },
+
+    {
+      id: "AP-BBSPV1",
+      name: "Baby Bibb with Spill Pocket", 
+      category: "Apparel & Wearables",
+      description: "Soft baby bib with a built-in spill pocket to catch messes, perfect for adding cute custom designs or names - 10.24 x 9.06 inches.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/babybib.png"],
+      basePrice: 8.99,
+    },
+
         
-        {
-          id: "BA-TV3001",
-          name: "Tote Bag",
-          category: "Apparel & Wearables", 
-          description: "13.5 inches x 13.5 inches x 4 inches customizable tote bag, available in multiple colors.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632229_31.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632228_2.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632230_31.png"], 
-          basePrice: 10.99,
-          variations: [
-            { label: "Black", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632228_2.png"},
-            { label: "White", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632230_31.png"},
-            { label: "Natural", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632229_31.png"}
-          ]
-        },
+            // ***************CATEGORY - Drinkware & Kitchenware******************
     
-        {
-          id: "AP-BOV401",
-          name: "Baby Onesie", 
-          category: "Apparel & Wearables",
-          description: "Personalized baby body suit to capture those precious moments. Perfect for gifting.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/onesie.png"],
-          basePrice: 10.99,
-          variations: [
-            { label: "6-9 months", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/onesie.png"},
-            { label: "9-12 months", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/onesie.png"},
-            { label: "12-18 months", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/onesie.png"},
-            { label: "18-24 months", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/onesie.png"}
-          ]
-        },
+    {
+      id: "TU-SV1601",
+      name: "20oz Skinny Tumbler", 
+      category: "Drinkware & Kitchenware",
+      description: "Skinny 20oz tumbler available in a variety of colors and finishes including holographic, glitter, ombre and glow-perfect for custom designs.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/skinny%20color.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBGLOW1_cee74f28-51c3-4bb9-b14a-0455a7897ec7.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBDUOSK1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBSKINNYEDGEHOLOWHITE1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBMETGLITWHITE1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20oz%20Skinny%20Tumbler.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ombre%20group.png"],
+      basePrice:17.99 ,
+      variations: [
+        { label: "Skinny White", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20oz%20Skinny%20Tumbler.png" },
+        { label: "Duo Skinny White w/ 2 lids", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBDUOSK1.png" },
+        { label: "Glow Skinny", extra:3, image: "https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBGLOW1_cee74f28-51c3-4bb9-b14a-0455a7897ec7.png"},
+        { label: "Holographic Skinny", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBSKINNYEDGEHOLOWHITE1.png" },
+        { label: "Metallic Glitter Skinny", extra: 1, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBMETGLITWHITE1.png" },
+        { label: "Skinny Loving Lime", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/skinny%20color.png" },
+        { label: "Skinny Sweet Sunshine", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/skinny%20color.png" },
+        { label: "Skinny Playful Petals", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/skinny%20color.png" },
+        { label: "Skinny Cupid’s Crush", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/skinny%20color.png" },
+        { label: "Duo Skinny Ombre Sugarplum", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ombre%20group.png" },
+        { label: "Duo Skinny Ombre Mulled Wine", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ombre%20group.png" },
+        { label: "Duo Skinny Ombre Cranberry Spice", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ombre%20group.png" },
+        { label: "Duo Skinny Ombre Silent Night", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ombre%20group.png" },
+        { label: "Duo Skinny Ombre Wintersky", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ombre%20group.png" },
+        { label: "Duo Skinny Ombre Icy Wonderland", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ombre%20group.png" },
+        { label: "Duo Skinny Ombre Peppermint Cream", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ombre%20group.png"}
+      ]
+    },
     
-        {
-          id: "AP-BBSPV1",
-          name: "Baby Bibb with Spill Pocket", 
-          category: "Apparel & Wearables",
-          description: "Soft baby bib with a built-in spill pocket to catch messes, perfect for adding cute custom designs or names - 10.24 x 9.06 inches.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/babybib.png"],
-          basePrice: 8.99,
-        },
-    
-            
-                // ***************CATEGORY - Drinkware & Kitchenware******************
-        
-        {
-          id: "TU-SV1601",
-          name: "20oz Skinny Tumbler", 
-          category: "Drinkware & Kitchenware",
-          description: "Skinny 20oz tumbler available in a variety of colors and finishes including holographic, glitter, ombre and glow-perfect for custom designs.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/skinny%20color.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBGLOW1_cee74f28-51c3-4bb9-b14a-0455a7897ec7.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBDUOSK1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBSKINNYEDGEHOLOWHITE1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBMETGLITWHITE1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20oz%20Skinny%20Tumbler.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ombre%20group.png"],
-          basePrice:17.99 ,
-          variations: [
-            { label: "Skinny White", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20oz%20Skinny%20Tumbler.png" },
-            { label: "Duo Skinny White w/ 2 lids", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBDUOSK1.png" },
-            { label: "Glow Skinny", extra:3, image: "https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBGLOW1_cee74f28-51c3-4bb9-b14a-0455a7897ec7.png"},
-            { label: "Holographic Skinny", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBSKINNYEDGEHOLOWHITE1.png" },
-            { label: "Metallic Glitter Skinny", extra: 1, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBMETGLITWHITE1.png" },
-            { label: "Skinny Loving Lime", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/skinny%20color.png" },
-            { label: "Skinny Sweet Sunshine", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/skinny%20color.png" },
-            { label: "Skinny Playful Petals", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/skinny%20color.png" },
-            { label: "Skinny Cupid’s Crush", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/skinny%20color.png" },
-            { label: "Duo Skinny Ombre Sugarplum", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ombre%20group.png" },
-            { label: "Duo Skinny Ombre Mulled Wine", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ombre%20group.png" },
-            { label: "Duo Skinny Ombre Cranberry Spice", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ombre%20group.png" },
-            { label: "Duo Skinny Ombre Silent Night", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ombre%20group.png" },
-            { label: "Duo Skinny Ombre Wintersky", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ombre%20group.png" },
-            { label: "Duo Skinny Ombre Icy Wonderland", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ombre%20group.png" },
-            { label: "Duo Skinny Ombre Peppermint Cream", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ombre%20group.png"}
-          ]
-        },
-        
-        {
-          id: "TU-SGV201",
-          name: "Snow Globe Tumbler", 
-          category: "Drinkware & Kitchenware",
-          description: "Fun snow globe tumbler designed for creative custom prints and eye-catching drinkware designs.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SKINNYSNOWGLOBE1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SNOWGLOBEWHANDLE1.png"],
-          basePrice: 16.99,
-          variations: [
-            { label: "20oz Snow Globe", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SKINNYSNOWGLOBE1.png"},
-            { label: "20oz Snow Globe with Handle", extra: 1, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SNOWGLOBEWHANDLE1.png"}
-          ]
-        },
-    
-        {
-          id: "MU-IMVN01",
-          name: "Insulated Mug - 10oz",
-          category: "Drinkware & Kitchenware",
-          description: "Insulated coffee mug with a tinted sliding lid to keep drinks hot while showcasing your custom design.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/Coffee%20Mug%20Tumbler.png",],
-          basePrice: 11.99
-        },
-    
-        {
-          id: "BO-KWV601",
-          name: "Kids Water Bottle - 12oz",
-          category: "Drinkware & Kitchenware",
-          description: "Leak proof flip top lid and built in internal straw. Available in multiple colors.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20Sippy.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12SUBSIPPYBLUE1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20Sippy%20Cover.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20Sippy%20Bottom.png"],
-          basePrice: 15.99,
-          variations: [
-            {label: "Pink with green", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20Sippy.png"},
-            {label: "Blue with gray", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12SUBSIPPYBLUE1.png",},
-            {label: "Red with gray", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20Sippy.png"},
-            {label: "Black with gray", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20Sippy.png"},
-            {label: "Pink with Gray", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20Sippy.png"},
-            {label: "Orange with yellow", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20Sippy.png"}
-          ]
-        },
-    
-        {
-          id: "TU-SWGVN1",
-          name: "Stemless Wine Glass - 12oz", 
-          category: "Drinkware & Kitchenware",
-          description: "Stemless tumbler shape wineglass withdouble-wall vacuum insulated and clear sliding lid. Comes with a clear straw.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12SUBSTEMLESS1_b840e95b-9ec6-4372-b0e2-1229ac95c877.png"],
-          basePrice: 15.99,
-        },
-    
-        {
-          id: "MU-CCCVN1",
-          name: "Ceramic Coffee Mug - 15oz", 
-          category: "Drinkware & Kitchenware",
-          description: "Classic ceramic mug available in white or heat-changing black.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15CERAMICMUG1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ceramic%20mug.png"],
-          basePrice: 7.99,
-          variations: [
-            {label: "White", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15CERAMICMUG1.png"},
-            {label: "Black Heat Changing", extra:1, image: "https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ceramic%20mug.png"}
-    
-          ]
-        },
-    
-        {
-          id: "MU-GCVN01",
-          name: "Glass Coffee Mug", 
-          category: "Drinkware & Kitchenware",
-          description: "GClear or Matte glass coffee mug perfect for custom logos, designs, or personalized gifts.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15SUBGLASSGLITTERGLOBEMUG21_b7891d44-d6c4-40fd-8855-aabde5a38081.png", "https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/17SUBGLASSCOFFEEMATTE1_5a1ee9c7-f6d0-49ba-9de5-75cd392a8b1f.png"],
-          basePrice: 7.99,
-          variations: [
-            {label: "Clear-15oz", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15SUBGLASSGLITTERGLOBEMUG21_b7891d44-d6c4-40fd-8855-aabde5a38081.png"},
-            {label: "Clear-17oz", extra:2, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Glass%20coffee%20mug%20clear.png"},
-            {label: "Matte-17oz", extra:2, image: "https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/17SUBGLASSCOFFEEMATTE1_5a1ee9c7-f6d0-49ba-9de5-75cd392a8b1f.png"}
-          ]
-        },
-    
-         
-        {
-          id: "TU-GGV301",
-          name: "Gradient Glass Tumbler", 
-          category: "Drinkware & Kitchenware",
-          description: "20oz gradient glass skinny tumbler available in multiple colors. Comes  with 2 lids.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ScreenShot2022-08-30at10.53.45AM_a3b58e0f-76d5-4d7e-9fe1-1e9f8355091f.png"],
-          basePrice:16.99 ,
-          variations: [
-            { label: "Red", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ScreenShot2022-08-30at10.53.45AM_a3b58e0f-76d5-4d7e-9fe1-1e9f8355091f.png"},
-            { label: "Blue", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ScreenShot2022-08-30at10.53.45AM_a3b58e0f-76d5-4d7e-9fe1-1e9f8355091f.png"},
-            { label: "Pink", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ScreenShot2022-08-30at10.53.45AM_a3b58e0f-76d5-4d7e-9fe1-1e9f8355091f.png" }
-          ]
-        },
-    
-        {
-          id: "TU-GV7001",
-          name: "Grippy Tumbler", 
-          category: "Drinkware & Kitchenware",
-          description: "Comes with clear twist on lid, removable handle and metal straw available in multiple colors, styles and sizes. ",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30oz%20holo%20grippy.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20grippy.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBGRIPPY1_2ef6555c-2a8c-45d5-a489-9fb67b5ee899.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBGRIPPY3_f4dfa40e-98c8-4b57-ab3d-1ed5656bf07a.png"],
-          basePrice: 16.99,
-          variations: [
-            { label: "12oz White", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20grippy.png"},
-            { label: "20oz White", extra: 1, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20grippy.png"},
-            { label: "30oz  White", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBGRIPPY1_2ef6555c-2a8c-45d5-a489-9fb67b5ee899.png"},
-            { label: "30oz Holographic White", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30oz%20holo%20grippy.png"},
-            { label: "30oz Holographic Gradient - Pink", extra: 8, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30oz%20holo%20grippy.png"},
-            { label: "30oz Holographic Gradient – Purple", extra: 8, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30oz%20holo%20grippy.png"},
-            { label: "30oz Holographic Gradient - Green", extra: 8, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30oz%20holo%20grippy.png"}
-          ]
-        },
-    
-        {
-          id: "TU-TRV201",
-          name: "Tri Sip Tumbler", 
-          category: "Drinkware & Kitchenware",
-          description: "Innovative tumbler featuring a tri-sip lid design for multiple drinking options and custom personalization.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-081.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-061.png"],
-          basePrice:26.99,
-          variations: [
-            { label: "20oz Tri-Sip", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-081.png"},
-            { label: "30oz Tri-Sip", extra: 3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-061.png"}
-          ]
-        },
-    
-        {
-          id: "TU-SPV501",
-          name: "Speaker Tumbler", 
-          category: "Drinkware & Kitchenware",
-          description: "Tumblers with detachable bluetooth speaker. Available in multiple sizes.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSPEAKER1_157f9541-edfb-4e51-9de1-1a1e674aace8.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBGRIPPYSPEAKER1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30oz%20holographic%20speaker.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBGRIPPYSPEAKER1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBTRAVELERSPEAKERWHITE1_large.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-102.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-077_56958e84-c60d-475c-b35b-b50e72abf137.png"],
-          basePrice: 36.99,
-          variations: [
-            { label: "20oz Skinny Speaker Tumbler", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSPEAKER1_157f9541-edfb-4e51-9de1-1a1e674aace8.png"},
-            { label: "30oz Grippy Speaker Tumbler", extra: 2, image: "https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBGRIPPYSPEAKER1.png"},
-            { label: "30oz Holographic Unicorn Grippy Tumbler", extra: 4, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30oz%20holographic%20speaker.png"},
-            { label: "30oz Traveler Speaker Tumbler", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBGRIPPYSPEAKER1.png"},
-            { label: "40oz Traveler Speaker Tumbler", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBTRAVELERSPEAKERWHITE1_large.png"}
-          ]
-        },
-    
-        {
-          id: "TU-FVN001",
-          name: "22oz Fatty Tumbler", 
-          category: "Drinkware & Kitchenware",
-          description: "Double wall vacuum insulated with tinted lid and clear straw. Diameter - 3.45 inches",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/22SUBFATTY1_3ea845bb-434b-4b8c-a997-79b35bdbb49b.png"],
-          basePrice:17.99,
-        },
-    
-        {
-          id: "BO-HHV101",
-          name: "Hydro Handle Bottle", 
-          category: "Drinkware & Kitchenware",
-          description: "Insulated tumbler with a sturdy carry handle, perfect for custom designs and everyday hydration.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/Duo%20Hydro%20group.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/25SUBHYHA1_9dc7a375-5863-418a-b865-0e1b4f49ffc8.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBHYHA1_d76affb2-b7ee-4d97-8e44-4d9c23ff96a9.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/32SUBHYDROMETALGLITWHITE.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/hydro%20hound.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBCLIPMATE1_large.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBCLIPMATEHOLO.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/18oz%20hydro.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/5oz%20hydro.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/32oz%20hydro.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40oz%20hydro.png"],
-          basePrice: 16.99,
-          variations: [
-            { label: "25oz Hydro", extra: 1, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/25SUBHYHA1_9dc7a375-5863-418a-b865-0e1b4f49ffc8.png"},
-            { label: "40oz Hydro", extra: 5, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBHYHA1_d76affb2-b7ee-4d97-8e44-4d9c23ff96a9.png"},
-            { label: "32oz Metallic Glitter Hydro", extra: 3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/32SUBHYDROMETALGLITWHITE.png"},
-            { label: "32oz Hydro Hound", extra: 4, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/hydro%20hound.png"},
-            { label: "30oz Clipmate Hydro", extra: 3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBCLIPMATE1_large.png"},
-            { label: "30oz Holographic Clipmate Hydro", extra: 8, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBCLIPMATEHOLO.png"},
-            { label: "18oz Duo Hydro - 2 Lids", extra: 1, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/18oz%20hydro.png"},
-            { label: "25oz Duo Hydro - 2 Lids", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/5oz%20hydro.png"},
-            { label: "32oz Duo Hydro - 2 Lids", extra: 3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/32oz%20hydro.png"},
-            { label: "40oz Duo Hydro - 2 Lids", extra: 5, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40oz%20hydro.png"},
-            { label: "Duo Hydro Toddler - 2 Lids & Handles", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/blank.png"}
-          ]
-        },
-    
-        {
-          id: "BO-HHV301",
-          name: "Hydro Hound Tumbler - 32oz", 
-          category: "Drinkware & Kitchenware",
-          description: "32oz hydro hound tumbler with an attached portable bowl, perfect for custom designs for pet lovers.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/Duo%20Hydro%20group.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/25SUBHYHA1_9dc7a375-5863-418a-b865-0e1b4f49ffc8.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBHYHA1_d76affb2-b7ee-4d97-8e44-4d9c23ff96a9.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/32SUBHYDROMETALGLITWHITE.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/hydro%20hound.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBCLIPMATE1_large.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBCLIPMATEHOLO.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/18oz%20hydro.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/5oz%20hydro.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/32oz%20hydro.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40oz%20hydro.png"],
-          basePrice: 43.99,
-          variations: [
-            { label: "Two Tone", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/hydro%20hound.png"},
-            { label: "White", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/hydro%20hound.png"},
-            { label: "Clear", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/hydro%20hound.png"},
-          ]
-        },
-    
-        {
-          id: "TU-BSV201",
-          name: "40oz Big Swig Tumbler", 
-          category: "Drinkware & Kitchenware",
-          description: "Large 40oz holographic tumbler designed for bold custom designs and all-day hydration. Ombre variations with souvenier keychain.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBBIGSWIG1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBHOLOBIGSWIG1.png", "https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/black.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/blue.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/green.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/orange.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/purple.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/red.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/sand.png"],
-          basePrice: 26.99,
-          variations: [
-            { label: "White", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBBIGSWIG1.png"},
-            { label: "Holographic", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBHOLOBIGSWIG1.png"},
-            { label: "Ombre Black w/ Keychain", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/black.png"},
-            { label: "Ombre Blue w/ Keychain", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/blue.png"},
-            { label: "Ombre Green w/ Keychain", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/green.png"},
-            { label: "Ombre Orange w/ Keychain", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/orange.png"},
-            { label: "Ombre Purple w/ Keychain", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/purple.png"},
-            { label: "Ombre Red w/ Keychain", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/red.png"},
-            { label: "Ombre Sand w/ Keychain", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/sand.png"}
-          ]
-        },
-    
-        {
-          id: "TU-TV5001",
-          name: "Traveler Tumbler", 
-          category: "Drinkware & Kitchenware",
-          description: "Large capacity traveler tumbler perfect for custom artwork while keeping drinks hot or cold longer.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBTRAVELEROMBREGROUP_9b9e5916-89ea-412f-b34b-ee68656293ee.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBTRAVELERWHITE.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/trio%20traveler.png"],
-          basePrice:29.99 ,
-          variations: [
-            { label: "White 40oz", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBTRAVELERWHITE.png"},
-            { label: "Green 40oz Holographic", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBTRAVELEROMBREGROUP_9b9e5916-89ea-412f-b34b-ee68656293ee.png"},
-            { label: "Pink 40oz Holographic", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBTRAVELEROMBREGROUP_9b9e5916-89ea-412f-b34b-ee68656293ee.png"},
-            { label: "White 40oz Holographic", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBTRAVELEROMBREGROUP_9b9e5916-89ea-412f-b34b-ee68656293ee.png"},
-            { label: "30oz Trio Traveler - 3 Interchangable handles", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/trio%20traveler.png"}
-          ]
-        },
-    
-        {
-          id: "BO-FV1001",
-          name: "Flask Bottle", 
-          category: "Drinkware & Kitchenware",
-          description: "Sleek 7oz flask bottle ready for custom designs, perfect for gifts, events, or personal use.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/Flask.png"],
-          basePrice: 16.99,
-        },
-    
-              // ***************CATEGORY - Home & Living******************
-    
-        {
-          id: "HO-ASPVN1",
-          name: "Aluminum Spray Bottle - 16oz", 
-          category: "Home & Living",
-          description: "Durable 16oz aluminum spray bottle ready for custom branding or personalized designs.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/16SUBSPRAY1.png"],
-          basePrice: 10.99,
-        },
-    
-         {
-          id: "HO-SDVN01",
-          name: "Soap Dispenser", 
-          category: "Home & Living",
-          description: "Stylish pump soap dispenser ready for custom designs, perfect for kitchens and bathrooms.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-248.png"],
-          basePrice: 10.99,
-        },
-    
-        {
-          id: "HO-BV4001",
-          name: "Blanket", 
-          category: "Home & Living",
-          description: "Soft customizable blanket available in four styles, perfect for personalized photos and designs.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBBLANKETS1_24212936-9b47-4d9a-b46b-2fb9ab646052.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/O1CN016TVKnN2Eb34CBdD9t__3230388762-0-cib_1_1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/O1CN01IuHBt12Eb34QqFdtd__3230388762-0-cib_1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ScreenShot2022-07-13at10.20.44AM.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/blanket20measurement.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/blanket9measure.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/moonblanksetsize.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/pawsizeblanket.png"],
-          basePrice: 31.99,
-          variations: [
-            { label: "14 Panel Moon", extra: 4, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/O1CN016TVKnN2Eb34CBdD9t__3230388762-0-cib_1_1.png"},
-            { label: "15 Panel Paw", extra: 3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/O1CN01IuHBt12Eb34QqFdtd__3230388762-0-cib_1.png"},
-            { label: "9 Panel", extra: 1, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ScreenShot2022-07-13at10.20.44AM.png"},
-            { label: "20 Panel", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ScreenShot2022-07-13at10.20.44AM.png"}
-          ]
-        },
-    
-        {
-          id: "HO-SPFVN1",
-          name: "Slate Photo Frame with Stand", 
-          category: "Home & Living",
-          description: "Elegant slate photo frame with a display stand, perfect for custom photo prints and keepsakes - 7.8 inches x 11.8 inches, display stand included.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/c79100bd9a1c81231de8bfb99f98f395_L.png"],
-          basePrice: 21.99,
-        },
-    
-        {
-          id: "HO-TWPHV2",
-          name: "Tabletop Wood Photo Panel", 
-          category: "Home & Living",
-          description: "Natural wood photo panel designed for vibrant custom photo prints and home décor.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15379E15965E1.png"],
-          basePrice: 18.99,
-          variations: [
-            { label: "4x6 inches", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15379E15965E1.png"},
-            { label: "5x7 inches", extra: 3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15379E15965E1.png"}
-          ]
-        },
-    
-        {
-          id: "HO-WPPV21",
-          name: "Wood Photo Panel", 
-          category: "Home & Living",
-          description: "Beautiful wood photo panel designed for personalized photo prints and custom artwork. - inches x 10 inches. Perfect for showcasing your precious moments or personalized gifting.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15298E15618E3.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/weathered.png"],
-          basePrice: 17.99,
-          variations: [
-            { label: "Walnut", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15298E15618E3.png"},
-            { label: "Weathered", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/weathered.png"}
-          ]
-        },
-    
-        {
-          id: "HO-CV2001",
-          name: "Candle Jar", 
-          category: "Home & Living",
-          description: "10oz glass candle jar ready for custom designs, perfect for gifts or decorative use.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-440.png"],
-          basePrice:8.99
-        },
-    
-        {
-          id: "HO-SSJV11",
-          name: "Sassy Storage Jar", 
-          category: "Home & Living",
-          description: "Fun and stylish storage jar perfect for custom designs and decorative organization.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-440.png"],
-          basePrice:15.99
-        },
-    
-                // ***************CATEGORY - Games & Gifts******************
-    
-        {
-          id: "GA-CPVN01",
-          name: "Cardboard Puzzle",
-          category: "Games & Gifts",
-          description: "9.5x7.5 inches, 30 pieces. Customize it with memories, kids art or whatever your heart desires.",
-          images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SFS-SPUZ30puzzle_1.png"],
-          basePrice: 10.99
-        },
-    
-        {
-          id: "GA-CCVM01",
-          name: "Custom Cards ",
-          category: "Games & Gifts",
-          description: "Versatile custom card that can be used for business cards, playing cards, invitations, and more.",
-          images: [""],
-          basePrice: 17.99
-        }
-    ];
+    {
+      id: "TU-SGV201",
+      name: "Snow Globe Tumbler", 
+      category: "Drinkware & Kitchenware",
+      description: "Fun snow globe tumbler designed for creative custom prints and eye-catching drinkware designs.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SKINNYSNOWGLOBE1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SNOWGLOBEWHANDLE1.png"],
+      basePrice: 16.99,
+      variations: [
+        { label: "20oz Snow Globe", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SKINNYSNOWGLOBE1.png"},
+        { label: "20oz Snow Globe with Handle", extra: 1, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SNOWGLOBEWHANDLE1.png"}
+      ]
+    },
 
-    // --- 2. CORE UI FUNCTIONS ---
-    function showToast(message) {
-        const toast = document.getElementById("toast");
-        toast.textContent = message || "Item added!";
-        toast.classList.add("show");
-        setTimeout(() => { toast.classList.remove("show"); }, 2000);
+    {
+      id: "MU-IMVN01",
+      name: "Insulated Mug - 10oz",
+      category: "Drinkware & Kitchenware",
+      description: "Insulated coffee mug with a tinted sliding lid to keep drinks hot while showcasing your custom design.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/Coffee%20Mug%20Tumbler.png",],
+      basePrice: 11.99
+    },
+
+    {
+      id: "BO-KWV601",
+      name: "Kids Water Bottle - 12oz",
+      category: "Drinkware & Kitchenware",
+      description: "Leak proof flip top lid and built in internal straw. Available in multiple colors.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20Sippy.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12SUBSIPPYBLUE1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20Sippy%20Cover.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20Sippy%20Bottom.png"],
+      basePrice: 15.99,
+      variations: [
+        {label: "Pink with green", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20Sippy.png"},
+        {label: "Blue with gray", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12SUBSIPPYBLUE1.png",},
+        {label: "Red with gray", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20Sippy.png"},
+        {label: "Black with gray", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20Sippy.png"},
+        {label: "Pink with Gray", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20Sippy.png"},
+        {label: "Orange with yellow", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20Sippy.png"}
+      ]
+    },
+
+    {
+      id: "TU-SWGVN1",
+      name: "Stemless Wine Glass - 12oz", 
+      category: "Drinkware & Kitchenware",
+      description: "Stemless tumbler shape wineglass withdouble-wall vacuum insulated and clear sliding lid. Comes with a clear straw.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12SUBSTEMLESS1_b840e95b-9ec6-4372-b0e2-1229ac95c877.png"],
+      basePrice: 15.99,
+    },
+
+    {
+      id: "MU-CCCVN1",
+      name: "Ceramic Coffee Mug - 15oz", 
+      category: "Drinkware & Kitchenware",
+      description: "Classic ceramic mug available in white or heat-changing black.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15CERAMICMUG1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ceramic%20mug.png"],
+      basePrice: 7.99,
+      variations: [
+        {label: "White", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15CERAMICMUG1.png"},
+        {label: "Black Heat Changing", extra:1, image: "https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ceramic%20mug.png"}
+
+      ]
+    },
+
+    {
+      id: "MU-GCVN01",
+      name: "Glass Coffee Mug", 
+      category: "Drinkware & Kitchenware",
+      description: "GClear or Matte glass coffee mug perfect for custom logos, designs, or personalized gifts.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15SUBGLASSGLITTERGLOBEMUG21_b7891d44-d6c4-40fd-8855-aabde5a38081.png", "https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/17SUBGLASSCOFFEEMATTE1_5a1ee9c7-f6d0-49ba-9de5-75cd392a8b1f.png"],
+      basePrice: 7.99,
+      variations: [
+        {label: "Clear-15oz", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15SUBGLASSGLITTERGLOBEMUG21_b7891d44-d6c4-40fd-8855-aabde5a38081.png"},
+        {label: "Clear-17oz", extra:2, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Glass%20coffee%20mug%20clear.png"},
+        {label: "Matte-17oz", extra:2, image: "https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/17SUBGLASSCOFFEEMATTE1_5a1ee9c7-f6d0-49ba-9de5-75cd392a8b1f.png"}
+      ]
+    },
+
+     
+    {
+      id: "TU-GGV301",
+      name: "Gradient Glass Tumbler", 
+      category: "Drinkware & Kitchenware",
+      description: "20oz gradient glass skinny tumbler available in multiple colors. Comes  with 2 lids.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ScreenShot2022-08-30at10.53.45AM_a3b58e0f-76d5-4d7e-9fe1-1e9f8355091f.png"],
+      basePrice:16.99 ,
+      variations: [
+        { label: "Red", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ScreenShot2022-08-30at10.53.45AM_a3b58e0f-76d5-4d7e-9fe1-1e9f8355091f.png"},
+        { label: "Blue", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ScreenShot2022-08-30at10.53.45AM_a3b58e0f-76d5-4d7e-9fe1-1e9f8355091f.png"},
+        { label: "Pink", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ScreenShot2022-08-30at10.53.45AM_a3b58e0f-76d5-4d7e-9fe1-1e9f8355091f.png" }
+      ]
+    },
+
+    {
+      id: "TU-GV7001",
+      name: "Grippy Tumbler", 
+      category: "Drinkware & Kitchenware",
+      description: "Comes with clear twist on lid, removable handle and metal straw available in multiple colors, styles and sizes. ",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30oz%20holo%20grippy.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20grippy.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBGRIPPY1_2ef6555c-2a8c-45d5-a489-9fb67b5ee899.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBGRIPPY3_f4dfa40e-98c8-4b57-ab3d-1ed5656bf07a.png"],
+      basePrice: 16.99,
+      variations: [
+        { label: "12oz White", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20grippy.png"},
+        { label: "20oz White", extra: 1, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/12oz%20grippy.png"},
+        { label: "30oz  White", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBGRIPPY1_2ef6555c-2a8c-45d5-a489-9fb67b5ee899.png"},
+        { label: "30oz Holographic White", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30oz%20holo%20grippy.png"},
+        { label: "30oz Holographic Gradient - Pink", extra: 8, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30oz%20holo%20grippy.png"},
+        { label: "30oz Holographic Gradient – Purple", extra: 8, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30oz%20holo%20grippy.png"},
+        { label: "30oz Holographic Gradient - Green", extra: 8, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30oz%20holo%20grippy.png"}
+      ]
+    },
+
+    {
+      id: "TU-TRV201",
+      name: "Tri Sip Tumbler", 
+      category: "Drinkware & Kitchenware",
+      description: "Innovative tumbler featuring a tri-sip lid design for multiple drinking options and custom personalization.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-081.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-061.png"],
+      basePrice:26.99,
+      variations: [
+        { label: "20oz Tri-Sip", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-081.png"},
+        { label: "30oz Tri-Sip", extra: 3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-061.png"}
+      ]
+    },
+
+    {
+      id: "TU-SPV501",
+      name: "Speaker Tumbler", 
+      category: "Drinkware & Kitchenware",
+      description: "Tumblers with detachable bluetooth speaker. Available in multiple sizes.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSPEAKER1_157f9541-edfb-4e51-9de1-1a1e674aace8.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBGRIPPYSPEAKER1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30oz%20holographic%20speaker.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBGRIPPYSPEAKER1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBTRAVELERSPEAKERWHITE1_large.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-102.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-077_56958e84-c60d-475c-b35b-b50e72abf137.png"],
+      basePrice: 36.99,
+      variations: [
+        { label: "20oz Skinny Speaker Tumbler", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSPEAKER1_157f9541-edfb-4e51-9de1-1a1e674aace8.png"},
+        { label: "30oz Grippy Speaker Tumbler", extra: 2, image: "https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBGRIPPYSPEAKER1.png"},
+        { label: "30oz Holographic Unicorn Grippy Tumbler", extra: 4, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30oz%20holographic%20speaker.png"},
+        { label: "30oz Traveler Speaker Tumbler", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBGRIPPYSPEAKER1.png"},
+        { label: "40oz Traveler Speaker Tumbler", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBTRAVELERSPEAKERWHITE1_large.png"}
+      ]
+    },
+
+    {
+      id: "TU-FVN001",
+      name: "22oz Fatty Tumbler", 
+      category: "Drinkware & Kitchenware",
+      description: "Double wall vacuum insulated with tinted lid and clear straw. Diameter - 3.45 inches",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/22SUBFATTY1_3ea845bb-434b-4b8c-a997-79b35bdbb49b.png"],
+      basePrice:17.99,
+    },
+
+    {
+      id: "BO-HHV101",
+      name: "Hydro Handle Bottle", 
+      category: "Drinkware & Kitchenware",
+      description: "Insulated tumbler with a sturdy carry handle, perfect for custom designs and everyday hydration.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/Duo%20Hydro%20group.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/25SUBHYHA1_9dc7a375-5863-418a-b865-0e1b4f49ffc8.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBHYHA1_d76affb2-b7ee-4d97-8e44-4d9c23ff96a9.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/32SUBHYDROMETALGLITWHITE.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/hydro%20hound.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBCLIPMATE1_large.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBCLIPMATEHOLO.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/18oz%20hydro.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/5oz%20hydro.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/32oz%20hydro.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40oz%20hydro.png"],
+      basePrice: 16.99,
+      variations: [
+        { label: "25oz Hydro", extra: 1, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/25SUBHYHA1_9dc7a375-5863-418a-b865-0e1b4f49ffc8.png"},
+        { label: "40oz Hydro", extra: 5, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBHYHA1_d76affb2-b7ee-4d97-8e44-4d9c23ff96a9.png"},
+        { label: "32oz Metallic Glitter Hydro", extra: 3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/32SUBHYDROMETALGLITWHITE.png"},
+        { label: "32oz Hydro Hound", extra: 4, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/hydro%20hound.png"},
+        { label: "30oz Clipmate Hydro", extra: 3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBCLIPMATE1_large.png"},
+        { label: "30oz Holographic Clipmate Hydro", extra: 8, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBCLIPMATEHOLO.png"},
+        { label: "18oz Duo Hydro - 2 Lids", extra: 1, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/18oz%20hydro.png"},
+        { label: "25oz Duo Hydro - 2 Lids", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/5oz%20hydro.png"},
+        { label: "32oz Duo Hydro - 2 Lids", extra: 3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/32oz%20hydro.png"},
+        { label: "40oz Duo Hydro - 2 Lids", extra: 5, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40oz%20hydro.png"},
+        { label: "Duo Hydro Toddler - 2 Lids & Handles", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/blank.png"}
+      ]
+    },
+
+    {
+      id: "BO-HHV301",
+      name: "Hydro Hound Tumbler - 32oz", 
+      category: "Drinkware & Kitchenware",
+      description: "32oz hydro hound tumbler with an attached portable bowl, perfect for custom designs for pet lovers.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/Duo%20Hydro%20group.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/25SUBHYHA1_9dc7a375-5863-418a-b865-0e1b4f49ffc8.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBHYHA1_d76affb2-b7ee-4d97-8e44-4d9c23ff96a9.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/32SUBHYDROMETALGLITWHITE.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/hydro%20hound.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBCLIPMATE1_large.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBCLIPMATEHOLO.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/18oz%20hydro.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/5oz%20hydro.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/32oz%20hydro.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40oz%20hydro.png"],
+      basePrice: 43.99,
+      variations: [
+        { label: "Two Tone", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/hydro%20hound.png"},
+        { label: "White", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/hydro%20hound.png"},
+        { label: "Clear", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/hydro%20hound.png"},
+      ]
+    },
+
+    {
+      id: "TU-BSV201",
+      name: "40oz Big Swig Tumbler", 
+      category: "Drinkware & Kitchenware",
+      description: "Large 40oz holographic tumbler designed for bold custom designs and all-day hydration. Ombre variations with souvenier keychain.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBBIGSWIG1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBHOLOBIGSWIG1.png", "https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/black.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/blue.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/green.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/orange.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/purple.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/red.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/sand.png"],
+      basePrice: 26.99,
+      variations: [
+        { label: "White", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBBIGSWIG1.png"},
+        { label: "Holographic", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBHOLOBIGSWIG1.png"},
+        { label: "Ombre Black w/ Keychain", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/black.png"},
+        { label: "Ombre Blue w/ Keychain", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/blue.png"},
+        { label: "Ombre Green w/ Keychain", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/green.png"},
+        { label: "Ombre Orange w/ Keychain", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/orange.png"},
+        { label: "Ombre Purple w/ Keychain", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/purple.png"},
+        { label: "Ombre Red w/ Keychain", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/red.png"},
+        { label: "Ombre Sand w/ Keychain", extra: 7, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/sand.png"}
+      ]
+    },
+
+    {
+      id: "TU-TV5001",
+      name: "Traveler Tumbler", 
+      category: "Drinkware & Kitchenware",
+      description: "Large capacity traveler tumbler perfect for custom artwork while keeping drinks hot or cold longer.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBTRAVELEROMBREGROUP_9b9e5916-89ea-412f-b34b-ee68656293ee.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBTRAVELERWHITE.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/trio%20traveler.png"],
+      basePrice:29.99 ,
+      variations: [
+        { label: "White 40oz", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBTRAVELERWHITE.png"},
+        { label: "Green 40oz Holographic", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBTRAVELEROMBREGROUP_9b9e5916-89ea-412f-b34b-ee68656293ee.png"},
+        { label: "Pink 40oz Holographic", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBTRAVELEROMBREGROUP_9b9e5916-89ea-412f-b34b-ee68656293ee.png"},
+        { label: "White 40oz Holographic", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBTRAVELEROMBREGROUP_9b9e5916-89ea-412f-b34b-ee68656293ee.png"},
+        { label: "30oz Trio Traveler - 3 Interchangable handles", extra: 2, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/trio%20traveler.png"}
+      ]
+    },
+
+    {
+      id: "BO-FV1001",
+      name: "Flask Bottle", 
+      category: "Drinkware & Kitchenware",
+      description: "Sleek 7oz flask bottle ready for custom designs, perfect for gifts, events, or personal use.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/Flask.png"],
+      basePrice: 16.99,
+    },
+
+          // ***************CATEGORY - Home & Living******************
+
+    {
+      id: "HO-ASPVN1",
+      name: "Aluminum Spray Bottle - 16oz", 
+      category: "Home & Living",
+      description: "Durable 16oz aluminum spray bottle ready for custom branding or personalized designs.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/16SUBSPRAY1.png"],
+      basePrice: 10.99,
+    },
+
+     {
+      id: "HO-SDVN01",
+      name: "Soap Dispenser", 
+      category: "Home & Living",
+      description: "Stylish pump soap dispenser ready for custom designs, perfect for kitchens and bathrooms.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-248.png"],
+      basePrice: 10.99,
+    },
+
+    {
+      id: "HO-BV4001",
+      name: "Blanket", 
+      category: "Home & Living",
+      description: "Soft customizable blanket available in four styles, perfect for personalized photos and designs.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBBLANKETS1_24212936-9b47-4d9a-b46b-2fb9ab646052.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/O1CN016TVKnN2Eb34CBdD9t__3230388762-0-cib_1_1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/O1CN01IuHBt12Eb34QqFdtd__3230388762-0-cib_1.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ScreenShot2022-07-13at10.20.44AM.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/blanket20measurement.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/blanket9measure.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/moonblanksetsize.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/pawsizeblanket.png"],
+      basePrice: 31.99,
+      variations: [
+        { label: "14 Panel Moon", extra: 4, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/O1CN016TVKnN2Eb34CBdD9t__3230388762-0-cib_1_1.png"},
+        { label: "15 Panel Paw", extra: 3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/O1CN01IuHBt12Eb34QqFdtd__3230388762-0-cib_1.png"},
+        { label: "9 Panel", extra: 1, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ScreenShot2022-07-13at10.20.44AM.png"},
+        { label: "20 Panel", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ScreenShot2022-07-13at10.20.44AM.png"}
+      ]
+    },
+
+    {
+      id: "HO-SPFVN1",
+      name: "Slate Photo Frame with Stand", 
+      category: "Home & Living",
+      description: "Elegant slate photo frame with a display stand, perfect for custom photo prints and keepsakes - 7.8 inches x 11.8 inches, display stand included.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/c79100bd9a1c81231de8bfb99f98f395_L.png"],
+      basePrice: 21.99,
+    },
+
+    {
+      id: "HO-TWPHV2",
+      name: "Tabletop Wood Photo Panel", 
+      category: "Home & Living",
+      description: "Natural wood photo panel designed for vibrant custom photo prints and home décor.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15379E15965E1.png"],
+      basePrice: 18.99,
+      variations: [
+        { label: "4x6 inches", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15379E15965E1.png"},
+        { label: "5x7 inches", extra: 3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15379E15965E1.png"}
+      ]
+    },
+
+    {
+      id: "HO-WPPV21",
+      name: "Wood Photo Panel", 
+      category: "Home & Living",
+      description: "Beautiful wood photo panel designed for personalized photo prints and custom artwork. - inches x 10 inches. Perfect for showcasing your precious moments or personalized gifting.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15298E15618E3.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/weathered.png"],
+      basePrice: 17.99,
+      variations: [
+        { label: "Walnut", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15298E15618E3.png"},
+        { label: "Weathered", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics2/weathered.png"}
+      ]
+    },
+
+    {
+      id: "HO-CV2001",
+      name: "Candle Jar", 
+      category: "Home & Living",
+      description: "10oz glass candle jar ready for custom designs, perfect for gifts or decorative use.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-440.png"],
+      basePrice:8.99
+    },
+
+    {
+      id: "HO-SSJV11",
+      name: "Sassy Storage Jar", 
+      category: "Home & Living",
+      description: "Fun and stylish storage jar perfect for custom designs and decorative organization.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-440.png"],
+      basePrice:15.99
+    },
+
+            // ***************CATEGORY - Games & Gifts******************
+
+    {
+      id: "GA-CPVN01",
+      name: "Cardboard Puzzle",
+      category: "Games & Gifts",
+      description: "9.5x7.5 inches, 30 pieces. Customize it with memories, kids art or whatever your heart desires.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SFS-SPUZ30puzzle_1.png"],
+      basePrice: 10.99
+    },
+
+    {
+      id: "GA-CCVM01",
+      name: "Custom Cards ",
+      category: "Games & Gifts",
+      description: "Versatile custom card that can be used for business cards, playing cards, invitations, and more.",
+      images: [""],
+      basePrice: 17.99
     }
+];
+let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
 
-    window.toggleDrawer = function() {
-        const d = document.getElementById('bundle-drawer');
-        d.style.display = (d.style.display === "block") ? "none" : "block";
-    }
+const fontOptions = [
+    { name: 'Standard', family: "'Segoe UI', sans-serif" },
+    { name: 'Cursive', family: "'Pacifico', cursive" },
+    { name: 'Bold', family: "'Bebas Neue', sans-serif" },
+    { name: 'Modern', family: "'Montserrat', sans-serif" },
+    { name: 'Elegant', family: "'Playfair Display', serif" },
+    { name: 'Varsity', family: "'Graduate', serif" },
+    { name: 'Luxury', family: "'Cinzel', serif" },
+    { name: 'Playful', family: "'Fredoka One', cursive" },
+    { name: 'Retro', family: "'Space Mono', monospace" },
+    { name: 'Sketch', family: "'Shadows Into Light', cursive" }
+];
 
-    // --- 3. BUNDLE LOGIC ---
-    window.addToBundle = function(btn) {
-        const card = btn.closest('.item-card');
-        const productId = card.getAttribute('data-id'); 
-        const varietySelect = card.querySelector('.variety-select');
-        const variety = varietySelect ? varietySelect.value : "Standard";
-        
-        const uniqueKey = `${productId}-${variety}`;
-        let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
+const colorSwatches = ['#000000','#FFFFFF','#BE123C','#1E3A8A', '#14532D','#2563EB','#E2918F','#D4AF37','#C0C0C0','#DB2777','#A78BFA','#EA580C'];
 
-        if (!bundle[uniqueKey]) {
-            bundle[uniqueKey] = {
-                productId: productId, 
-                variety: variety,
-                quantity: 1
-            };
-        } else {
-            bundle[uniqueKey].quantity++;
-        }
-
-        localStorage.setItem('myBundle', JSON.stringify(bundle));
-        showToast("Added to bundle!");
-        updateUI(); 
-    }
-
-    window.changeQty = function(key, delta) {
-        let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
-        if (!bundle[key]) return;
-        bundle[key].quantity += delta;
-        if (bundle[key].quantity <= 0) delete bundle[key];
-        localStorage.setItem('myBundle', JSON.stringify(bundle));
-        updateUI();
-    }
-
-    function updateUI() {
-    const drawer = document.getElementById('bundle-drawer');
-    const banner = document.getElementById('promo-banner');
-    const bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
-    const keys = Object.keys(bundle);
-
-    drawer.innerHTML = '';
+// --- 3. THE RENDER ENGINE ---
+function render() {
+    const container = document.getElementById('items-container');
+    if (!container) return;
+    container.innerHTML = '';
+    
     let subtotal = 0;
     let itemCount = 0;
 
-    keys.forEach(key => {
-        const item = bundle[key];
-        const productInfo = productList.find(p => p.id === item.productId);
-        if (!productInfo) return;
+    const entries = Object.entries(bundle);
+    if (entries.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:50px;"><h2>Your bundle is empty</h2><a href="index.html" style="color:#2F6B64;">Return to Catalog</a></div>';
+        return;
+    }
 
-        // Combine sizes and variations to find the correct extra cost
-        const options = [...(productInfo.sizes || []), ...(productInfo.variations || [])];
-        const variation = options.find(v => v.label === item.variety);
-        const extra = variation ? variation.extra : 0;
-        const lineItemTotal = (productInfo.basePrice + extra) * item.quantity;
+    entries.forEach(([key, item]) => {
+        const p = productList.find(prod => prod.id === item.productId);
+        if(!p) return;
 
-        subtotal += lineItemTotal;
+        // Logic for Variation/Style selection
+        const selectedVar = p.variations ? p.variations.find(v => v.label === item.variety) : null;
+        const selectedStyle = p.styles ? p.styles.find(s => s.label === item.style) : null;
+        
+        let extra = 0;
+        if (selectedVar) extra += selectedVar.extra;
+        if (selectedStyle) extra += selectedStyle.extra;
+        const itemPrice = p.basePrice + extra;
+        const itemSubtotal = itemPrice * item.quantity;
+        
+        // Dynamic Image Update
+        const displayImg = selectedStyle?.image || selectedVar?.image || p.images[0];
+
+        subtotal += ((p.basePrice + extra) * item.quantity);
         itemCount += item.quantity;
 
-        drawer.innerHTML += `
-            <div class="drawer-item">
-                <div><strong>${productInfo.name}</strong><br><small>${item.variety}</small></div>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <div class="qty-circle" onclick="changeQty('${key}', -1)">-</div>
-                    <span>${item.quantity}</span>
-                    <div class="qty-circle" onclick="changeQty('${key}', 1)">+</div>
-                    <span style="min-width:60px; text-align:right;">$${lineItemTotal.toFixed(2)}</span>
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.setAttribute('data-key', key);
+        row.innerHTML = `
+            <div class="remove-x" onclick="removeItem('${key}')">X</div>
+            <div class="preview-section">
+                <div class="product-preview">
+                    <img src="${displayImg}" class="base-img">
+                    ${item.localImage ? `<img src="${item.localImage}" class="user-img-overlay">` : ''}
+                    <div class="preview-text" style=" color:${item.textColor || '#000'}; font-family:${item.fontFamily || 'sans-serif'}; font-size:${item.fontSize || 22}px;">${item.customText ?? ''}</div>
                 </div>
-            </div>`;
-    });
+                <input type="file" id="file-input-${key}" style="display: none;" accept="image/*" onchange="handleImageUpload('${key}', this)">
+                <button class="btn-upload" onclick="document.getElementById('file-input-${key}').click()" style="width: auto; margin-top: 10px;">
+                    ${item.localImage ? '✓ Image Loaded' : 'Upload Image'}
+                </button>
+                <button class="btn-clear" onclick="clearDesign('${key}')">Clear Design</button>
+                <div>
+                    <label>Quantity</label>
+                    <input type="number" min="1" value="${item.quantity || 1}" oninput="updateQuantity('${key}', this.value)">
+                </div>
+                <div style="font-weight:bold; color:#000000; margin-top:5px;">
+                        Item Total: $${itemSubtotal.toFixed(2)}
+                </div>
+                </div>
+            </div>
+            <div class="details" style="font-size: 16px; color:#000; font-weight: bold;">
+               <div>
+                    <h2 style="margin:0 0 5px 0; color:#000000;">${p.name}</h2>
+                    <div style="font-size:16px; font-weight: bold; margin-bottom:10px;">
+                        $${itemPrice.toFixed(2)} each
+                    </div>
+                    <div Style="font-size: 12px; color: blue;">(Discount calculated in final Total)</div>
+                    
+                    <hr>
+                    <label>Option</label>
+                    ${p.variations ? `
+                            <select onchange="updateProp('${key}', 'variety', this.value)">
+                                ${p.variations.map(v => `<option value="${v.label}" ${item.variety === v.label ? 'selected' : ''}>${v.label} (+$${v.extra.toFixed(2)})</option>`).join('')}
+                            </select>
+                        ` : ''}
 
-    // --- LIVE DISCOUNT CALCULATION ---
-    let discountPercent = 0;
+                        ${p.styles ? `
+                            
+                            <select onchange="updateProp('${key}', 'style', this.value)">
+                                ${p.styles.map(s => `<option value="${s.label}" ${item.style === s.label ? 'selected' : ''}>${s.label} (+$${s.extra.toFixed(2)})</option>`).join('')}
+                            </select>
+                        ` : ''}
+                </div>
+                <div><label>Add Text</label></div>
+                <div><input type="text" value="${item.customText ?? ''}" oninput="updateProp('${key}', 'customText', this.value)" placeholder="Enter text here..."></div>
+                <div><label>Text Color</label></div>
+                <div class="color-swatches">${colorSwatches.map(c => `<div class="color-sq ${item.textColor === c ? 'active' : ''}" style="background:${c}" onclick="updateProp('${key}', 'textColor', '${c}')"></div>`).join('')}</div>
+                <div style="font-size:16px; margin-bottom:10px;"><label>Font Size</label>
+                <input type="range" min="10" max="80" value="${item.fontSize || 22}" oninput="updateProp('${key}', 'fontSize', this.value)">${item.fontSize || 22}px</div>
+                <div><label>Font Style</label>
+                <select onchange="updateProp('${key}', 'fontFamily', this.value)">${fontOptions.map(f => `<option value="${f.family}" style="font-family:${f.family}" ${item.fontFamily === f.family ? 'selected' : ''}>${f.name}</option>`).join('')}</select></div>
+                <div><label>Special Instructions</label>
+                <textarea rows="3" oninput="updateProp('${key}', 'notes', this.value)">${item.notes || ''}</textarea></div>
+            </div>
+        `;
+      
+        console.log("ITEM:", item);
+        container.appendChild(row);
+    });
+    
+    // --- Totals Display ---
+    let discPercent = 0;
+    if (itemCount === 2) discPercent = 0.05;
+    else if (itemCount >= 3 && itemCount <= 5) discPercent = 0.10;
+    else if (itemCount >= 6 && itemCount <= 10) discPercent = 0.15;
+    else if (itemCount >= 11) discPercent = 0.20;
+        
+    const finalTotal = subtotal * (1 - discPercent);
+    const savings = subtotal - finalTotal;
     let nextTierMsg = "";
 
-    if (itemCount === 2) {
-        discountPercent = 0.05;
-        nextTierMsg = "Add 1 more for 10% off!";
-    } else if (itemCount >= 3 && itemCount <= 5) {
-        discountPercent = 0.10;
-        nextTierMsg = itemCount < 5 ? "Add more for 10% off!" : "Add 1 more for 15% off!";
-    } else if (itemCount >= 6 && itemCount <= 10) {
-        discountPercent = 0.15;
-        nextTierMsg = itemCount < 10 ? "Add more for 15% off!" : "Add 1 more for 20% off!";
-    } else if (itemCount >= 11) {
-        discountPercent = 0.20;
-        nextTierMsg = "MAX DISCOUNT REACHED! 🎉";
-    } else if (itemCount === 1) {
-        nextTierMsg = "Add 1 more item for 5% off!";
-    }
+    if (itemCount === 1) nextTierMsg = "Add 1 more item to get 5% OFF";
+    else if (itemCount === 2) nextTierMsg = "Add 1 more item to get 10% OFF";
+    else if (itemCount >= 3 && itemCount <= 4) nextTierMsg = "Add more items to get 15% OFF";
+    else if (itemCount >= 6 && itemCount <= 9) nextTierMsg = "Add more items to get 20% OFF";
+   document.getElementById('total-display').innerHTML = `
+    <div style="font-size:14px;">
+        Items: ${itemCount}
+    </div>
 
-    const discountAmount = subtotal * discountPercent;
-    const finalTotal = subtotal - discountAmount;
+    ${discPercent > 0 ? `
+        <div style="font-size:14px; color:#bbf7d0;">
+            Discount Applied: ${(discPercent * 100)}% OFF
+        </div>
+        <div style="font-size:13px; color:#bbf7d0;">
+            You Save: $${savings.toFixed(2)}
+        </div>
+        <div style="text-decoration:line-through; font-size:13px; opacity:0.7;">
+            Subtotal: $${subtotal.toFixed(2)}
+        </div>
+    ` : ''}
 
-    // Update Promo Banner Text
-    if (itemCount > 0) {
-        banner.innerHTML = `🔥 Bundle Status: ${itemCount} Items | Discount: ${Math.round(discountPercent * 100)}% | ${nextTierMsg}`;
-    } else {
-        banner.innerHTML = `🎁 Bundle & Save: 2 Items (5%) | 3-5 (10%) | 6-10 (15%) | 11+ (20%)`;
-    }
-
-    // Update Sticky Bar Price Display
-    const totalValEl = document.getElementById('total-val');
-    if (discountPercent > 0) {
-        totalValEl.innerHTML = `
-            <span style="text-decoration: line-through; color: #666; font-size: 0.85rem; margin-right: 5px;">$${subtotal.toFixed(2)}</span>
-            <span style="color: #059669;">$${finalTotal.toFixed(2)}</span>
-        `;
-    } else {
-        totalValEl.textContent = `$${subtotal.toFixed(2)}`;
-    }
-            
-    document.getElementById('count').textContent = itemCount;
-    document.getElementById('go-to-bundle').disabled = (itemCount === 0);
+    <div style="font-size:24px; font-weight:bold; margin-top:5px;">
+        Total: $${finalTotal.toFixed(2)}
+    </div>
+         ${nextTierMsg ? `
+    <div style="font-size:12px; opacity:0.8; margin-top:5px;">
+        ${nextTierMsg}
+    </div>
+` : ''}
+`;
+    initPayPal(finalTotal.toFixed(2));
 }
-    // --- 4. CATALOG GENERATION (FIXED) ---
-    function renderCatalog() {
-        const container = document.getElementById('catalog-container');
-        if (!container) return;
-
-        // Grouping items by category
-        const grouped = {};
-        productList.forEach(p => {
-            const cat = p.category || "General";
-            if (!grouped[cat]) grouped[cat] = [];
-            grouped[cat].push(p);
-        });
-
-        let html = '';
-        for (const catName in grouped) {
-            html += `
-            <div class="category">
-                <div class="category-header" onclick="const c = this.nextElementSibling; c.style.display = (c.style.display === 'none' ? 'block' : 'none');">
-                    <span>${catName}</span>
-                    <span>▾</span>
-                </div>
-                <div class="category-content">
-                    <div class="item-grid">
-                        ${grouped[catName].map(p => `
-                            <div class="item-card" data-id="${p.id}">
-                                <img src="${p.images ? p.images[0] : ''}" onerror="this.src='https://via.placeholder.com/150'">
-                                <div style="font-weight:600; margin-top:10px;">${p.name}</div>
-                                <div style="color:#059669; margin-bottom:8px">$${p.basePrice.toFixed(2)}</div>
-                                <select class="variety-select">
-                                    ${p.sizes ? p.sizes.map(s => `<option value="${s.label}">${s.label} (+$${s.extra})</option>`).join('') : ''}
-                                    ${p.variations ? p.variations.map(v => `<option value="${v.label}">${v.label} (+$${v.extra})</option>`).join('') : ''}
-                                    ${(!p.sizes && !p.variations) ? '<option value="Standard">Standard</option>' : ''}
-                                </select>
-                                <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            </div>`;
-        }
-        container.innerHTML = html;
-    }
-
-    // --- 5. START ---
-    document.getElementById('go-to-bundle').onclick = () => window.location.href = 'customize.html';
     
-    // Run everything once the page is ready
-    window.onload = () => {
-        renderCatalog();
-        updateUI();
+// --- 4. CORE FUNCTIONS ---
+window.updateProp = (key, prop, val) => {
+    if (prop === 'fontSize') val = parseInt(val);
+
+    bundle[key][prop] = val;
+    localStorage.setItem('myBundle', JSON.stringify(bundle));
+
+    const card = document.querySelector(`[data-key="${key}"]`);
+
+    if (prop === 'customText' && card) {
+        card.querySelector('.preview-text').textContent = val;
+    } else if (prop === 'fontSize' && card) {
+        card.querySelector('.preview-text').style.fontSize = val + "px";
+    } else {
+        render();
+    }
+};
+
+window.handleImageUpload = (key, input) => {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        bundle[key].localImage = e.target.result; 
+        localStorage.setItem('myBundle', JSON.stringify(bundle));
+        render();
     };
+    reader.readAsDataURL(file);
+};
+
+window.clearDesign = (key) => {
+    bundle[key].customText = "";
+    bundle[key].localImage = null;
+    localStorage.setItem('myBundle', JSON.stringify(bundle));
+    render();
+};
+
+window.removeItem = (key) => {
+    delete bundle[key];
+    localStorage.setItem('myBundle', JSON.stringify(bundle));
+    if (Object.keys(bundle).length === 0) window.location.href = 'index.html';
+    render();
+};
+window.updateQuantity = (key, val) => {
+    let qty = parseInt(val);
+
+    // Prevent invalid values
+    if (isNaN(qty) || qty < 1) qty = 1;
+
+    bundle[key].quantity = qty;
+
+    localStorage.setItem('myBundle', JSON.stringify(bundle));
+    render();
+};
+
+// --- 5. CHECKOUT FUNCTIONS ---
+async function processCloudinaryUploads() {
+    for (let key in bundle) {
+        if (bundle[key].localImage) {
+            const formData = new FormData();
+            formData.append('file', bundle[key].localImage);
+            formData.append('upload_preset', 'Custom_Bundle_Preset'); 
+            try {
+                const res = await fetch(`https://api.cloudinary.com/v1_1/dpsmcu07f/image/upload`, { method: 'POST', body: formData });
+                const data = await res.json();
+                bundle[key].cloudinaryUrl = data.secure_url;
+            } catch (e) { console.error("Cloudinary Error:", e); }
+        }
+    }
+}
+
+function initPayPal(total) {
+    const container = document.getElementById('paypal-button-container');
+    if (!container) return;
+    container.innerHTML = '';
+    paypal.Buttons({
+        style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal', tagline: false },
+        fundingSource: paypal.FUNDING.PAYPAL,
+        createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: total } }] }),
+        onApprove: (data, actions) => actions.order.capture().then(details => sendOrderEmail(details))
+    }).render('#paypal-button-container');
+}
+
+async function sendOrderEmail(details) {
+    await processCloudinaryUploads();
+    let summary = Object.entries(bundle).map(([k, v]) => `ITEM: ${v.productId}\nTEXT: ${v.customText || 'N/A'}\nLINK: ${v.cloudinaryUrl || 'No Image'}\n---`).join('\n');
+    
+    emailjs.send('service_ezq1fuc', 'template_r4hpykx', {
+        order_id: details.id,
+        customer_name: details.payer.name.given_name,
+        message: summary,
+        total_paid: details.purchase_units[0].amount.value
+    }).then(() => {
+        localStorage.clear();
+        window.location.href = "thank-you.html";
+    });
+}
+
+// Kickstart the page
+render();
 </script>
 </body>
 </html>

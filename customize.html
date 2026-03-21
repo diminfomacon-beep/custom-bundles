@@ -14,18 +14,11 @@
       (function(){ emailjs.init("1LZbCPvH49G_r0ypB"); })();
     </script>
 
-    <script src="https://cdn.jsdelivr.net/gh/diminfomacon-beep/custom-bundles@main/productList.js"></script>
-
     <style>
         body {font-family: 'Segoe UI', Tahoma, sans-serif; background:#CAE4DB; padding:0; margin:0; color: #1f2937; padding-bottom: 220px;}
         .wrapper {max-width: 950px; margin: auto; padding: 20px;}
         .header {display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
         
-        #bulk-actions {
-            background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 20px; 
-            border: 2px dashed #2F6B64; display: none; align-items: center; justify-content: space-between;
-        }
-
         .item-row {
             background: #9cbdb1; border-radius: 12px; padding: 25px; margin-bottom: 20px; 
             display: grid; grid-template-columns: 300px 1fr; gap: 25px; 
@@ -94,6 +87,86 @@
 </div>
 
 <script>
+// --- EMBEDDED PRODUCT LIST ---
+const productList = [
+    {
+      id: "AP-APSVM1",
+      name: "Adult White Polyester Graphic T-Shirt",
+      category: "Apparel & Wearables",
+      description: "Lightweight white polyester t-shirt designed for vibrant custom prints.",
+      basePrice: 15.99,
+      images:["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"],
+      sizes:[{label:"S", extra:0}, {label:"M", extra:0}, {label:"L", extra:0}, {label:"XL", extra:0}, {label:"2XL", extra:0}, {label:"3XL", extra:0}],
+      styles:[
+        {label:"Logo Front", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
+        {label:"Large Front", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
+        {label:"Large Back", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
+        {label:"Logo Front & Large Back", extra:6, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"}
+      ]
+    },
+    {
+      id: "AP-ACSVM2",
+      name: "Adult Cotton T-Shirt",
+      category: "Apparel & Wearables",
+      description: "Premium polyester shirt with multiple design styles.",
+      basePrice: 15.99,
+      images:["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"],
+      sizes:[{label:"S", extra:0}, {label:"M", extra:0}, {label:"L", extra:0}, {label:"XL", extra:0}, {label:"2XL", extra:0}, {label:"3XL", extra:0}],
+      styles:[
+        {label:"Logo Front", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
+        {label:"Large Front", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"},
+        {label:"Large Back", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"},
+        {label:"Logo Front & Large Back", extra:6, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"}
+      ]
+    },
+    {
+      id: "BA-TV3001",
+      name: "Tote Bag",
+      category: "Apparel & Wearables", 
+      description: "13.5x13.5x4 inch customizable tote bag.",
+      basePrice: 10.99,
+      variations: [
+        { label: "Black", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632228_2.png"},
+        { label: "White", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632230_31.png"},
+        { label: "Natural", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/10632229_31.png"}
+      ]
+    },
+    {
+      id: "TU-SV1601",
+      name: "20oz Skinny Tumbler", 
+      category: "Drinkware & Kitchenware",
+      description: "Skinny 20oz tumbler in various finishes.",
+      basePrice: 17.99,
+      variations: [
+        { label: "Skinny White", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20oz%20Skinny%20Tumbler.png" },
+        { label: "Glow Skinny", extra:3, image: "https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/20SUBGLOW1_cee74f28-51c3-4bb9-b14a-0455a7897ec7.png"}
+      ]
+    },
+    {
+      id: "MU-CCCVN1",
+      name: "Ceramic Coffee Mug - 15oz", 
+      category: "Drinkware & Kitchenware",
+      description: "Classic ceramic mug available in white or heat-changing black.",
+      basePrice: 7.99,
+      variations: [
+        {label: "White", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15CERAMICMUG1.png"},
+        {label: "Black Heat Changing", extra:1, image: "https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/ceramic%20mug.png"}
+      ]
+    },
+    {
+      id: "TU-BSV201",
+      name: "40oz Big Swig Tumbler", 
+      category: "Drinkware & Kitchenware",
+      description: "Large 40oz holographic tumbler.",
+      basePrice: 26.99,
+      variations: [
+        { label: "White", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBBIGSWIG1.png"},
+        { label: "Holographic", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBHOLOBIGSWIG1.png"}
+      ]
+    }
+];
+
+// Logic starts here
 let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
 
 const fontOptions = [
@@ -112,13 +185,6 @@ const fontOptions = [
 function render() {
     const container = document.getElementById('items-container');
     const totalPriceEl = document.getElementById('total-price');
-    
-    // Safety check for productList
-    if (typeof productList === 'undefined') {
-        container.innerHTML = "<p style='text-align:center; padding:50px;'>Error: productList.js could not be loaded.</p>";
-        return;
-    }
-
     const keys = Object.keys(bundle);
     let subtotal = 0;
 
@@ -130,8 +196,7 @@ function render() {
         return;
     }
 
-    // --- CATEGORY & ITEM RENDERING ---
-    // FIXED: Corrected the lookup to use 'productList' and find by productId
+    // Determine unique categories in the current bundle
     const activeCategories = [...new Set(keys.map(key => {
         const item = bundle[key];
         const p = productList.find(prod => prod.id === item.productId);
@@ -169,7 +234,7 @@ function render() {
                     <div class="product-preview">
                         <img src="${displayImg}" class="base-img">
                         <img id="img-overlay-${key}" class="user-img-overlay" src="${item.cloudinaryUrl || ''}" style="display: ${item.cloudinaryUrl ? 'block' : 'none'}">
-                        <div class="preview-text" id="text-layer-${key}" style="color: ${item.textColor || '#000000'}; font-family: ${item.fontFamily || fontOptions[0].family}; font-size: ${item.fontSize || 24}px;">
+                        <div class="preview-text" id="text-layer-${key}" style="color: ${item.textColor || '#000000'}; font-family: ${item.fontFamily || fontOptions[0].family}; font-size: 24px;">
                             ${item.customText || ''}
                         </div>
                     </div>
@@ -178,7 +243,7 @@ function render() {
                     <h3 style="margin:0; color: #2F6B64;">${productInfo.name}</h3>
                     <p style="font-size: 0.75rem; color: #666; margin: 5px 0 15px 0;">${productInfo.description}</p>
                     ${productInfo.sizes ? `<label>Size</label><div class="swatch-container">${productInfo.sizes.map(s => `<div class="swatch ${item.size === s.label ? 'active' : ''}" style="background:#fff; width:40px; height:30px; display:flex; align-items:center; justify-content:center; border:1px solid #ccc; font-size:11px; cursor:pointer;" onclick="updateProp('${key}', 'size', '${s.label}')">${s.label}</div>`).join('')}</div>` : ''}
-                    ${(productInfo.styles || productInfo.variations) ? `<label>${productInfo.styles ? 'Design Style' : 'Color/Variety'}</label><div class="swatch-container">${(productInfo.styles || productInfo.variations).map(opt => `<div class="swatch ${(item.style === opt.label || item.variety === opt.label) ? 'active' : ''}" style="background: ${opt.hex || '#ffffff'}; color: ${getContrastColor(opt.hex || '#ffffff')}; width: auto; padding: 6px 12px; border: 1px solid #ccc; font-size: 10px; font-weight: bold; cursor: pointer;" onclick="updateProp('${key}', '${productInfo.styles ? 'style' : 'variety'}', '${opt.label}')">${opt.label} ${opt.extra > 0 ? '(+$'+opt.extra+')' : ''}</div>`).join('')}</div>` : ''}
+                    ${(productInfo.styles || productInfo.variations) ? `<label>${productInfo.styles ? 'Design Style' : 'Color/Variety'}</label><div class="swatch-container">${(productInfo.styles || productInfo.variations).map(opt => `<div class="swatch ${(item.style === opt.label || item.variety === opt.label) ? 'active' : ''}" style="background: #ffffff; color: #000; width: auto; padding: 6px 12px; border: 1px solid #ccc; font-size: 10px; font-weight: bold; cursor: pointer;" onclick="updateProp('${key}', '${productInfo.styles ? 'style' : 'variety'}', '${opt.label}')">${opt.label} ${opt.extra > 0 ? '(+$'+opt.extra+')' : ''}</div>`).join('')}</div>` : ''}
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top:15px;">
                         <div><label>Text Color</label><input type="color" value="${item.textColor || '#000000'}" onchange="updateProp('${key}', 'textColor', this.value)" style="width:100%; height:32px; cursor:pointer; border:1px solid #ddd; padding:0; background:none;"></div>
                         <div><label>Font Style</label><select onchange="updateProp('${key}', 'fontFamily', this.value)" style="height:32px; font-size:12px; width:100%;">${fontOptions.map(f => `<option value="${f.family}" ${item.fontFamily === f.family ? 'selected' : ''}>${f.name}</option>`).join('')}</select></div>
@@ -193,7 +258,7 @@ function render() {
 
     // --- DISCOUNT LOGIC ---
     let discountPercent = 0;
-    const totalQty = Object.values(bundle).reduce((sum, item) => sum + item.quantity, 0);
+    const totalQty = Object.values(bundle).reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
 
     if (totalQty === 2) discountPercent = 0.05;
     else if (totalQty >= 3 && totalQty <= 5) discountPercent = 0.10;
@@ -278,8 +343,8 @@ TEXT: ${item.customText || 'None'}
 
 function goBackToCatalog() { window.location.href = 'index.html'; }
 
-// Run render when page loads
-window.onload = render;
+// Run render immediately
+render();
 </script>
 </body>
 </html>

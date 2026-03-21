@@ -166,7 +166,7 @@
             font-family: 'Segoe UI', sans-serif;
         }
         .studio-notification {
-            background: #fbbf24; color: #000; text-align: center; 
+            background: #FEE84A; color: #000; text-align: center; 
             padding: 10px; font-weight: bold; font-size: 0.85rem;
             display: flex; flex-direction: column; align-items: center;
         }
@@ -207,6 +207,15 @@
             margin-bottom: 10px;
         }
 
+        .header {
+            background-color: #2F6B64;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            color:#fff;
+            font-size: 20px;
+        }
 
        .details select {
             width: 100%;
@@ -240,9 +249,10 @@
 
 
     <div class="wrapper">
+        <div><button onclick="goBackToCatalog()" style="cursor:pointer; padding: 8px 15px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ddd; background: #FEE84A; font-weight: bold;">← Back to Catalog</button></div>
+
         <div class="header">
-            <button onclick="goBackToCatalog()" style="cursor:pointer; padding: 8px 15px; border-radius: 6px; border: 1px solid #ddd; background: #fff; font-weight: bold;">← Back to Catalog</button>
-            <h2 style="margin:0">Customize Your Bundle</h2>
+            <div><h2 style="margin:0">Customize Your Bundle</h2></div>
         </div>
         <div id="items-container"></div>
     </div>
@@ -451,7 +461,7 @@ const productList = [
       id: "MU-GCVN01",
       name: "Glass Coffee Mug", 
       category: "Drinkware & Kitchenware",
-      description: "GClear or Matte glass coffee mug perfect for custom logos, designs, or personalized gifts.",
+      description: "Clear or Matte glass coffee mug perfect for custom logos, designs, or personalized gifts.",
       images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/15SUBGLASSGLITTERGLOBEMUG21_b7891d44-d6c4-40fd-8855-aabde5a38081.png", "https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/17SUBGLASSCOFFEEMATTE1_5a1ee9c7-f6d0-49ba-9de5-75cd392a8b1f.png"],
       basePrice: 7.99,
       variations: [
@@ -938,64 +948,92 @@ window.updateQuantity = (key, val) => {
 };
 
 // --- 5. CHECKOUT FUNCTIONS ---
+
 async function processCloudinaryUploads() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) overlay.style.display = 'flex';
+
     for (let key in bundle) {
-        if (bundle[key].localImage) {
+        // Upload only if there is a local image and it hasn't been uploaded yet
+        if (bundle[key].localImage && !bundle[key].cloudinaryUrl) {
             const formData = new FormData();
             formData.append('file', bundle[key].localImage);
             formData.append('upload_preset', 'Custom_Bundle_Preset'); 
+            
             try {
-                const res = await fetch(`https://api.cloudinary.com/v1_1/dpsmcu07f/image/upload`, { method: 'POST', body: formData });
+                const res = await fetch(`https://api.cloudinary.com/v1_1/dpsmcu07f/image/upload`, { 
+                    method: 'POST', 
+                    body: formData 
+                });
                 const data = await res.json();
                 bundle[key].cloudinaryUrl = data.secure_url;
-            } catch (e) { console.error("Cloudinary Error:", e); }
+            } catch (e) { 
+                console.error("Cloudinary Error for " + key + ":", e); 
+            }
         }
     }
+    localStorage.setItem('myBundle', JSON.stringify(bundle));
 }
 
 function initPayPal(total) {
     const container = document.getElementById('paypal-button-container');
     if (!container) return;
     container.innerHTML = '';
+    
     paypal.Buttons({
         style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal', tagline: false },
-        fundingSource: paypal.FUNDING.PAYPAL,
-        createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: total } }] }),
-        onApprove: (data, actions) => actions.order.capture().then(details => sendOrderEmail(details))
+        createOrder: (data, actions) => actions.order.create({ 
+            purchase_units: [{ amount: { value: total } }] 
+        }),
+        onApprove: async (data, actions) => {
+            const details = await actions.order.capture();
+            await sendOrderEmail(details);
+        }
     }).render('#paypal-button-container');
 }
 
 async function sendOrderEmail(details) {
     await processCloudinaryUploads();
-    let summary = Object.entries(bundle).map(([k, v]) => `ITEM: ${v.productId}\nTEXT: ${v.customText || 'N/A'}\nLINK: ${v.cloudinaryUrl || 'No Image'}\n---`).join('\n');
     
-    emailjs.send('service_ezq1fuc', 'template_r4hpykx', {
+    // Create a clear summary for your inbox
+    let summary = Object.entries(bundle).map(([k, v]) => {
+        return `ITEM: ${v.productId} | QTY: ${v.quantity}
+STYLE: ${v.variety || 'N/A'} / ${v.style || 'N/A'}
+TEXT: ${v.customText || 'None'}
+IMAGE: ${v.cloudinaryUrl || 'No Image'}
+NOTES: ${v.notes || 'None'}
+--------------------------`;
+    }).join('\n');
+    
+    const templateParams = {
         order_id: details.id,
         customer_name: details.payer.name.given_name,
+        customer_email: details.payer.email_address,
         message: summary,
         total_paid: details.purchase_units[0].amount.value
-    }).then(() => {
-        localStorage.clear();
-        window.location.href = "thank-you.html";
-    });
-}
-window.goBackToCatalog = () => {
-    // Save any typed text or colors before leaving
-    try {
-        localStorage.setItem('myBundle', JSON.stringify(bundle));
-    } catch (e) {
-        console.warn("LocalStorage save failed, but moving back anyway.");
-    }
+    };
 
-    // Try moving back in history first (Best for Google Sites)
+    try {
+        await emailjs.send('service_ezq1fuc', 'template_r4hpykx', templateParams);
+        localStorage.removeItem('myBundle');
+        window.location.href = "thank-you.html";
+    } catch (error) {
+        console.error("EmailJS Failed:", error);
+        alert("Payment successful! But we couldn't auto-send your designs. Please contact support with your Order ID: " + details.id);
+        document.getElementById('loading-overlay').style.display = 'none';
+    }
+}
+
+window.goBackToCatalog = () => {
+    localStorage.setItem('myBundle', JSON.stringify(bundle));
     if (window.history.length > 1) {
         window.history.back();
     } else {
-        // Fallback if they opened the link directly in a new tab
         window.location.href = 'index.html';
     }
 };
-// Kickstart the page
+
+// Start the engine
 render();
 </script>
 </body>

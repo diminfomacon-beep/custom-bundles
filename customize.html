@@ -973,7 +973,22 @@ async function sendOrderEmail(details) {
         window.location.href = "thank-you.html";
     });
 }
+window.goBackToCatalog = () => {
+    // Save any typed text or colors before leaving
+    try {
+        localStorage.setItem('myBundle', JSON.stringify(bundle));
+    } catch (e) {
+        console.warn("LocalStorage save failed, but moving back anyway.");
+    }
 
+    // Try moving back in history first (Best for Google Sites)
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        // Fallback if they opened the link directly in a new tab
+        window.location.href = 'index.html';
+    }
+};
 // Kickstart the page
 render();
 </script>

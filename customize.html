@@ -13,7 +13,8 @@
     <script type="text/javascript">
       (function(){ emailjs.init("1LZbCPvH49G_r0ypB"); })();
     </script>
-    <script src="https://diminfomacon-beep.github.io/custom-bundles/productList.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/gh/diminfomacon-beep/custom-bundles@main/productList.js"></script>
 
     <style>
         body {font-family: 'Segoe UI', Tahoma, sans-serif; background:#CAE4DB; padding:0; margin:0; color: #1f2937; padding-bottom: 220px;}
@@ -41,17 +42,6 @@
         .user-img-overlay { max-width: 55%; max-height: 55%; object-fit: contain; z-index: 2; margin-bottom: 10px; }
         .preview-text { width: 90%; text-align: center; font-weight: bold; z-index: 2; word-wrap: break-word; line-height: 1.1; transition: 0.1s font-size; }
         
-        .design-controls { display: flex; gap: 8px; width: 100%; }
-        .btn-upload {
-            flex: 2; background: #2F6B64; color: white; padding: 10px; border-radius: 6px; 
-            font-size: 0.75rem; text-align: center; cursor: pointer; font-weight: bold;
-        }
-        .btn-upload.success { background: #059669; }
-        .btn-clear {
-            flex: 1; background: #FEE84A; color: #000; border: none; padding: 8px; 
-            border-radius: 20px; font-size: 0.75rem; cursor: pointer; font-weight: bold;
-        }
-
         .swatch-container { display: flex; gap: 6px; margin-bottom: 15px; flex-wrap: wrap; }
         .swatch { width: 28px; height: 28px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); }
         .swatch.active { outline: 2px solid #000; outline-offset: 2px; }
@@ -59,21 +49,10 @@
         .details h3 {margin: 0 0 5px 0; color: #2F6B64;}
         label {display: block; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; color: #000;}
         
-        input[type="text"], textarea, select {
+        input[type="text"], select {
             width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; 
             margin-bottom: 15px; font-family: inherit; box-sizing: border-box; background: white;
         }
-
-        /* FIXED SLIDER STYLING */
-        input[type="range"] { 
-            width: 100%; 
-            margin-bottom: 15px; 
-            cursor: pointer; 
-            touch-action: none; /* Prevents page scroll while sliding */
-            height: 30px; /* Makes the hit area larger for fingers */
-        }
-
-        select option { font-size: 1.1rem; padding: 8px; }
 
         .sticky-footer-container { position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000; }
         .summary-bar {
@@ -100,17 +79,12 @@
         <button onclick="goBackToCatalog()" style="cursor:pointer; padding: 8px 15px; border-radius: 6px; border: 1px solid #ddd; background: #fff; font-weight: bold;">← Back to Catalog</button>
         <h2 style="margin:0">Customize Bundle</h2>
     </div>
-    <div id="bulk-actions">
-        <div><strong>Bulk Design:</strong> Sync first item?</div>
-        <button onclick="applyFirstToAll()" style="background: #2F6B64; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;">Apply to All</button>
-    </div>
     <div id="items-container"></div>
 </div>
 
 <div class="sticky-footer-container">
     <div class="summary-bar">
         <div id="discount-line" style="font-size: 0.9rem; font-weight: bold; margin-bottom: 5px; display: none;"></div>
-        
         <div class="total-line">
             <span style="opacity:0.9; font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px;">Total:</span>
             <span style="font-size: 1.5rem;">$<span id="total-price">0</span></span>
@@ -121,13 +95,6 @@
 
 <script>
 let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
-
-const availableColors = [
-    { name: 'Black', hex: '#000000' }, { name: 'White', hex: '#FFFFFF' }, { name: 'Red', hex: '#BE123C' },
-    { name: 'Navy', hex: '#1E3A8A' }, { name: 'Forest', hex: '#14532D' }, { name: 'Royal Blue', hex: '#2563EB' },
-    { name: 'Rose Gold', hex: '#E2918F' }, { name: 'Gold', hex: '#D4AF37' }, { name: 'Silver', hex: '#C0C0C0' },
-    { name: 'Hot Pink', hex: '#DB2777' }, { name: 'Lavender', hex: '#A78BFA' }, { name: 'Orange', hex: '#EA580C' }
-];
 
 const fontOptions = [
     { name: 'Standard', family: "'Segoe UI', sans-serif" },
@@ -145,6 +112,13 @@ const fontOptions = [
 function render() {
     const container = document.getElementById('items-container');
     const totalPriceEl = document.getElementById('total-price');
+    
+    // Safety check for productList
+    if (typeof productList === 'undefined') {
+        container.innerHTML = "<p style='text-align:center; padding:50px;'>Error: productList.js could not be loaded.</p>";
+        return;
+    }
+
     const keys = Object.keys(bundle);
     let subtotal = 0;
 
@@ -157,11 +131,12 @@ function render() {
     }
 
     // --- CATEGORY & ITEM RENDERING ---
- // Change this line inside render():
-const activeCategories = [...new Set(keys.map(key => {
-    const p = productList.find(prod => prod.id === bundle[key].productId); // Fix applied here
-    return p ? p.category : "Other";
-}))];
+    // FIXED: Corrected the lookup to use 'productList' and find by productId
+    const activeCategories = [...new Set(keys.map(key => {
+        const item = bundle[key];
+        const p = productList.find(prod => prod.id === item.productId);
+        return p ? p.category : "Other";
+    }))];
 
     activeCategories.forEach(catName => {
         const catHeader = document.createElement('h2');
@@ -216,20 +191,18 @@ const activeCategories = [...new Set(keys.map(key => {
         });
     });
 
-    // --- NEW DISCOUNT LOGIC ---
+    // --- DISCOUNT LOGIC ---
     let discountPercent = 0;
-    const itemCount = keys.length;
+    const totalQty = Object.values(bundle).reduce((sum, item) => sum + item.quantity, 0);
 
-    if (itemCount === 2) discountPercent = 0.05;
-    else if (itemCount >= 3 && itemCount <= 5) discountPercent = 0.10;
-    else if (itemCount >= 6 && itemCount <= 10) discountPercent = 0.15;
-    else if (itemCount >= 11) discountPercent = 0.20;
+    if (totalQty === 2) discountPercent = 0.05;
+    else if (totalQty >= 3 && totalQty <= 5) discountPercent = 0.10;
+    else if (totalQty >= 6 && totalQty <= 10) discountPercent = 0.15;
+    else if (totalQty >= 11) discountPercent = 0.20;
 
     const discountAmount = subtotal * discountPercent;
     const finalTotal = subtotal - discountAmount;
 
-    // --- UPDATING THE UI SUMMARY ---
-    // We add a line for the discount if one exists
     const discountDisplay = document.getElementById('discount-line');
     if (discountPercent > 0) {
         discountDisplay.innerHTML = `<span style="color:#FEE84A;">Bundle Discount (${(discountPercent * 100)}%): -$${discountAmount.toFixed(2)}</span>`;
@@ -259,48 +232,15 @@ window.removeItem = (key) => {
     if (Object.keys(bundle).length === 0) window.location.href = 'index.html';
 };
 
-window.clearDesign = (key) => {
-    bundle[key].cloudinaryUrl = '';
-    bundle[key].customText = '';
-    bundle[key].fontSize = 24;
-    localStorage.setItem('myBundle', JSON.stringify(bundle));
-    render();
-};
-
 window.updateProp = (key, prop, value) => {
-    // Update the data in the bundle
     bundle[key][prop] = value;
-    
-    // Save to browser memory
     localStorage.setItem('myBundle', JSON.stringify(bundle));
-    
-    // If they changed the text, update the preview layer instantly
     if (prop === 'customText') {
         const textLayer = document.getElementById(`text-layer-${key}`);
         if (textLayer) textLayer.textContent = value;
     } else {
-        // For everything else (Variety swap, Color swap), re-render the row
         render();
     }
-};
-
-window.handleImageUpload = async (key, input) => {
-    const file = input.files[0];
-    if (!file) return;
-    document.getElementById('loading-overlay').style.display = 'flex';
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'Custom_Bundle_Preset');
-    try {
-        const response = await fetch(`https://api.cloudinary.com/v1_1/dpsmcu07f/image/upload`, { method: 'POST', body: formData });
-        const data = await response.json();
-        if (data.secure_url) {
-            bundle[key].cloudinaryUrl = data.secure_url;
-            localStorage.setItem('myBundle', JSON.stringify(bundle));
-            render();
-        }
-    } catch (e) { alert("Upload failed."); }
-    document.getElementById('loading-overlay').style.display = 'none';
 };
 
 function initPayPal(total) {
@@ -315,15 +255,13 @@ function initPayPal(total) {
 }
 
 function sendOrderEmail(details) {
-    let orderSummary = Object.entries(bundle).map(([id, item]) => {
-    const productInfo = window.availableProducts.find(p => p.id === id) || { name: id };
+    let orderSummary = Object.entries(bundle).map(([key, item]) => {
+    const productInfo = productList.find(p => p.id === item.productId) || { name: "Unknown" };
     return `
 ITEM: ${productInfo.name}
 SIZE: ${item.size || 'N/A'}
 STYLE/VARIETY: ${item.style || item.variety || 'Standard'}
-TEXT: ${item.customText}
-FONT: ${item.fontFamily}
-IMAGE LINK: ${item.cloudinaryUrl || 'No image uploaded'}
+TEXT: ${item.customText || 'None'}
 ---`;
     }).join('\n');
 
@@ -340,20 +278,8 @@ IMAGE LINK: ${item.cloudinaryUrl || 'No image uploaded'}
 
 function goBackToCatalog() { window.location.href = 'index.html'; }
 
-function applyFirstToAll() {
-    const keys = Object.keys(bundle);
-    const s = bundle[keys[0]];
-    keys.forEach(k => {
-        bundle[k].customText = s.customText;
-        bundle[k].textColor = s.textColor;
-        bundle[k].fontFamily = s.fontFamily;
-        bundle[k].fontSize = s.fontSize;
-    });
-    localStorage.setItem('myBundle', JSON.stringify(bundle));
-    render();
-}
-
-render();
+// Run render when page loads
+window.onload = render;
 </script>
 </body>
 </html>

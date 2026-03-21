@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gift Catalog</title>
+    <script src="productList.js"></script>
     <style>
         body {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #9cbdb1; color: #1f2937; margin: 0; padding: 0;}
         
@@ -29,47 +30,37 @@
         /* Drawer */
         #bundle-drawer { max-width: 1000px; margin: 0 auto; background: #CAE4DB; display: none; padding: 10px 20px; border-top: 1px solid #f3f4f6; max-height: 300px; overflow-y: auto; }
         .drawer-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f9fafb; font-size: 0.9rem; align-items: center; }
-        .clear-btn { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
 
-        /* Content Padding */
-        /* Update this in your <style> tag */
-
-        /* Ensure the banner is visible below the sticky header */
+        /* Promo Banner */
         #promo-banner {
-            position: sticky;
-            top: 110px; /* Adjust this so it sits right under the bundle bar */
-            z-index: 999;
+            background: #fbbf24; color: #000; text-align: center; 
+            padding: 12px; font-weight: bold; font-size: 0.9rem; 
+            border-bottom: 2px solid #d97706; margin-top: 145px;
         }
+
         .container { max-width: 1000px; margin: 20px auto 40px; padding: 0 20px; }
         .category { margin-bottom: 15px; border-radius: 12px; background: #CAE4DB; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .category-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; background: #CAE4DB; border-bottom: 1px solid #9cbdb1; font-weight: bold; transition: background 0.2s;}
-        .category-header:hover { background: #5e7a70; color: #fff}
-        .category-content { display: none; padding: 25px; }
+        .category-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; background: #CAE4DB; border-bottom: 1px solid #9cbdb1; font-weight: bold; }
+        .category-header:hover { background: #bedad0; }
+        .category-content { display: block; padding: 25px; } /* Default open for generated content */
         
         .item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-        .item-card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 15px; text-align: center; background: #fff; transition: transform 0.2s; }
-        .item-card:hover { transform: translateY(-3px); border-color: #2F6B64; }
+        .item-card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 15px; text-align: center; background: #fff; }
         .item-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
         
-        .variety-select { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 0.85rem; background: #f9fafb; }
-        .add-btn { width: 100%; padding: 10px; border-radius: 8px; border: none; background: #2F6B64; color: white; cursor: pointer; font-weight: bold; transition: background 0.2s; }
-        .add-btn:active { background: #2F6B64; transform: scale(0.98); }
+        .variety-select { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 0.85rem; }
+        .add-btn { width: 100%; padding: 10px; border-radius: 8px; border: none; background: #2F6B64; color: white; cursor: pointer; font-weight: bold; }
 
-        /* Notification Toast */
         #toast {
-            visibility: hidden; min-width: 250px; background-color: #CAE4DB; color: #000;
+            visibility: hidden; min-width: 250px; background-color: #333; color: #fff;
             text-align: center; border-radius: 8px; padding: 16px; position: fixed;
             z-index: 2000; left: 50%; bottom: 30px; transform: translateX(-50%);
-            font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        #toast.show { visibility: visible; }
 
-        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+        .qty-circle { background: #fff; border: 1px solid #ccc; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        .qty-circle { background: #f3f4f6; border: 1px solid #ccc; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-
-        @media (max-width: 600px) { .container { margin-top: 190px; } }
+        @media (max-width: 600px) { #promo-banner { margin-top: 160px; } }
     </style>
 </head>
 <body>
@@ -89,345 +80,212 @@
         <div id="bundle-drawer"></div>
     </div>
 </div>
-<div id="promo-banner" style="background: #fbbf24; color: #000; text-align: center; padding: 12px; font-weight: bold; font-size: 0.9rem; border-bottom: 2px solid #d97706; margin-top: 155px;">
+
+<div id="promo-banner">
     🎁 Bundle & Save: 2 Items (5%) | 3-5 (10%) | 6-10 (15%) | 11+ (20%)
 </div>
-<div class="container" id="catalog-container"></div>
 
-    <div class="category">
-        <div class="category-header"><span>Housewarming Gifts</span><span>+</span></div>
-        <div class="category-content">
-            <div class="item-grid">
-                <div class="item-card" data-name="Cutting Board" data-price="25" data-img="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
-                    <img src="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
-                    <div style="font-weight:600">Wooden Cutting Board</div>
-                    <div style="color:#059669; margin-bottom:8px">$25</div>
-                    <select class="variety-select">
-                        <option value="Bamboo">Wood: Bamboo</option>
-                        <option value="Walnut">Wood: Walnut</option>
-                    </select>
-                    <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
-                </div>
-                <div class="item-card" data-name="Cutting Board" data-price="25" data-img="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
-                    <img src="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
-                    <div style="font-weight:600">Wooden Cutting Board</div>
-                    <div style="color:#059669; margin-bottom:8px">$25</div>
-                    <select class="variety-select">
-                        <option value="Bamboo">Wood: Bamboo</option>
-                        <option value="Walnut">Wood: Walnut</option>
-                    </select>
-                    <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
-                </div>
-                <div class="item-card" data-name="Cutting Board" data-price="25" data-img="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
-                    <img src="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
-                    <div style="font-weight:600">Wooden Cutting Board</div>
-                    <div style="color:#059669; margin-bottom:8px">$25</div>
-                    <select class="variety-select">
-                        <option value="Bamboo">Wood: Bamboo</option>
-                        <option value="Walnut">Wood: Walnut</option>
-                    </select>
-                    <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
-                </div>
-                <div class="item-card" data-name="Cutting Board" data-price="25" data-img="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
-                    <img src="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
-                    <div style="font-weight:600">Wooden Cutting Board</div>
-                    <div style="color:#059669; margin-bottom:8px">$25</div>
-                    <select class="variety-select">
-                        <option value="Bamboo">Wood: Bamboo</option>
-                        <option value="Walnut">Wood: Walnut</option>
-                    </select>
-                    <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
-                </div>
-                <div class="item-card" data-name="Cutting Board" data-price="25" data-img="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
-                    <img src="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
-                    <div style="font-weight:600">Wooden Cutting Board</div>
-                    <div style="color:#059669; margin-bottom:8px">$25</div>
-                    <select class="variety-select">
-                        <option value="Bamboo">Wood: Bamboo</option>
-                        <option value="Walnut">Wood: Walnut</option>
-                    </select>
-                    <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
-                </div>
-                <div class="item-card" data-name="Cutting Board" data-price="25" data-img="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
-                    <img src="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
-                    <div style="font-weight:600">Wooden Cutting Board</div>
-                    <div style="color:#059669; margin-bottom:8px">$25</div>
-                    <select class="variety-select">
-                        <option value="Bamboo">Wood: Bamboo</option>
-                        <option value="Walnut">Wood: Walnut</option>
-                    </select>
-                    <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
-                </div>
-                <div class="item-card" data-name="Cutting Board" data-price="25" data-img="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
-                    <img src="https://images.unsplash.com/photo-1594385208974-2e75f9d8ad48?w=400">
-                    <div style="font-weight:600">Wooden Cutting Board</div>
-                    <div style="color:#059669; margin-bottom:8px">$25</div>
-                    <select class="variety-select">
-                        <option value="Bamboo">Wood: Bamboo</option>
-                        <option value="Walnut">Wood: Walnut</option>
-                    </select>
-                    <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
-                </div>
-            </div>
-        </div>
+<div class="container" id="catalog-container">
     </div>
-</div>
-<script>
-    // 1. Initialize bundle from LocalStorage or empty object
-    let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
 
-    function showToast(message) {
+<script>
+    // --- 1. CORE DATA FUNCTIONS ---
+    
+    function showToast(message = "Item added to bundle!") {
         const toast = document.getElementById("toast");
         toast.textContent = message;
-        toast.className = "show";
-        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        toast.classList.add("show");
+        setTimeout(() => { toast.classList.remove("show"); }, 2000);
     }
-
-    // Toggle Categories
-    document.querySelectorAll('.category-header').forEach(h => {
-        h.onclick = () => {
-            const content = h.nextElementSibling;
-            const isClosing = content.style.display === "block";
-            content.style.display = isClosing ? "none" : "block";
-            h.querySelector('span:last-child').textContent = isClosing ? "+" : "−";
-        };
-    });
 
     function toggleDrawer() {
         const d = document.getElementById('bundle-drawer');
         d.style.display = (d.style.display === "block") ? "none" : "block";
     }
 
-    // Also update the 'Clear All' in index.html
-    function clearBundle() {
-        // Direct clear to avoid Google Sites blocking the popup
-        bundle = {};
-        try {
-            localStorage.removeItem('myBundle');
-        } catch (e) {
-            localStorage.setItem('myBundle', JSON.stringify({}));
-        }
-        updateUI();
-        showToast("Bundle cleared");
-    }
+    // --- 2. BUNDLE LOGIC ---
 
     function addToBundle(btn) {
-    const card = btn.closest('.item-card');
-    const productId = card.getAttribute('data-id'); 
-    
-    // 1. Find the select element
-    const varietySelect = card.querySelector('.variety-select');
-    
-    // 2. Get the value (fixed the double 'const variety' error here)
-    const variety = varietySelect ? varietySelect.value : "Standard";
-    
-    // 3. Create the unique key
-    const uniqueKey = `${productId}-${variety}`;
+        const card = btn.closest('.item-card');
+        const productId = card.getAttribute('data-id'); 
+        const varietySelect = card.querySelector('.variety-select');
+        const variety = varietySelect ? varietySelect.value : "Standard";
+        
+        const uniqueKey = `${productId}-${variety}`;
+        let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
 
-    let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
+        if (!bundle[uniqueKey]) {
+            bundle[uniqueKey] = {
+                productId: productId, 
+                variety: variety,
+                quantity: 1
+            };
+        } else {
+            bundle[uniqueKey].quantity++;
+        }
 
-    if (!bundle[uniqueKey]) {
-        bundle[uniqueKey] = {
-            productId: productId, 
-            variety: variety,
-            quantity: 1,
-            customText: '',
-            textColor: '#000000',
-            fontFamily: "'Segoe UI', sans-serif",
-            fontSize: 24
-        };
-    } else {
-        bundle[uniqueKey].quantity++;
+        localStorage.setItem('myBundle', JSON.stringify(bundle));
+        showToast();
+        updateUI(); 
     }
 
-    // 4. Save and Update
-    localStorage.setItem('myBundle', JSON.stringify(bundle));
-    
-    // Ensure these functions exist in your index.html
-    if (typeof updateUI === "function") updateUI(); 
-    if (typeof showToast === "function") showToast(); 
-}
-    function changeQty(key, amt) {
+    function changeQty(key, delta) {
+        let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
         if (!bundle[key]) return;
-        bundle[key].quantity += amt;
+
+        bundle[key].quantity += delta;
         if (bundle[key].quantity <= 0) delete bundle[key];
+
+        localStorage.setItem('myBundle', JSON.stringify(bundle));
         updateUI();
     }
 
-   function updateUI() {
-    const drawer = document.getElementById('bundle-drawer');
-    const banner = document.getElementById('promo-banner');
-    const bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
-    const keys = Object.keys(bundle);
+    function updateUI() {
+        const drawer = document.getElementById('bundle-drawer');
+        const banner = document.getElementById('promo-banner');
+        const bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
+        const keys = Object.keys(bundle);
 
-    drawer.innerHTML = '';
-    let subtotal = 0;
-    let itemCount = 0;
+        drawer.innerHTML = '';
+        let subtotal = 0;
+        let itemCount = 0;
 
-    keys.forEach(key => {
-        const item = bundle[key];
-        // FIND THE ORIGINAL PRODUCT DATA
-        const productInfo = productList.find(p => p.id === item.productId);
-        
-        if (!productInfo) return; // Safety check
+        keys.forEach(key => {
+            const item = bundle[key];
+            const productInfo = productList.find(p => p.id === item.productId);
+            if (!productInfo) return;
 
-        // CALCULATE INDIVIDUAL PRICE
-        // Find if the variety has an 'extra' cost
-        let extraCost = 0;
-        const variation = (productInfo.sizes || productInfo.variations || [])
-                          .find(v => v.label === item.variety);
-        if (variation) extraCost = variation.extra;
+            // Find price including variation extra cost
+            let extraCost = 0;
+            const variation = (productInfo.sizes || productInfo.variations || [])
+                              .find(v => v.label === item.variety);
+            if (variation) extraCost = variation.extra;
 
-        const currentPrice = productInfo.basePrice + extraCost;
-        const rowTotal = currentPrice * item.quantity;
+            const currentPrice = productInfo.basePrice + extraCost;
+            const rowTotal = currentPrice * item.quantity;
 
-        subtotal += rowTotal;
-        itemCount += item.quantity;
+            subtotal += rowTotal;
+            itemCount += item.quantity;
 
-        const row = document.createElement('div');
-        row.className = 'drawer-item';
-        row.innerHTML = `
-            <div>
-                <strong>${productInfo.name}</strong> <br>
-                <small>${item.variety}</small>
-            </div>
-            <div style="display:flex; align-items:center; gap:10px;">
-                <div class="qty-circle" onclick="changeQty('${key}', -1)">-</div>
-                <span>${item.quantity}</span>
-                <div class="qty-circle" onclick="changeQty('${key}', 1)">+</div>
-                <span style="min-width:50px; text-align:right;">$${rowTotal.toFixed(2)}</span>
+            const row = document.createElement('div');
+            row.className = 'drawer-item';
+            row.innerHTML = `
+                <div>
+                    <strong>${productInfo.name}</strong> <br>
+                    <small>${item.variety}</small>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="qty-circle" onclick="changeQty('${key}', -1)">-</div>
+                    <span>${item.quantity}</span>
+                    <div class="qty-circle" onclick="changeQty('${key}', 1)">+</div>
+                    <span style="min-width:60px; text-align:right;">$${rowTotal.toFixed(2)}</span>
+                </div>
+            `;
+            drawer.appendChild(row);
+        });
+
+        // --- DISCOUNT CALCULATION ---
+        let discountPercent = 0;
+        let nextTier = "";
+
+        if (itemCount === 2) {
+            discountPercent = 0.05;
+            nextTier = "Add 1 more for 10% off!";
+        } else if (itemCount >= 3 && itemCount <= 5) {
+            discountPercent = 0.10;
+            nextTier = itemCount < 5 ? "Add more for 10% off!" : "Add 1 more for 15% off!";
+        } else if (itemCount >= 6 && itemCount <= 10) {
+            discountPercent = 0.15;
+            nextTier = "Add more for 15% off!";
+        } else if (itemCount >= 11) {
+            discountPercent = 0.20;
+            nextTier = "MAX DISCOUNT REACHED! 🎉";
+        } else if (itemCount === 1) {
+            nextTier = "Add 1 more item for 5% off!";
+        }
+
+        const finalTotal = subtotal * (1 - discountPercent);
+
+        if (itemCount > 0) {
+            banner.innerHTML = `🔥 Bundle Status: ${itemCount} Items | Discount: ${Math.round(discountPercent * 100)}% | ${nextTier}`;
+        } else {
+            banner.innerHTML = `🎁 Bundle & Save: 2 Items (5%) | 3-5 (10%) | 6-10 (15%) | 11+ (20%)`;
+        }
+
+        document.getElementById('total-val').innerHTML = 
+            discountPercent > 0 
+            ? `<span style="text-decoration: line-through; color: #666; font-size: 0.8rem;">$${subtotal.toFixed(2)}</span> $${finalTotal.toFixed(2)}` 
+            : `$${subtotal.toFixed(2)}`;
+            
+        document.getElementById('count').textContent = itemCount;
+        document.getElementById('go-to-bundle').disabled = itemCount === 0;
+    }
+
+    // --- 3. CATALOG GENERATION ---
+
+    function renderCatalog() {
+        const container = document.getElementById('catalog-container');
+        if (!window.productList) {
+            container.innerHTML = "<p style='text-align:center; padding:20px;'>Error: productList.js not found.</p>";
+            return;
+        }
+
+        const grouped = productList.reduce((acc, product) => {
+            const cat = product.category || product.ccategory || "Other";
+            if (!acc[cat]) acc[cat] = [];
+            acc[cat].push(product);
+            return acc;
+        }, {});
+
+        let html = '';
+        for (const category in grouped) {
+            html += `
+            <div class="category">
+                <div class="category-header" onclick="const c = this.nextElementSibling; c.style.display = c.style.display === 'none' ? 'block' : 'none';">
+                    <span>${category}</span>
+                    <span>▾</span>
+                </div>
+                <div class="category-content">
+                    <div class="item-grid">
+                        ${grouped[category].map(product => renderProductCard(product)).join('')}
+                    </div>
+                </div>
+            </div>`;
+        }
+        container.innerHTML = html;
+    }
+
+    function renderProductCard(p) {
+        let options = '';
+        if (p.sizes) {
+            options = p.sizes.map(s => `<option value="${s.label}">${s.label} (+$${s.extra})</option>`).join('');
+        } else if (p.variations) {
+            options = p.variations.map(v => `<option value="${v.label}">${v.label} (+$${v.extra})</option>`).join('');
+        } else {
+            options = `<option value="Standard">Standard</option>`;
+        }
+
+        return `
+            <div class="item-card" data-id="${p.id}">
+                <img src="${p.images[0]}" alt="${p.name}">
+                <div style="font-weight:600; margin-top:10px;">${p.name}</div>
+                <div style="color:#059669; margin-bottom:8px">$${p.basePrice.toFixed(2)}</div>
+                <select class="variety-select">${options}</select>
+                <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
             </div>
         `;
-        drawer.appendChild(row);
+    }
+
+    // --- 4. INITIALIZATION ---
+
+    document.getElementById('go-to-bundle').addEventListener('click', () => {
+        window.location.href = 'customize.html';
     });
 
-    // --- DISCOUNT CALCULATION (Your existing logic is good) ---
-    // ... keep the rest of your code here ...
-    // --- DISCOUNT CALCULATION ---
-    let discountPercent = 0;
-    let nextTier = "";
-
-    if (itemCount === 2) {
-        discountPercent = 0.05;
-        nextTier = "Add 1 more for 10% off!";
-    } else if (itemCount >= 3 && itemCount <= 5) {
-        discountPercent = 0.10;
-        nextTier = itemCount < 5 ? "Add more for 10% off!" : "Add 1 more for 15% off!";
-    } else if (itemCount >= 6 && itemCount <= 10) {
-        discountPercent = 0.15;
-        nextTier = "Add more for 15% off!";
-    } else if (itemCount >= 11) {
-        discountPercent = 0.20;
-        nextTier = "MAX DISCOUNT REACHED! 🎉";
-    } else if (itemCount === 1) {
-        nextTier = "Add 1 more item for 5% off!";
-    }
-
-    const discountAmount = subtotal * discountPercent;
-    const finalTotal = subtotal - discountAmount;
-
-    // --- UPDATE BANNER TEXT ---
-    if (itemCount > 0) {
-        banner.innerHTML = `🔥 Bundle Status: ${itemCount} Items | Discount: ${discountPercent * 100}% | <span style="text-decoration:underline">${nextTier}</span>`;
-    } else {
-        banner.innerHTML = `🎁 Bundle & Save: 2 Items (5%) | 3-5 (10%) | 6-10 (15%) | 11+ (20%)`;
-    }
-
-    // --- UPDATE TOTALS ---
-    document.getElementById('total-val').innerHTML = 
-        discountPercent > 0 
-        ? `<span style="text-decoration: line-through; color: #666; font-size: 0.9rem;">$${subtotal}</span> $${finalTotal.toFixed(2)}` 
-        : `$${subtotal}`;
-        
-    document.getElementById('count').textContent = itemCount;
-    document.getElementById('go-to-bundle').disabled = itemCount === 0;
-}
-
-    // Initial render
-    updateUI();
-document.addEventListener('DOMContentLoaded', () => {
-    renderCatalog();
-});
-
-function renderCatalog() {
-    const container = document.getElementById('catalog-container');
-    
-    // 1. Group products by category
-    const grouped = productList.reduce((acc, product) => {
-        // Safe check for your 'ccategory' typo in the JS file
-        const cat = product.category || product.ccategory || "Other";
-        if (!acc[cat]) acc[cat] = [];
-        acc[cat].push(product);
-        return acc;
-    }, {});
-
-    // 2. Generate HTML for each category
-    let html = '';
-    for (const category in grouped) {
-        html += `
-        <div class="category">
-            <div class="category-header" onclick="this.parentElement.classList.toggle('active')">
-                <span>${category}</span>
-                <span>+</span>
-            </div>
-            <div class="category-content" style="display: block;">
-                <div class="item-grid">
-                    ${grouped[category].map(product => renderProductCard(product)).join('')}
-                </div>
-            </div>
-        </div>`;
-    }
-    container.innerHTML = html;
-}
-function showToast() {
-    const toast = document.getElementById("toast");
-    toast.style.display = "block";
-    setTimeout(() => {
-        toast.style.display = "none";
-    }, 2000);
-}
-
-function renderProductCard(p) {
-    // Generate variety options based on sizes or variations in your JS
-    let options = '';
-    if (p.sizes) {
-        options = p.sizes.map(s => `<option value="${s.label}">${s.label} (+$${s.extra})</option>`).join('');
-    } else if (p.variations) {
-        options = p.variations.map(v => `<option value="${v.label}">${v.label} (+$${v.extra})</option>`).join('');
-    } else {
-        options = `<option value="Standard">Standard</option>`;
-    }
-
-    return `
-        <div class="item-card" data-id="${p.id}">
-            <img src="${p.images[0]}" alt="${p.name}">
-            <div style="font-weight:600; margin-top:10px;">${p.name}</div>
-            <div style="color:#059669; margin-bottom:8px">$${p.basePrice.toFixed(2)}</div>
-            <select class="variety-select">
-                ${options}
-            </select>
-            <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
-        </div>
-    `;
-}
-
-document.getElementById('go-to-bundle').addEventListener('click', () => {
-    window.location.href = 'customize.html';
-});
-
-function changeQty(key, delta) {
-    let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
-    if (!bundle[key]) return;
-
-    bundle[key].quantity += delta;
-
-    if (bundle[key].quantity <= 0) {
-        delete bundle[key];
-    }
-
-    localStorage.setItem('myBundle', JSON.stringify(bundle));
-    updateUI();
-}
+    document.addEventListener('DOMContentLoaded', () => {
+        renderCatalog();
+        updateUI();
+    });
 </script>
 </body>
 </html>

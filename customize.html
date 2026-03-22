@@ -16,6 +16,18 @@
 
     <style>
         body {font-family: 'Segoe UI', sans-serif; background:#CAE4DB; margin:0; padding-bottom: 250px;}
+        /* Add this to your CSS */
+        html, body {
+            overflow: visible !important; /* Force the content to expand */
+            height: auto !important;     /* Prevent the 100vh constraint */
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Hide the scrollbar track specifically */
+        ::-webkit-scrollbar {
+            display: none;
+        }
         .wrapper {max-width: 950px; margin: auto; padding: 20px;}
         
         /* Apply to All Bar */

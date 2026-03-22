@@ -335,24 +335,7 @@
 
         ::-webkit-scrollbar { display: none; }
 
-        /* 2. The Floating Top Header */
-        #floating-checkout-footer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 10001;
-            background: #2F6B64;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: transform 0.3s ease-in-out;
-        }
-
-        /* 3. The Wrapper (The Content Spacer) */
-        .wrapper {
-            max-width: 950px;
-            margin: 180px auto 100px auto; /* 180px top margin keeps content from hiding under the bar */
-            padding: 20px;
-        }
+        
 
         /* 4. PayPal UI Fix */
         #paypal-button-container {
@@ -367,10 +350,37 @@
             #paypal-button-container { width: 100%; }
         }
 
-        .summary-bar {
-            max-width: 600px;
+        /* 1. The Floating Header */
+        #floating-checkout-footer {
+            position: fixed; /* This makes it float */
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10001;
+            background: #2F6B64;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* 2. The Content Spacer */
+        /* Since the bar is floating, it doesn't take up space. 
+        We must push the wrapper down manually. */
+        .wrapper {
+            max-width: 950px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 20px;
+            margin-top: 180px !important; /* Adjust this number to match header height */
+        }
+
+        /* 3. Reset summary bar so it stays inside the float */
+        .summary-bar {
+            position: static !important;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 900px;
+            margin: auto;
+            padding: 10px 20px;
         }
 
         .studio-notification {
@@ -393,12 +403,7 @@
         </style>
 </head>
 <body>
-    <div id="loading-overlay">
-        <div class="spinner"></div>
-        <p>Processing Designs...</p>
-    </div>
-
-    <div id="floating-checkout-footer">
+     <div id="floating-checkout-footer">
         <div id="footer-toggle" onclick="toggleFooter()" style="position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%); background-color:#FEE84A; color: #000; padding: 5px 15px; border-radius: 0 0 10px 10px; cursor: pointer; font-size: 12px; font-weight: bold; box-shadow: 0 3px 10px rgba(0,0,0,0.2); z-index: 10002;">
             <span id="toggle-text">Hide Checkout</span> <span id="toggle-arrow">▲</span>
         </div>
@@ -1143,24 +1148,25 @@ if (footer) {
     initPayPal(finalTotal.toFixed(2));
 }
     
-window.toggleFooter = function() {
+function toggleFooter() {
     const content = document.getElementById('footer-content');
     const text = document.getElementById('toggle-text');
     const arrow = document.getElementById('toggle-arrow');
-    const header = document.getElementById('floating-checkout-header');
-
+    
     if (content.style.display === "none") {
         content.style.display = "block";
-        header.style.boxShadow = "0 4px 15px rgba(0,0,0,0.3)";
         text.textContent = "Hide Checkout";
-        arrow.textContent = "▲"; // Points up to "close"
+        arrow.textContent = "▲";
+        // Reset wrapper margin when shown
+        document.querySelector('.wrapper').style.marginTop = "210px";
     } else {
         content.style.display = "none";
-        header.style.boxShadow = "none";
         text.textContent = "Show Checkout";
-        arrow.textContent = "▼"; // Points down to "open"
+        arrow.textContent = "▼";
+        // Shrink wrapper margin when hidden so there isn't a huge gap
+        document.querySelector('.wrapper').style.marginTop = "60px";
     }
-};
+}
 // --- 4. CORE FUNCTIONS ---
 window.updateProp = (key, prop, val) => {
     if (prop === 'fontSize') val = parseInt(val);

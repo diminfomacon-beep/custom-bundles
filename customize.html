@@ -10,7 +10,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="https://www.paypal.com/sdk/js?client-id=AYCrwEjBMTIJctW65WTbEqCfEGx4IYVyLFU09iInrV8m4nLFonxGlAb6bD707bL-qaDSPUNfqJJzgoYS&currency=USD"></script>
     <script type="text/javascript">(function(){ emailjs.init("1LZbCPvH49G_r0ypB"); })();</script>
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Anton&family=Arizonia&family=Audiowide&family=Bangers&family=Berkshire+Swash&family=Boogaloo&family=Bowlby+One&family=Bree+Serif&family=Bubblegum+Sans&family=Bungee&family=Bungee+Spice&family=Carter+One&family=Changa+One&family=Chango&family=Chewy&family=Coiny&family=Croissant+One&family=Days+One&family=DynaPuff&family=Germania+One&family=Gravitas+One&family=Honk&family=Irish+Grover&family=Jaro&family=Jersey+25&family=Just+Another+Hand&family=Lilita+One&family=Limelight&family=Lobster&family=Lobster+Two&family=Luckiest+Guy&family=Merriweather+Sans&family=Metamorphous&family=Milonga&family=MonteCarlo&family=New+Rocker&family=Pacifico&family=Permanent+Marker&family=Righteous&family=Roboto&family=Rowdies&family=Schoolbell&family=Sigmar&family=Sofia&family=Ultra&family=Unbounded&family=Vollkorn&display=swap" rel="stylesheet">
 
     <style>
         body {font-family: 'Segoe UI', sans-serif; background:#CAE4DB; margin:0; padding-bottom: 250px;}
@@ -239,6 +241,38 @@
             width: 100%;
         }
         
+        /* Add this to your customize.html <style> */
+        .preview-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none; /* So it doesn't block image clicks */
+            word-wrap: break-word;
+            width: 80%;
+            line-height: 1.2;
+        }
+
+        .product-preview {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            max-width: 300px;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .user-img-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0.7; /* Adjust so product details show through */
+        }
         </style>
 </head>
 <body>
@@ -734,20 +768,100 @@ const productList = [
 let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
 
 const fontOptions = [
-    { name: 'Standard', family: "'Segoe UI', sans-serif" },
-    { name: 'Cursive', family: "'Pacifico', cursive" },
-    { name: 'Bold', family: "'Bebas Neue', sans-serif" },
-    { name: 'Modern', family: "'Montserrat', sans-serif" },
-    { name: 'Elegant', family: "'Playfair Display', serif" },
-    { name: 'Varsity', family: "'Graduate', serif" },
-    { name: 'Luxury', family: "'Cinzel', serif" },
-    { name: 'Playful', family: "'Fredoka One', cursive" },
-    { name: 'Retro', family: "'Space Mono', monospace" },
-    { name: 'Sketch', family: "'Shadows Into Light', cursive" }
+    { name: 'Standard (Segoe)', family: "'Segoe UI', sans-serif" },
+    { name: 'Roboto', family: "'Roboto', sans-serif" },
+    { name: 'Bungee (Blocky)', family: "'Bungee', sans-serif" },
+    { name: 'Changa One', family: "'Changa One', sans-serif" },
+    { name: 'Anton', family: "'Anton', sans-serif" },
+    { name: 'Gravitas One', family: "'Gravitas One', serif" },
+    { name: 'Alfa Slab One', family: "'Alfa Slab One', serif" },
+    { name: 'Pacifico (Cursive)', family: "'Pacifico', cursive" },
+    { name: 'Lobster', family: "'Lobster', cursive" },
+    { name: 'Lobster Two', family: "'Lobster Two', cursive" },
+    { name: 'Merriweather Sans', family: "'Merriweather Sans', sans-serif" },
+    { name: 'Lilita One', family: "'Lilita One', cursive" },
+    { name: 'Unbounded', family: "'Unbounded', sans-serif" },
+    { name: 'Milonga', family: "'Milonga', cursive" },
+    { name: 'Luckiest Guy', family: "'Luckiest Guy', cursive" },
+    { name: 'Rowdies', family: "'Rowdies', sans-serif" },
+    { name: 'Vollkorn', family: "'Vollkorn', serif" },
+    { name: 'Permanent Marker', family: "'Permanent Marker', cursive" },
+    { name: 'Righteous', family: "'Righteous', sans-serif" },
+    { name: 'Bangers', family: "'Bangers', cursive" },
+    { name: 'Germania One', family: "'Germania One', cursive" },
+    { name: 'Bree Serif', family: "'Bree Serif', serif" },
+    { name: 'Chango', family: "'Chango', cursive" },
+    { name: 'Audiowide', family: "'Audiowide', sans-serif" },
+    { name: 'Berkshire Swash', family: "'Berkshire Swash', cursive" },
+    { name: 'Ultra', family: "'Ultra', serif" },
+    { name: 'Sofia', family: "'Sofia', cursive" },
+    { name: 'Carter One', family: "'Carter One', cursive" },
+    { name: 'Boogaloo', family: "'Boogaloo', cursive" },
+    { name: 'New Rocker', family: "'New Rocker', cursive" },
+    { name: 'Chewy', family: "'Chewy', cursive" },
+    { name: 'Limelight', family: "'Limelight', cursive" },
+    { name: 'Days One', family: "'Days One', sans-serif" },
+    { name: 'Just Another Hand', family: "'Just Another Hand', cursive" },
+    { name: 'Honk (Color)', family: "'Honk', system-ui" },
+    { name: 'Croissant One', family: "'Croissant One', cursive" },
+    { name: 'Bungee Spice', family: "'Bungee Spice', system-ui" },
+    { name: 'Arizonia', family: "'Arizonia', cursive" },
+    { name: 'Schoolbell', family: "'Schoolbell', cursive" },
+    { name: 'DynaPuff', family: "'DynaPuff', cursive" },
+    { name: 'Bowlby One', family: "'Bowlby One', cursive" },
+    { name: 'Irish Grover', family: "'Irish Grover', cursive" },
+    { name: 'MonteCarlo', family: "'MonteCarlo', cursive" },
+    { name: 'Sigmar One', family: "'Sigmar', cursive" },
+    { name: 'Jersey 25', family: "'Jersey 25', sans-serif" },
+    { name: 'Metamorphous', family: "'Metamorphous', serif" },
+    { name: 'Coiny', family: "'Coiny', cursive" },
+    { name: 'Bubblegum Sans', family: "'Bubblegum Sans', cursive" },
+    { name: 'Jaro', family: "'Jaro', sans-serif" }
 ];
 
-const colorSwatches = ['#000000','#FFFFFF','#BE123C','#1E3A8A', '#14532D','#2563EB','#E2918F','#D4AF37','#C0C0C0','#DB2777','#A78BFA','#EA580C'];
+const colorSwatches = [
+    // --- THE BASICS (4) ---
+    '#000000', // Black
+    '#FFFFFF', // White
+    '#4B5563', // Graphite / Dark Grey
+    '#9CA3AF', // Silver / Light Grey
+    
+    // --- THE RAINBOW (10) ---
+    '#BE123C', // Crimson Red
+    '#EA580C', // Bright Orange
+    '#FACC15', // Golden Yellow
+    '#14532D', // Hunter Green
+    '#22C55E', // Kelly Green
+    '#1E3A8A', // Navy Blue
+    '#2563EB', // Royal Blue
+    '#0EA5E9', // Sky Blue
+    '#7C3AED', // Deep Purple
+    '#DB2777', // Deep Pink
+    
+    // --- COMMON & TRENDING (12) ---
+    '#E2918F', // Soft Rose / Pastel Pink
+    '#F472B6', // Bubblegum
+    '#A78BFA', // Lavender
+    '#7DD3FC', // Baby Blue
+    '#FDE68A', // Pastel Yellow
+    '#D4AF37', // Antique Gold (More bronze-like)
+    '#C0C0C0', // Metallic Silver
+    '#78350F', // Chocolate Brown
+    '#A16207', // Tan / Camel
+    '#065F46', // Teal / Petrol
+    '#4D7C0F', // Olive Drab
+    '#4A3728', // Espresso (New!)
 
+    // --- POP & SPECIALTY (10) ---
+    '#00FF00', // Neon Green (New!)
+    '#FF69B4', // Hot Pink
+    '#800000', // Maroon
+    '#00FFFF', // Cyan / Aqua
+    '#F5F5DC', // Beige / Ivory
+    '#008080', // Teal Green
+    '#FF7F50', // Coral
+    '#6B7280'  // Slate Grey
+];
 // --- 3. THE RENDER ENGINE ---
 function render() {
     const container = document.getElementById('items-container');

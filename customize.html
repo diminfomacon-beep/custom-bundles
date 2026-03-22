@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Bebas+Neue&family=Montserrat:wght@700&family=Playfair+Display:ital,wght@1,700&family=Graduate&family=Cinzel:wght@700&family=Fredoka+One&family=Space+Mono&family=Shadows+Into+Light&display=swap" rel="stylesheet">
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script src="https://www.paypal.com/sdk/js?client-id=AYCrwEjBMTIJctW65WTbEqCfEGx4IYVyLFU09iInrV8m4nLFonxGlAb6bD707bL-qaDSPUNfqJJzgoYS&currency=USD"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AYCrwEjBMTIJctW65WTbEqCfEGx4IYVyLFU09iInrV8m4nLFonxGlAb6bD707bL-qaDSPUNfqJJzgoYS&currency=USD&disable-funding=credit,card,venmo"></script>"></script>
     <script type="text/javascript">(function(){ emailjs.init("1LZbCPvH49G_r0ypB"); })();</script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,18 +17,12 @@
     <style>
         body {font-family: 'Segoe UI', sans-serif; background:#CAE4DB; margin:0; padding-bottom: 250px;}
         /* Add this to your CSS */
-        html, body {
-            overflow: visible !important; /* Force the content to expand */
-            height: auto !important;     /* Prevent the 100vh constraint */
-            margin: 0;
-            padding: 0;
-        }
+   
 
-        /* Hide the scrollbar track specifically */
-        ::-webkit-scrollbar {
-            display: none;
-        }
-        .wrapper {max-width: 950px; margin: auto; padding: 20px;}
+    /* Hide the scrollbar track specifically */
+    ::-webkit-scrollbar {
+        display: none;
+    }
         
         /* Apply to All Bar */
         #bulk-actions {
@@ -165,18 +159,18 @@
 
         
        .summary-bar {
-            position: fixed;
-            bottom: 20px;       /* distance from bottom */
-            right: 20px;         /* distance from left */
-            width: auto;        /* shrink to content */
-            max-width: 300px;   /* optional: prevent it from getting too wide */
-            background: #2F6B64;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            width: 100%;
+            max-width: 900px; 
+            margin: 0 auto;
+            padding: 10px 20px;
+            background: transparent; /* Let the green header show through */
             color: white;
-            padding: 15px 20px; /* you can reduce padding to make it less tall */
+            box-shadow: none;
             border-radius: 12px; /* rounded corners look nice */
             text-align: left;    /* align text nicely */
-            z-index: 1000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             font-family: 'Segoe UI', sans-serif;
         }
         .studio-notification {
@@ -200,8 +194,6 @@
         @media (max-width: 768px) {
             .item-row { grid-template-columns: 1fr; justify-items: center; }
             .preview-section, .product-preview { width: 100%; max-width: 320px; }
-            .summary-bar { padding: 10px 15px; }
-            #paypal-button-container { width: 150px; }
         }
         .details input[type="text"] {
             width: 100%;
@@ -241,18 +233,21 @@
             background-color: #fff;
             cursor: pointer;
         }
-        
+        /* 1. Reset Body for Google Sites + VS Code */
+        html, body {
+            overflow: visible !important;
+            height: auto !important;
+            margin: 0;
+            padding: 0;
+        }
+
         #paypal-wrapper {
             display: flex;
             justify-content: flex-start; /* keep it left-aligned */
             margin-top: 10px;
         }
 
-        #paypal-button-container {
-            max-width: 200px; /* fit nicely inside sticky box */
-            width: 100%;
-        }
-        
+       
         /* Add this to your customize.html <style> */
         .preview-text {
             position: absolute;
@@ -329,16 +324,47 @@
                 padding: 10px;
             }
         }
+        /* 1. Reset & Global Layout */
+        html, body {
+            font-family: 'Segoe UI', sans-serif; 
+            background: #CAE4DB; 
+            margin: 0;
+            overflow-y: visible !important; /* Required for Google Sites auto-height */
+            height: auto !important;
+        }
+
+        ::-webkit-scrollbar { display: none; }
+
+        /* 2. The Floating Top Header */
         #floating-checkout-footer {
-            position: fixed; /* This is the magic for Google Sites */
-            bottom: 0;
+            position: fixed;
+            top: 0;
             left: 0;
             width: 100%;
-            z-index: 10000;
-            background: #2F6B64; /* Matching your theme */
-            padding: 15px 0;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
-            text-align: center;
+            z-index: 10001;
+            background: #2F6B64;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* 3. The Wrapper (The Content Spacer) */
+        .wrapper {
+            max-width: 950px;
+            margin: 180px auto 100px auto; /* 180px top margin keeps content from hiding under the bar */
+            padding: 20px;
+        }
+
+        /* 4. PayPal UI Fix */
+        #paypal-button-container {
+            width: 200px;
+            min-height: 45px;
+        }
+
+        /* 5. Mobile Adjustments */
+        @media (max-width: 768px) {
+            .wrapper { margin-top: 200px; } /* More space for stacked header on mobile */
+            .summary-bar { flex-direction: column; gap: 10px; text-align: center; }
+            #paypal-button-container { width: 100%; }
         }
 
         .summary-bar {
@@ -362,54 +388,52 @@
         #items-container {
             padding-bottom: 250px; 
         }
-        #floating-checkout-footer {
-            /* ... your existing CSS ... */
-            transition: all 0.3s ease-in-out;
-        }
+       
+        
         </style>
 </head>
 <body>
-        <div id="loading-overlay">
+    <div id="loading-overlay">
         <div class="spinner"></div>
         <p>Processing Designs...</p>
-        </div>
-
-
-    <div class="wrapper">
-        <div><button onclick="goBackToCatalog()" style="cursor:pointer; padding: 8px 15px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ddd; background: #FEE84A; font-weight: bold;">← Back to Catalog</button></div>
-
-        <div class="header">
-            <div><h2 style="margin:0">Customize Your Bundle</h2></div>
-        </div>
-        <div id="items-container"></div>
     </div>
 
-    <div id="floating-checkout-footer" class="sticky-footer-container">
-        <div id="footer-toggle" onclick="toggleFooter()" style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background-color:#FEE84A; color: #000; padding: 5px 15px; border-radius: 10px 10px 0 0; cursor: pointer; font-size: 12px; font-weight: bold; box-shadow: 0 -3px 10px rgba(0,0,0,0.2);">
-            <span id="toggle-text">Hide Checkout</span> <span id="toggle-arrow">▼</span>
+    <div id="floating-checkout-footer">
+        <div id="footer-toggle" onclick="toggleFooter()" style="position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%); background-color:#FEE84A; color: #000; padding: 5px 15px; border-radius: 0 0 10px 10px; cursor: pointer; font-size: 12px; font-weight: bold; box-shadow: 0 3px 10px rgba(0,0,0,0.2); z-index: 10002;">
+            <span id="toggle-text">Hide Checkout</span> <span id="toggle-arrow">▲</span>
         </div>
 
         <div id="footer-content">
-            <div class="summary-bar">
-                <div style="font-size:12px; opacity:0.8;">Bundle Discount Tier Applied</div>
-                <div id="total-display" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 10px; color: rgb(209, 222, 233);">Total: $0.00</div>
-                <div id="paypal-button-container" style="width: 100%; max-width: 300px; margin: auto;"></div>
+            <div id="promo-banner" style="background: rgba(0,0,0,0.2); color: white; padding: 8px; font-size: 13px; text-align: center; font-weight: bold;">
+                💸 Bundle Discount Tier Applied
             </div>
-            <div class="studio-notification">
-                For more flexible custom designs visit the D.I.M. Design Studio
-                <div class="bouncing-arrow">🔻🔻🔻🔻🔻⬇️🔻🔻🔻🔻🔻</div>
+
+            <div class="summary-bar" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; max-width: 900px; margin: auto;">
+                <div id="total-display" style="font-size: 1.4rem; font-weight: bold; color: #fff; margin: 0;">Total: $0.00</div>
+                <div id="paypal-button-container"></div>
             </div>
-            <div class="studio-link-section" style="background: rgba(0,0,0,0.15); padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
-                <div style="font-size: 11px; margin-bottom: 8px; color: #cbd5e1; text-transform: uppercase; letter-spacing: 1px;">Advanced Customization</div>
-                
-                <a href="https://www.dimbrightideas.com/d-i-m-design-studio" 
-                target="_top" 
-                style="display: inline-block; background: #D4AF37; color: #000; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); transition: transform 0.2s;">
-                    🎨 Open D.I.M. Design Studio ↗
+
+            <div class="studio-link-section" style="background: rgba(0,0,0,0.15); padding: 8px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1);">
+                <a href="https://www.dimbrightideas.com/d-i-m-design-studio" target="_top" style="color: #fff; text-decoration: none;  font-size: 15px;">
+                    👉For a more advanced design experience 🎨 Open D.I.M. Design Studio👈
                 </a>
             </div>
         </div>
     </div>
+
+    <div class="wrapper">
+        <div style="margin-bottom: 20px;">
+            <button onclick="goBackToCatalog()" style="cursor:pointer; padding: 8px 15px; border-radius: 6px; border: 1px solid #ddd; background: #FEE84A; font-weight: bold;">← Back to Catalog</button>
+        </div>
+
+        <div class="header">
+            <h2 style="margin:0; padding: 10px;">Customize Your Bundle</h2>
+        </div>
+
+        <div id="items-container">
+            </div>
+    </div>
+
 <script>
 // --- PRODUCT LIST (Make sure this matches your Index exactly) ---
 
@@ -1119,6 +1143,24 @@ if (footer) {
     initPayPal(finalTotal.toFixed(2));
 }
     
+window.toggleFooter = function() {
+    const content = document.getElementById('footer-content');
+    const text = document.getElementById('toggle-text');
+    const arrow = document.getElementById('toggle-arrow');
+    const header = document.getElementById('floating-checkout-header');
+
+    if (content.style.display === "none") {
+        content.style.display = "block";
+        header.style.boxShadow = "0 4px 15px rgba(0,0,0,0.3)";
+        text.textContent = "Hide Checkout";
+        arrow.textContent = "▲"; // Points up to "close"
+    } else {
+        content.style.display = "none";
+        header.style.boxShadow = "none";
+        text.textContent = "Show Checkout";
+        arrow.textContent = "▼"; // Points down to "open"
+    }
+};
 // --- 4. CORE FUNCTIONS ---
 window.updateProp = (key, prop, val) => {
     if (prop === 'fontSize') val = parseInt(val);

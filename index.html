@@ -32,40 +32,46 @@
         /* The Floating Button */
         .floating-bundle-btn {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #2F6B64;
-            color: white;
-            padding: 15px 25px;
-            border-radius: 50px; /* Makes it a pill shape */
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            top: 15px; /* Pinned to the top instead of bottom */
+            right: 15px;
+            background: #FEE84A;
+            color: #000;
+            padding: 10px 18px;
+            border-radius: 30px; /* Clean oval shape */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             z-index: 9999;
             cursor: pointer;
-            font-weight: bold;
+            font-family: sans-serif;
             display: flex;
+            flex-direction: row; /* Horizontal layout for the top bar */
             align-items: center;
-            gap: 10px;
-            transition: transform 0.2s ease;
+            gap: 12px;
+            transition: transform 0.2s ease, background 0.2s;
         }
 
         .floating-bundle-btn:hover {
-            transform: scale(1.05);
-            background: #24524c;
+            transform: translateY(3px); /* Subtle downward push on hover */
+            background: #cebd3c;
         }
 
-        /* The Counter Badge on the button */
         #count-badge {
             background: #BE123C;
             color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
         }
 
+        #floating-total {
+            font-weight: bold;
+            font-size: 14px;
+            border-left: 1px solid rgba(255,255,255,0.3);
+            padding-left: 10px;
+        }
         #bundle-drawer {
             display: none;
             position: fixed;

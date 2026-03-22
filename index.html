@@ -6,7 +6,18 @@
     <title>Gift Catalog</title>
     <style>
         body {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #9cbdb1; color: #1f2937; margin: 5px; padding: 0;}
-        
+       /* Add this to your CSS */
+      html, body {
+          overflow: visible !important; /* Force the content to expand */
+          height: auto !important;     /* Prevent the 100vh constraint */
+          margin: 0;
+          padding: 0;
+      }
+
+      /* Hide the scrollbar track specifically */
+      ::-webkit-scrollbar {
+          display: none;
+      } 
         /* Sticky Header */
         .sticky-header {
             position: fixed;

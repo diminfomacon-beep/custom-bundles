@@ -148,7 +148,7 @@
         }
         
         .sticky-footer-container {
-            position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000;
+            position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000; 
         }
 
         
@@ -273,6 +273,87 @@
             object-fit: contain;
             opacity: 0.7; /* Adjust so product details show through */
         }
+        /* 1. The Floating Top Banner */
+        #promo-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10001;
+            background: #2F6B64;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        /* 2. The Floating Bottom Checkout Card */
+        .floating-checkout-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%); /* Centers it horizontally */
+            width: 90%;
+            max-width: 500px;
+            background: #ffffff;
+            border: 2px solid #2F6B64;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
+            z-index: 10000;
+        }
+
+        /* 3. Add padding to the body so the bottom items aren't hidden behind the float */
+        body {
+            padding-top: 60px; /* Space for top banner */
+            padding-bottom: 250px; /* Space for bottom checkout card */
+        }
+
+        /* Mobile tweak: make the checkout card slightly smaller */
+        @media (max-width: 480px) {
+            .floating-checkout-container {
+                bottom: 10px;
+                padding: 10px;
+            }
+        }
+        #floating-checkout-footer {
+            position: fixed; /* This is the magic for Google Sites */
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10000;
+            background: #2F6B64; /* Matching your theme */
+            padding: 15px 0;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .summary-bar {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .studio-notification {
+           background: #FEE84A; 
+           color: #000;
+           text-align: center; 
+           padding: 8px;
+           font-weight: bold;
+           font-size: 0.85rem;
+           margin-top: 10px;
+        }
+
+        /* Crucial: Add space at the bottom of your items list 
+        so the footer doesn't cover the last item! */
+        #items-container {
+            padding-bottom: 250px; 
+        }
+        #floating-checkout-footer {
+            /* ... your existing CSS ... */
+            transition: all 0.3s ease-in-out;
+        }
         </style>
 </head>
 <body>
@@ -291,18 +372,23 @@
         <div id="items-container"></div>
     </div>
 
-    <div class="sticky-footer-container">
-        <div class="summary-bar">
-            <div style="font-size:12px; opacity:0.8;">Bundle Discount Tier Applied</div>
-            <div id="total-display" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 10px; color: rgb(209, 222, 233); ">Total: $0.00</div>
-            <div id="paypal-button-container" style="width: auto; margin: auto;"></div>
+    <div id="floating-checkout-footer" class="sticky-footer-container">
+        <div id="footer-toggle" onclick="toggleFooter()" style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background-color:#FEE84A; color: #000; padding: 5px 15px; border-radius: 10px 10px 0 0; cursor: pointer; font-size: 12px; font-weight: bold; box-shadow: 0 -3px 10px rgba(0,0,0,0.2);">
+            <span id="toggle-text">Hide Checkout</span> <span id="toggle-arrow">▼</span>
+        </div>
+
+        <div id="footer-content">
+            <div class="summary-bar">
+                <div style="font-size:12px; opacity:0.8;">Bundle Discount Tier Applied</div>
+                <div id="total-display" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 10px; color: rgb(209, 222, 233);">Total: $0.00</div>
+                <div id="paypal-button-container" style="width: 100%; max-width: 300px; margin: auto;"></div>
             </div>
-        <div class="studio-notification">
+            <div class="studio-notification">
                 For more flexible custom designs visit the D.I.M. Design Studio
                 <div class="bouncing-arrow">🔻🔻🔻🔻🔻⬇️🔻🔻🔻🔻🔻</div>
+            </div>
         </div>
     </div>
-
 <script>
 // --- PRODUCT LIST (Make sure this matches your Index exactly) ---
 
@@ -1003,6 +1089,12 @@ function render() {
     </div>
 ` : ''}
 `;
+// At the bottom of your render() function:
+const footer = document.getElementById('floating-checkout-footer');
+if (footer) {
+    // Show only if there are items in the bundle
+    footer.style.display = (itemCount > 0) ? 'block' : 'none';
+}
     initPayPal(finalTotal.toFixed(2));
 }
     
@@ -1042,7 +1134,27 @@ window.clearDesign = (key) => {
     localStorage.setItem('myBundle', JSON.stringify(bundle));
     render();
 };
+window.toggleFooter = function() {
+    const content = document.getElementById('footer-content');
+    const text = document.getElementById('toggle-text');
+    const arrow = document.getElementById('toggle-arrow');
+    const footer = document.getElementById('floating-checkout-footer');
 
+    if (content.style.display === "none") {
+        // Expand
+        content.style.display = "block";
+        footer.style.background = "#2F6B64"; // Restore background
+        text.textContent = "Hide Checkout";
+        arrow.textContent = "▼";
+    } else {
+        // Collapse
+        content.style.display = "none";
+        footer.style.background = "transparent"; // Hide the big bar background
+        footer.style.boxShadow = "none";
+        text.textContent = "Show Checkout";
+        arrow.textContent = "▲";
+    }
+};
 window.removeItem = (key) => {
     delete bundle[key];
     localStorage.setItem('myBundle', JSON.stringify(bundle));

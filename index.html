@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gift Catalog</title>
     <style>
-        body {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #9cbdb1; color: #1f2937; margin: 0; padding: 0;}
+        body {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #9cbdb1; color: #1f2937; margin: 5px; padding: 0;}
         
         /* Sticky Header */
         .sticky-header {
@@ -29,7 +29,61 @@
         /* Drawer */
         #bundle-drawer { max-width: 1000px; margin: 0 auto; background: #CAE4DB; display: none; padding: 10px 20px; border-top: 1px solid #f3f4f6; max-height: 300px; overflow-y: auto; }
         .drawer-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f9fafb; font-size: 0.9rem; align-items: center; }
+        /* The Floating Button */
+        .floating-bundle-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2F6B64;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px; /* Makes it a pill shape */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 9999;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s ease;
+        }
 
+        .floating-bundle-btn:hover {
+            transform: scale(1.05);
+            background: #24524c;
+        }
+
+        /* The Counter Badge on the button */
+        #count-badge {
+            background: #BE123C;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        #bundle-drawer {
+            display: none;
+            position: fixed;
+            /* This centers it in the Google Sites embed window */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); 
+            
+            width: 90%;
+            max-width: 400px;
+            max-height: 70vh;
+            background: #fff39c;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            z-index: 10000;
+            padding: 20px;
+            overflow-y: auto;
+        }
         /* Promo Banner */
         #promo-banner {
             background: #FEE84A; color: #000; text-align: center; 
@@ -44,7 +98,7 @@
 
         @keyframes pulse-soft {
             0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
+            50% { transform: scale(1); }
             100% { transform: scale(1); }
         }
 
@@ -92,10 +146,10 @@
     <div class="header-content"><h1>Bundles & Gifts Catalog</h1></div>
     <div class="bundle-bar">
         <div class="bundle-bar-content">
-            <div class="bundle-info">
-                <span class="bundle-header-title" onclick="toggleDrawer()">Bundle Items (<span id="count">0</span>) ▾</span>
-                <span class="total-display" id="total-val">$0</span>
-            </div>
+           <div class="floating-bundle-btn" onclick="toggleDrawer(event)">
+              🛒 View Bundle 
+              <span id="count-badge">0</span>
+          </div>
             <button id="go-to-bundle" class="btn-customize" disabled>Customize Items</button>
         </div>
         <div id="bundle-drawer"></div>
@@ -660,90 +714,100 @@ document.addEventListener('click', function(event) {
     }
 
     // 5. THE UI UPDATE ENGINE
-    function updateUI() {
-        const drawer = document.getElementById('bundle-drawer');
-        const banner = document.getElementById('promo-banner');
-        const totalValEl = document.getElementById('total-val');
-        const countEl = document.getElementById('count');
-        const btnGo = document.getElementById('go-to-bundle');
+function updateUI() {
+    const drawer = document.getElementById('bundle-drawer');
+    const banner = document.getElementById('promo-banner');
+    const totalValEl = document.getElementById('total-val');
+    const countEl = document.getElementById('count');
+    const btnGo = document.getElementById('go-to-bundle');
+    const badge = document.getElementById('count-badge');
+    const floatingPill = document.getElementById('bundle-pill');
 
-        if (!drawer) return;
+    if (!drawer) return;
 
-        let subtotal = 0;
-        let itemCount = 0;
-        let drawerHTML = '';
-        const keys = Object.keys(bundle);
+    let subtotal = 0;
+    let itemCount = 0;
+    let drawerHTML = '';
+    const keys = Object.keys(bundle);
 
-        
-                // Inside updateUI(), where you build the header:
-        if (keys.length > 0) {
-            drawerHTML += `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:10px; border-bottom:1px solid #eee; margin-bottom:10px;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span onclick="toggleDrawer()" style="cursor:pointer; font-size:18px; font-weight:bold; color:#666; padding-right:5px;">&times;</span>
-                        <span style="font-weight:bold; color:#2F6B64;">Your Selections</span>
-                    </div>
-                    <button onclick="clearBundle()" style="background:none; border:none; color:#BE123C; cursor:pointer; font-size:12px; text-decoration:underline;">Clear All</button>
+    // 1. Build Drawer Header
+    if (keys.length > 0) {
+        drawerHTML += `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:10px; border-bottom:1px solid #eee; margin-bottom:10px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span onclick="toggleDrawer(event)" style="cursor:pointer; font-size:18px; font-weight:bold; color:#666; padding-right:5px;">&times;</span>
+                    <span style="font-weight:bold; color:#2F6B64;">Your Selections</span>
                 </div>
-            `;
-        
-        } else {
-            drawerHTML = '<div style="text-align:center; padding:20px; color:#666;">Your bundle is empty</div>';
-        }
-
-        keys.forEach(key => {
-            const item = bundle[key];
-            const productInfo = productList.find(p => p.id === item.productId);
-            if (!productInfo) return;
-
-            const options = [...(productInfo.sizes || []), ...(productInfo.variations || [])];
-            const variation = options.find(v => v.label === item.variety);
-            const extra = variation ? variation.extra : 0;
-            const lineTotal = (productInfo.basePrice + extra) * item.quantity;
-
-            subtotal += lineTotal;
-            itemCount += item.quantity;
-
-            drawerHTML += `
-                <div class="drawer-item" style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px; align-items:center;">
-                    <div><strong>${productInfo.name}</strong><br><small>${item.variety}</small></div>
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <div class="qty-circle" style="cursor:pointer; background:#eee; width:22px; height:22px; line-height:20px; text-align:center; border-radius:50%; border:1px solid #ddd;" onclick="changeQty('${key}', -1)">-</div>
-                        <span style="font-weight:bold;">${item.quantity}</span>
-                        <div class="qty-circle" style="cursor:pointer; background:#eee; width:22px; height:22px; line-height:20px; text-align:center; border-radius:50%; border:1px solid #ddd;" onclick="changeQty('${key}', 1)">+</div>
-                        <span style="min-width:60px; text-align:right;">$${lineTotal.toFixed(2)}</span>
-                    </div>
-                </div>`;
-        });
-
-        drawer.innerHTML = drawerHTML;
-
-        // Discount Tiers
-        let disc = 0;
-        let msg = "Add 1 more for 5% off!";
-        if (itemCount === 2) { disc = 0.05; msg = "Add 1 more for 10% off!"; }
-        else if (itemCount >= 3 && itemCount <= 5) { disc = 0.10; msg = (itemCount < 5) ? "Add more for 10% off!" : "Add 1 more for 15% off!"; }
-        else if (itemCount >= 6 && itemCount <= 10) { disc = 0.15; msg = (itemCount < 10) ? "Add more for 15% off!" : "Add 1 more for 20% off!"; }
-        else if (itemCount >= 11) { disc = 0.20; msg = "MAX DISCOUNT REACHED! 🎉"; }
-
-        const final = subtotal * (1 - disc);
-
-        if (banner) {
-            banner.innerHTML = (itemCount > 0) 
-                ? `💵Bundle: ${itemCount} Items | Discount: ${Math.round(disc*100)}% | ${msg}`
-                : `💸 Bundle & Save: 2 Items (5%) | 3-5 (10%) | 6-10 (15%) | 11+ (20%)`;
-        }
-
-        if (totalValEl) {
-            totalValEl.innerHTML = (disc > 0) 
-                ? `<span style="text-decoration:line-through; opacity:0.6; font-size:0.8em; margin-right:5px;">$${subtotal.toFixed(2)}</span> <span style="color:#059669; font-weight:bold;">$${final.toFixed(2)}</span>`
-                : `$${subtotal.toFixed(2)}`;
-        }
-
-        if (countEl) countEl.textContent = itemCount;
-        if (btnGo) btnGo.disabled = (itemCount === 0);
+                <button onclick="clearBundle()" style="background:none; border:none; color:#BE123C; cursor:pointer; font-size:12px; text-decoration:underline;">Clear All</button>
+            </div>
+        `;
+    } else {
+        drawerHTML = '<div style="text-align:center; padding:20px; color:#666;">Your bundle is empty</div>';
     }
 
+    // 2. Calculate Totals and Build Item List
+    keys.forEach(key => {
+        const item = bundle[key];
+        const productInfo = productList.find(p => p.id === item.productId);
+        if (!productInfo) return;
+
+        const options = [...(productInfo.sizes || []), ...(productInfo.variations || [])];
+        const variation = options.find(v => v.label === item.variety);
+        const extra = variation ? variation.extra : 0;
+        const lineTotal = (productInfo.basePrice + extra) * item.quantity;
+
+        subtotal += lineTotal;
+        itemCount += item.quantity;
+
+        drawerHTML += `
+            <div class="drawer-item" style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px; align-items:center;">
+                <div><strong>${productInfo.name}</strong><br><small>${item.variety}</small></div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="qty-circle" style="cursor:pointer; background:#eee; width:22px; height:22px; line-height:20px; text-align:center; border-radius:50%; border:1px solid #ddd;" onclick="changeQty('${key}', -1)">-</div>
+                    <span style="font-weight:bold;">${item.quantity}</span>
+                    <div class="qty-circle" style="cursor:pointer; background:#eee; width:22px; height:22px; line-height:20px; text-align:center; border-radius:50%; border:1px solid #ddd;" onclick="changeQty('${key}', 1)">+</div>
+                    <span style="min-width:60px; text-align:right;">$${lineTotal.toFixed(2)}</span>
+                </div>
+            </div>`;
+    });
+
+    // Set the built HTML into the drawer
+    drawer.innerHTML = drawerHTML;
+
+    // 3. Discount Tiers Logic
+    let disc = 0;
+    let msg = "Add 1 more for 5% off!";
+    if (itemCount === 2) { disc = 0.05; msg = "Add 1 more for 10% off!"; }
+    else if (itemCount >= 3 && itemCount <= 5) { disc = 0.10; msg = (itemCount < 5) ? "Add more for 10% off!" : "Add 1 more for 15% off!"; }
+    else if (itemCount >= 6 && itemCount <= 10) { disc = 0.15; msg = (itemCount < 10) ? "Add more for 15% off!" : "Add 1 more for 20% off!"; }
+    else if (itemCount >= 11) { disc = 0.20; msg = "MAX DISCOUNT REACHED! 🎉"; }
+
+    const final = subtotal * (1 - disc);
+
+    // 4. Update Header Banner
+    if (banner) {
+        banner.innerHTML = (itemCount > 0) 
+            ? `💵 Bundle: ${itemCount} Items | Discount: ${Math.round(disc*100)}% | ${msg}`
+            : `💸 Bundle & Save: 2 Items (5%) | 3-5 (10%) | 6-10 (15%) | 11+ (20%)`;
+    }
+
+    // 5. Update Floating Elements (Badge and Total)
+    if (countEl) countEl.textContent = itemCount;
+    if (badge) badge.textContent = itemCount;
+    
+    if (totalValEl) {
+        totalValEl.innerHTML = (disc > 0) 
+            ? `<span style="text-decoration:line-through; opacity:0.6; font-size:0.8em; margin-right:5px;">$${subtotal.toFixed(2)}</span> <span style="color:#059669; font-weight:bold;">$${final.toFixed(2)}</span>`
+            : `$${subtotal.toFixed(2)}`;
+    }
+
+    // 6. Handle Floating Pill Visibility
+    if (floatingPill) {
+        floatingPill.style.display = (itemCount > 0) ? 'flex' : 'none';
+    }
+
+    if (btnGo) btnGo.disabled = (itemCount === 0);
+}
     // 6. RENDER THE CATALOG
     function renderCatalog() {
         const container = document.getElementById('catalog-container');

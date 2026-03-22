@@ -39,8 +39,8 @@
 
         .container { max-width: 1000px; margin: 20px auto 40px; padding: 0 20px; }
         .category { margin-bottom: 15px; border-radius: 12px; background: #CAE4DB; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .category-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; background: #CAE4DB; border-bottom: 1px solid #2F6B64; font-weight: bold; }
-        .category-header:hover { background: #2F6B64; color: #fff;}
+        .category-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; background: #2F6B64; border-bottom: 1px solid #1b3d39; font-weight: bold; }
+        .category-header:hover { background: #2F6B64 !important; color: #fff !important;}
         .category-content { display: block; padding: 25px; } 
         
         .item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
@@ -60,6 +60,17 @@
         .qty-circle { background: #fff; border: 1px solid #ccc; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
         @media (max-width: 600px) { #promo-banner { margin-top: 160px; } }
+
+        #bundle-drawer {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: opacity 0.2s ease; /* Optional: makes it feel smoother */
+        }
+        /* Add this to your <style> block */
+        #bundle-drawer span[onclick="toggleDrawer()"]:hover {
+            color: #BE123C !important;
+            transform: scale(1.2);
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -81,7 +92,7 @@
 </div>
 
 <div id="promo-banner">
-    🎁 Bundle & Save: 2 Items (5%) | 3-5 (10%) | 6-10 (15%) | 11+ (20%)
+    🛒 Bundle & Save: 2 Items (5%) | 3-5 (10%) | 6-10 (15%) | 11+ (20%)
 </div>
 
 <div class="container" id="catalog-container"></div>
@@ -560,11 +571,38 @@
         setTimeout(() => { toast.classList.remove("show"); }, 3000);
     }
 
-    window.toggleDrawer = function() {
-        const d = document.getElementById('bundle-drawer');
-        if (d) d.style.display = (d.style.display === "block") ? "none" : "block";
-    }
+   window.toggleDrawer = function(event) {
+      // Prevent the click from "bleeding" through to the document
+      if (event) event.stopPropagation();
+      
+      const d = document.getElementById('bundle-drawer');
+      if (!d) return;
 
+      const isVisible = d.style.display === "block";
+      d.style.display = isVisible ? "none" : "block";
+  };
+// --- AUTO-HIDE LOGIC ---
+
+// 1. Close drawer when scrolling
+window.addEventListener('scroll', function() {
+    const d = document.getElementById('bundle-drawer');
+    if (d && d.style.display === "block") {
+        d.style.display = "none";
+    }
+}, { passive: true });
+
+// 2. Close drawer when clicking anywhere else on the page
+document.addEventListener('click', function(event) {
+    const d = document.getElementById('bundle-drawer');
+    const bundleBar = document.querySelector('.bundle-bar');
+
+    // If the drawer is open AND the click was NOT inside the drawer or the bar
+    if (d && d.style.display === "block") {
+        if (!d.contains(event.target) && !bundleBar.contains(event.target)) {
+            d.style.display = "none";
+        }
+    }
+});
     window.clearBundle = function() {
         if (confirm("Remove all items from your bundle?")) {
             localStorage.removeItem('myBundle');
@@ -625,12 +663,19 @@
         let drawerHTML = '';
         const keys = Object.keys(bundle);
 
+        
+                // Inside updateUI(), where you build the header:
         if (keys.length > 0) {
             drawerHTML += `
                 <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:10px; border-bottom:1px solid #eee; margin-bottom:10px;">
-                    <span style="font-weight:bold; color:#2F6B64;">Your Selections</span>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span onclick="toggleDrawer()" style="cursor:pointer; font-size:18px; font-weight:bold; color:#666; padding-right:5px;">&times;</span>
+                        <span style="font-weight:bold; color:#2F6B64;">Your Selections</span>
+                    </div>
                     <button onclick="clearBundle()" style="background:none; border:none; color:#BE123C; cursor:pointer; font-size:12px; text-decoration:underline;">Clear All</button>
-                </div>`;
+                </div>
+            `;
+        
         } else {
             drawerHTML = '<div style="text-align:center; padding:20px; color:#666;">Your bundle is empty</div>';
         }
@@ -674,8 +719,8 @@
 
         if (banner) {
             banner.innerHTML = (itemCount > 0) 
-                ? `🔥 Bundle: ${itemCount} Items | Discount: ${Math.round(disc*100)}% | ${msg}`
-                : `🎁 Bundle & Save: 2 Items (5%) | 3-5 (10%) | 6-10 (15%) | 11+ (20%)`;
+                ? `💵Bundle: ${itemCount} Items | Discount: ${Math.round(disc*100)}% | ${msg}`
+                : `💸 Bundle & Save: 2 Items (5%) | 3-5 (10%) | 6-10 (15%) | 11+ (20%)`;
         }
 
         if (totalValEl) {
@@ -704,7 +749,7 @@
         for (const cat in grouped) {
             html += `
             <div class="category">
-                <div class="category-header" style="cursor:pointer; background:#f0fdf4; padding:12px; margin-top:15px; border-radius:8px; display:flex; justify-content:space-between; font-weight:bold; color:#166534;" onclick="const c = this.nextElementSibling; c.style.display = (c.style.display === 'none' ? 'block' : 'none');">
+                <div class="category-header" style="cursor:pointer; background:#f0fdf4; padding:12px; margin-top:0px; border-radius:8px; display:flex; justify-content:space-between; font-weight:bold; color:#166534;" onclick="const c = this.nextElementSibling; c.style.display = (c.style.display === 'none' ? 'block' : 'none');">
                     <span>${cat}</span><span>▾</span>
                 </div>
                 <div class="category-content">
@@ -732,7 +777,26 @@
         }
         container.innerHTML = html;
     }
+// 1. Close when clicking away
+document.addEventListener('click', function(event) {
+    const drawer = document.getElementById('bundle-drawer');
+    const bundleBar = document.querySelector('.bundle-bar');
+    
+    if (drawer && drawer.style.display === "block") {
+        // If the click is NOT in the drawer AND NOT on the bundle bar button
+        if (!drawer.contains(event.target) && !bundleBar.contains(event.target)) {
+            drawer.style.display = "none";
+        }
+    }
+});
 
+// 2. Close when scrolling
+window.addEventListener('scroll', function() {
+    const drawer = document.getElementById('bundle-drawer');
+    if (drawer && drawer.style.display === "block") {
+        drawer.style.display = "none";
+    }
+}, { passive: true });
     // 7. INITIALIZE ON LOAD
     window.onload = () => {
         renderCatalog();

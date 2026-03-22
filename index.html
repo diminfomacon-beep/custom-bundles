@@ -22,8 +22,8 @@
         .bundle-header-title { font-weight: 800; text-transform: uppercase; font-size: 0.85rem; color: #2F6B64; cursor: pointer; text-decoration: underline; }
         .total-display { font-size: 1.2rem; font-weight: bold; color: #059669; }
 
-        .btn-customize { background: #fbbf24; color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;}
-        .btn-customize:hover { background: #f59e0b; }
+        .btn-customize { background: #FEE84A; color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .btn-customize:hover { background: #cab723; }
         .btn-customize:disabled { background: #d1d5db; cursor: not-allowed; }
 
         /* Drawer */
@@ -32,15 +32,15 @@
 
         /* Promo Banner */
         #promo-banner {
-            background: #fbbf24; color: #000; text-align: center; 
+            background: #FEE84A; color: #000; text-align: center; 
             padding: 12px; font-weight: bold; font-size: 0.9rem; 
-            border-bottom: 2px solid #d97706; margin-top: 145px;
+            border-bottom: 2px solid #92820b; margin-top: 145px;
         }
 
         .container { max-width: 1000px; margin: 20px auto 40px; padding: 0 20px; }
         .category { margin-bottom: 15px; border-radius: 12px; background: #CAE4DB; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .category-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; background: #CAE4DB; border-bottom: 1px solid #9cbdb1; font-weight: bold; }
-        .category-header:hover { background: #bedad0; }
+        .category-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; background: #CAE4DB; border-bottom: 1px solid #2F6B64; font-weight: bold; }
+        .category-header:hover { background: #2F6B64; color: #fff;}
         .category-content { display: block; padding: 25px; } 
         
         .item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
@@ -549,45 +549,60 @@
     ];
 
     // --- 2. CORE UI FUNCTIONS ---
+    let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
+
+    // 3. CORE UI FUNCTIONS
     function showToast(message) {
         const toast = document.getElementById("toast");
-        toast.textContent = message || "Item added!";
+        if (!toast) return;
+        toast.textContent = message;
         toast.classList.add("show");
-        setTimeout(() => { toast.classList.remove("show"); }, 2000);
+        setTimeout(() => { toast.classList.remove("show"); }, 3000);
     }
 
     window.toggleDrawer = function() {
         const d = document.getElementById('bundle-drawer');
-        d.style.display = (d.style.display === "block") ? "none" : "block";
+        if (d) d.style.display = (d.style.display === "block") ? "none" : "block";
     }
 
-    // --- 3. BUNDLE LOGIC ---
+    window.clearBundle = function() {
+        if (confirm("Remove all items from your bundle?")) {
+            localStorage.removeItem('myBundle');
+            bundle = {}; 
+            updateUI();
+        }
+    }
+
+    // 4. ADD TO BUNDLE LOGIC
     window.addToBundle = function(btn) {
         const card = btn.closest('.item-card');
         const productId = card.getAttribute('data-id'); 
         const varietySelect = card.querySelector('.variety-select');
         const variety = varietySelect ? varietySelect.value : "Standard";
         
+        const qtyInput = card.querySelector('.qty-input');
+        const qtyToAdd = qtyInput ? parseInt(qtyInput.value) : 1;
+
         const uniqueKey = `${productId}-${variety}`;
-        let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
 
         if (!bundle[uniqueKey]) {
             bundle[uniqueKey] = {
                 productId: productId, 
                 variety: variety,
-                quantity: 1
+                quantity: qtyToAdd
             };
         } else {
-            bundle[uniqueKey].quantity++;
+            bundle[uniqueKey].quantity += qtyToAdd;
         }
 
         localStorage.setItem('myBundle', JSON.stringify(bundle));
-        showToast("Added to bundle!");
+        if (qtyInput) qtyInput.value = 1; 
+        
+        showToast(`Added ${qtyToAdd} to your bundle!`);
         updateUI(); 
     }
 
     window.changeQty = function(key, delta) {
-        let bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
         if (!bundle[key]) return;
         bundle[key].quantity += delta;
         if (bundle[key].quantity <= 0) delete bundle[key];
@@ -595,92 +610,89 @@
         updateUI();
     }
 
+    // 5. THE UI UPDATE ENGINE
     function updateUI() {
-    const drawer = document.getElementById('bundle-drawer');
-    const banner = document.getElementById('promo-banner');
-    const bundle = JSON.parse(localStorage.getItem('myBundle')) || {};
-    const keys = Object.keys(bundle);
+        const drawer = document.getElementById('bundle-drawer');
+        const banner = document.getElementById('promo-banner');
+        const totalValEl = document.getElementById('total-val');
+        const countEl = document.getElementById('count');
+        const btnGo = document.getElementById('go-to-bundle');
 
-    drawer.innerHTML = '';
-    let subtotal = 0;
-    let itemCount = 0;
+        if (!drawer) return;
 
-    keys.forEach(key => {
-        const item = bundle[key];
-        const productInfo = productList.find(p => p.id === item.productId);
-        if (!productInfo) return;
+        let subtotal = 0;
+        let itemCount = 0;
+        let drawerHTML = '';
+        const keys = Object.keys(bundle);
 
-        // Combine sizes and variations to find the correct extra cost
-        const options = [...(productInfo.sizes || []), ...(productInfo.variations || [])];
-        const variation = options.find(v => v.label === item.variety);
-        const extra = variation ? variation.extra : 0;
-        const lineItemTotal = (productInfo.basePrice + extra) * item.quantity;
+        if (keys.length > 0) {
+            drawerHTML += `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:10px; border-bottom:1px solid #eee; margin-bottom:10px;">
+                    <span style="font-weight:bold; color:#2F6B64;">Your Selections</span>
+                    <button onclick="clearBundle()" style="background:none; border:none; color:#BE123C; cursor:pointer; font-size:12px; text-decoration:underline;">Clear All</button>
+                </div>`;
+        } else {
+            drawerHTML = '<div style="text-align:center; padding:20px; color:#666;">Your bundle is empty</div>';
+        }
 
-        subtotal += lineItemTotal;
-        itemCount += item.quantity;
+        keys.forEach(key => {
+            const item = bundle[key];
+            const productInfo = productList.find(p => p.id === item.productId);
+            if (!productInfo) return;
 
-        drawer.innerHTML += `
-            <div class="drawer-item">
-                <div><strong>${productInfo.name}</strong><br><small>${item.variety}</small></div>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <div class="qty-circle" onclick="changeQty('${key}', -1)">-</div>
-                    <span>${item.quantity}</span>
-                    <div class="qty-circle" onclick="changeQty('${key}', 1)">+</div>
-                    <span style="min-width:60px; text-align:right;">$${lineItemTotal.toFixed(2)}</span>
-                </div>
-            </div>`;
-    });
+            const options = [...(productInfo.sizes || []), ...(productInfo.variations || [])];
+            const variation = options.find(v => v.label === item.variety);
+            const extra = variation ? variation.extra : 0;
+            const lineTotal = (productInfo.basePrice + extra) * item.quantity;
 
-    // --- LIVE DISCOUNT CALCULATION ---
-    let discountPercent = 0;
-    let nextTierMsg = "";
+            subtotal += lineTotal;
+            itemCount += item.quantity;
 
-    if (itemCount === 2) {
-        discountPercent = 0.05;
-        nextTierMsg = "Add 1 more for 10% off!";
-    } else if (itemCount >= 3 && itemCount <= 5) {
-        discountPercent = 0.10;
-        nextTierMsg = itemCount < 5 ? "Add more for 10% off!" : "Add 1 more for 15% off!";
-    } else if (itemCount >= 6 && itemCount <= 10) {
-        discountPercent = 0.15;
-        nextTierMsg = itemCount < 10 ? "Add more for 15% off!" : "Add 1 more for 20% off!";
-    } else if (itemCount >= 11) {
-        discountPercent = 0.20;
-        nextTierMsg = "MAX DISCOUNT REACHED! 🎉";
-    } else if (itemCount === 1) {
-        nextTierMsg = "Add 1 more item for 5% off!";
+            drawerHTML += `
+                <div class="drawer-item" style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px; align-items:center;">
+                    <div><strong>${productInfo.name}</strong><br><small>${item.variety}</small></div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div class="qty-circle" style="cursor:pointer; background:#eee; width:22px; height:22px; line-height:20px; text-align:center; border-radius:50%; border:1px solid #ddd;" onclick="changeQty('${key}', -1)">-</div>
+                        <span style="font-weight:bold;">${item.quantity}</span>
+                        <div class="qty-circle" style="cursor:pointer; background:#eee; width:22px; height:22px; line-height:20px; text-align:center; border-radius:50%; border:1px solid #ddd;" onclick="changeQty('${key}', 1)">+</div>
+                        <span style="min-width:60px; text-align:right;">$${lineTotal.toFixed(2)}</span>
+                    </div>
+                </div>`;
+        });
+
+        drawer.innerHTML = drawerHTML;
+
+        // Discount Tiers
+        let disc = 0;
+        let msg = "Add 1 more for 5% off!";
+        if (itemCount === 2) { disc = 0.05; msg = "Add 1 more for 10% off!"; }
+        else if (itemCount >= 3 && itemCount <= 5) { disc = 0.10; msg = (itemCount < 5) ? "Add more for 10% off!" : "Add 1 more for 15% off!"; }
+        else if (itemCount >= 6 && itemCount <= 10) { disc = 0.15; msg = (itemCount < 10) ? "Add more for 15% off!" : "Add 1 more for 20% off!"; }
+        else if (itemCount >= 11) { disc = 0.20; msg = "MAX DISCOUNT REACHED! 🎉"; }
+
+        const final = subtotal * (1 - disc);
+
+        if (banner) {
+            banner.innerHTML = (itemCount > 0) 
+                ? `🔥 Bundle: ${itemCount} Items | Discount: ${Math.round(disc*100)}% | ${msg}`
+                : `🎁 Bundle & Save: 2 Items (5%) | 3-5 (10%) | 6-10 (15%) | 11+ (20%)`;
+        }
+
+        if (totalValEl) {
+            totalValEl.innerHTML = (disc > 0) 
+                ? `<span style="text-decoration:line-through; opacity:0.6; font-size:0.8em; margin-right:5px;">$${subtotal.toFixed(2)}</span> <span style="color:#059669; font-weight:bold;">$${final.toFixed(2)}</span>`
+                : `$${subtotal.toFixed(2)}`;
+        }
+
+        if (countEl) countEl.textContent = itemCount;
+        if (btnGo) btnGo.disabled = (itemCount === 0);
     }
 
-    const discountAmount = subtotal * discountPercent;
-    const finalTotal = subtotal - discountAmount;
-
-    // Update Promo Banner Text
-    if (itemCount > 0) {
-        banner.innerHTML = `🔥 Bundle Status: ${itemCount} Items | Discount: ${Math.round(discountPercent * 100)}% | ${nextTierMsg}`;
-    } else {
-        banner.innerHTML = `🎁 Bundle & Save: 2 Items (5%) | 3-5 (10%) | 6-10 (15%) | 11+ (20%)`;
-    }
-
-    // Update Sticky Bar Price Display
-    const totalValEl = document.getElementById('total-val');
-    if (discountPercent > 0) {
-        totalValEl.innerHTML = `
-            <span style="text-decoration: line-through; color: #666; font-size: 0.85rem; margin-right: 5px;">$${subtotal.toFixed(2)}</span>
-            <span style="color: #059669;">$${finalTotal.toFixed(2)}</span>
-        `;
-    } else {
-        totalValEl.textContent = `$${subtotal.toFixed(2)}`;
-    }
-            
-    document.getElementById('count').textContent = itemCount;
-    document.getElementById('go-to-bundle').disabled = (itemCount === 0);
-}
-    // --- 4. CATALOG GENERATION (FIXED) ---
+    // 6. RENDER THE CATALOG
     function renderCatalog() {
         const container = document.getElementById('catalog-container');
         if (!container) return;
 
-        // Grouping items by category
         const grouped = {};
         productList.forEach(p => {
             const cat = p.category || "General";
@@ -689,26 +701,29 @@
         });
 
         let html = '';
-        for (const catName in grouped) {
+        for (const cat in grouped) {
             html += `
             <div class="category">
-                <div class="category-header" onclick="const c = this.nextElementSibling; c.style.display = (c.style.display === 'none' ? 'block' : 'none');">
-                    <span>${catName}</span>
-                    <span>▾</span>
+                <div class="category-header" style="cursor:pointer; background:#f0fdf4; padding:12px; margin-top:15px; border-radius:8px; display:flex; justify-content:space-between; font-weight:bold; color:#166534;" onclick="const c = this.nextElementSibling; c.style.display = (c.style.display === 'none' ? 'block' : 'none');">
+                    <span>${cat}</span><span>▾</span>
                 </div>
                 <div class="category-content">
-                    <div class="item-grid">
-                        ${grouped[catName].map(p => `
-                            <div class="item-card" data-id="${p.id}">
-                                <img src="${p.images ? p.images[0] : ''}" onerror="this.src='https://via.placeholder.com/150'">
-                                <div style="font-weight:600; margin-top:10px;">${p.name}</div>
-                                <div style="color:#059669; margin-bottom:8px">$${p.basePrice.toFixed(2)}</div>
-                                <select class="variety-select">
+                    <div class="item-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:20px; padding:15px 0;">
+                        ${grouped[cat].map(p => `
+                            <div class="item-card" data-id="${p.id}" style="background:white; border:1px solid #e5e7eb; padding:15px; border-radius:12px; text-align:center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                <img src="${p.images[0]}" style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px;" onerror="this.src='https://via.placeholder.com/150'">
+                                <div style="font-weight:700; margin:10px 0 5px;">${p.name}</div>
+                                <div style="color:#059669; font-weight:600; margin-bottom:10px;">$${p.basePrice.toFixed(2)}</div>
+                                <select class="variety-select" style="width:100%; margin-bottom:10px; padding:6px; border-radius:6px; border:1px solid #d1d5db; font-size:13px;">
                                     ${p.sizes ? p.sizes.map(s => `<option value="${s.label}">${s.label} (+$${s.extra})</option>`).join('') : ''}
                                     ${p.variations ? p.variations.map(v => `<option value="${v.label}">${v.label} (+$${v.extra})</option>`).join('') : ''}
                                     ${(!p.sizes && !p.variations) ? '<option value="Standard">Standard</option>' : ''}
                                 </select>
-                                <button class="add-btn" onclick="addToBundle(this)">Add to Bundle</button>
+                                <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:12px;">
+                                    <span style="font-size:12px; color:#666; font-weight:bold;">QTY:</span>
+                                    <input type="number" class="qty-input" value="1" min="1" style="width:50px; padding:5px; border:1px solid #d1d5db; border-radius:6px; text-align:center;">
+                                </div>
+                                <button class="add-btn" style="width:100%; background:#2F6B64; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; transition: background 0.2s;" onmouseover="this.style.background='#24524c'" onmouseout="this.style.background='#2F6B64'" onclick="addToBundle(this)">Add to Bundle</button>
                             </div>
                         `).join('')}
                     </div>
@@ -718,14 +733,13 @@
         container.innerHTML = html;
     }
 
-    // --- 5. START ---
-    document.getElementById('go-to-bundle').onclick = () => window.location.href = 'customize.html';
-    
-    // Run everything once the page is ready
+    // 7. INITIALIZE ON LOAD
     window.onload = () => {
         renderCatalog();
         updateUI();
     };
+    
+    document.getElementById('go-to-bundle').onclick = () => window.location.href = 'customize.html';
 </script>
 </body>
 </html>

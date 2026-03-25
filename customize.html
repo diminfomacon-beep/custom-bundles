@@ -690,7 +690,7 @@ function render() {
                     background: #fdfdfd; /* Subtle contrast to show text area */
                     box-sizing: border-box;
                 ">
-                    <div style="
+                    <div class="preview-text" style="
                         color:${item.textColor || '#000'}; 
                         font-family:${item.fontFamily || 'sans-serif'}; 
                         font-size:${item.fontSize || 20}px;
@@ -701,6 +701,7 @@ function render() {
                     ">
                         ${item.customText ?? ''}
                     </div>
+                 
                 </div>
             </div>
 
@@ -709,6 +710,9 @@ function render() {
                 <button class="btn-upload" onclick="document.getElementById('file-input-${key}').click()" style="width: auto; margin-top: 10px;">
                     ${item.localImage ? '✓ Image Loaded' : 'Upload Image'}
                 </button>
+                <div id="upload-error-${key}" style="color: #ef4444; font-size: 12px; margin-top: 5px; display: none; font-weight: bold;">
+                    ⚠ Image is too large for preview. Please use a smaller file.
+                </div>
                 <button class="btn-clear" onclick="clearDesign('${key}')">Clear Design</button>
                 
                 <div style="margin-top: 15px;">
@@ -891,38 +895,64 @@ function toggleFooter() {
 }
 // --- 4. CORE FUNCTIONS ---
 window.updateProp = (key, prop, val) => {
-    if (prop === 'fontSize') val = parseInt(val);
+    if (!bundle[key]) return;
 
+    // Save data
+    if (prop === 'fontSize') val = parseInt(val);
     bundle[key][prop] = val;
     localStorage.setItem('myBundle', JSON.stringify(bundle));
 
-    const card = document.querySelector(`[data-key="${key}"]`);
+    // Find the row using the data-key attribute
+    const row = document.querySelector(`[data-key="${key}"]`);
+    if (!row) return;
 
-    if (prop === 'customText' && card) {
-        card.querySelector('.preview-text').textContent = val;
-    } else if (prop === 'fontSize' && card) {
-        card.querySelector('.preview-text').style.fontSize = val + "px";
+    // Find the div we just gave the class "preview-text" to
+    const previewText = row.querySelector('.preview-text');
+    if (!previewText) return;
+
+    // Update the preview instantly
+    if (prop === 'customText') {
+        previewText.textContent = val;
+    } else if (prop === 'textColor') {
+        previewText.style.color = val;
+    } else if (prop === 'fontSize') {
+        previewText.style.fontSize = val + "px";
+        // This part updates the little "22px" text next to the slider
+        render(); 
+    } else if (prop === 'fontFamily') {
+        previewText.style.fontFamily = val;
     } else {
+        // For variety/style/notes, a full refresh is best
         render();
     }
 };
-
 window.handleImageUpload = (key, input) => {
     const file = input.files[0];
+    const errorLabel = document.getElementById(`upload-error-${key}`);
     if (!file) return;
 
-    // ADD THIS: Check if file is larger than 2MB
-    if (file.size > 2 * 1024 * 1024) {
-        alert("Image is too large! Please upload a file smaller than 2MB.");
-        return;
+    // Hide the error initially
+    if(errorLabel) errorLabel.style.display = 'none';
+
+    // Increase limit to 10MB just in case, but warn if it hits the 5MB browser limit
+    if (file.size > 10 * 1024 * 1024) { 
+        if(errorLabel) errorLabel.style.display = 'block';
+        return; 
     }
 
     const reader = new FileReader();
-    // ... rest of your code ...
     reader.onload = (e) => {
-        bundle[key].localImage = e.target.result; 
-        localStorage.setItem('myBundle', JSON.stringify(bundle));
-        render();
+        try {
+            bundle[key].localImage = e.target.result; 
+            localStorage.setItem('myBundle', JSON.stringify(bundle));
+            render();
+        } catch (e) {
+            // This catches the specific "LocalStorage Full" error
+            if(errorLabel) {
+                errorLabel.innerText = "⚠ Memory full! Try a smaller image.";
+                errorLabel.style.display = 'block';
+            }
+        }
     };
     reader.readAsDataURL(file);
 };

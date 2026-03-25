@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+    <!-- Part 1 - Head and CSS -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -344,12 +345,7 @@
         }
 
         /* 5. Mobile Adjustments */
-        @media (max-width: 768px) {
-            .wrapper { margin-top: 200px; } /* More space for stacked header on mobile */
-            .summary-bar { flex-direction: column; gap: 10px; text-align: center; }
-            #paypal-button-container { width: 100%; }
-        }
-
+        
         /* 1. The Floating Header */
         #floating-checkout-footer {
             position: fixed; /* This makes it float */
@@ -370,6 +366,7 @@
             margin: 0 auto;
             padding: 20px;
             margin-top: 180px !important; /* Adjust this number to match header height */
+            transition: margin-top 0.3s ease; /* Makes the toggle smooth */
         }
 
         /* 3. Reset summary bar so it stays inside the float */
@@ -398,8 +395,71 @@
         #items-container {
             padding-bottom: 250px; 
         }
-       
-        
+       /* --- CRITICAL MOBILE OPTIMIZATION (No Code Changes) --- */
+@media (max-width: 768px) {
+    /* 1. Fix the Overlap */
+    /* This pushes your items down so the floating header doesn't cover them */
+    .wrapper { 
+        margin-top: 250px !important; 
+        padding: 10px !important;
+    }
+
+    /* 2. Fix the Item Rows */
+    /* If your .item-row is using Grid, this forces it to a single column */
+    .item-row {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
+        padding: 15px !important;
+    }
+
+    /* 3. Fix the Floating Checkout Bar */
+    /* This ensures the PayPal button and Total text stack nicely */
+    .summary-bar {
+        flex-direction: column !important;
+        gap: 10px !important;
+        text-align: center !important;
+        padding: 10px !important;
+    }
+
+    /* 4. Make the PayPal button full width for thumbs */
+    #paypal-button-container {
+        width: 100% !important;
+        max-width: 280px; /* Keeps it from looking giant on tablets */
+        margin: 0 auto;
+    }
+
+    /* 5. Scale the Product Preview */
+    /* Prevents your product image from bleeding off the screen */
+    .product-preview {
+        width: 100% !important;
+        max-width: 300px !important;
+        height: auto !important;
+        aspect-ratio: 1 / 1; /* Keeps it square */
+        margin: 0 auto !important;
+    }
+}
+
+/* Specific fix for very small phones (iPhone SE, etc.) */
+@media (max-width: 480px) {
+    .wrapper {
+        margin-top: 280px !important;
+    }
+    
+    #total-display {
+        font-size: 1.1rem !important;
+    }
+}
+ @media (max-width: 480px) {
+    /* Shrink the new thumbnail slightly on small screens */
+    .item-row img[style*="width: 110px"] {
+        width: 85px !important;
+        height: 85px !important;
+    }
+    .item-row h2 {
+        font-size: 1.1rem !important;
+    }
+}       
         </style>
 </head>
 <body>
@@ -438,7 +498,7 @@
         <div id="items-container">
             </div>
     </div>
-
+<!-- Part 3 -Script -->
 <script>
 // --- PRODUCT LIST (Make sure this matches your Index exactly) ---
 
@@ -534,7 +594,42 @@ const productList = [
       images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/babybib.png"],
       basePrice: 8.99,
     },
+     {
+      id: "AP-BHVN01",
+      name: "Baby Hat", 
+      category: "Apparel & Wearables",
+      description:  "Cotton baby hat to keep their little head warm. Soft and comfortable and custom printable.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/babybib.png"],
+      basePrice: 2.99,
+    },
+    
+    {
+      id: "AP-BMVN01",
+      name: "Baby Mittens", 
+      category: "Apparel & Wearables",
+      description:  "Cotton baby hat to keep their little head warm. Soft and comfortable and custom printable.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/babybib.png"],
+      basePrice: 2.99,
+    },
 
+    {
+      id: "AP-BSVN01",
+      name: "Baby Socks", 
+      category: "Apparel & Wearables",
+      description:  "Cotton baby hat to keep their little head warm. Soft and comfortable and custom printable.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/babybib.png"],
+      basePrice: 2.99,
+    },
+       
+    {
+      id: "AP-BBCVN1",
+      name: "Baby Burp Cloth", 
+      category: "Apparel & Wearables",
+      description:  "Soft and comfortable baby burp cloth and fully customizable.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/babybib.png"],
+      basePrice: 5.99,
+    },   
+       
         
             // ***************CATEGORY - Drinkware & Kitchenware******************
     
@@ -793,6 +888,15 @@ const productList = [
       basePrice: 16.99,
     },
 
+    {
+      id: "BO-BBVN01",
+      name: "Baby Bottle", 
+      category: "Drinkware & Kitchenware",
+      description: "Fully customizable baby bottle with colic deterent straw.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/Flask.png"],
+      basePrice: 17.99,
+    },
+
           // ***************CATEGORY - Home & Living******************
 
     {
@@ -880,7 +984,14 @@ const productList = [
       images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-440.png"],
       basePrice:15.99
     },
-
+       {
+      id: "HO-WBVN01",
+      name: "Wooden Box", 
+      category: "Apparel & Wearables",
+      description:  "Customizable wood burned keepsake box for all you precious memories.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/babybib.png"],
+      basePrice: 26.99,
+    }, 
             // ***************CATEGORY - Games & Gifts******************
 
     {
@@ -1038,59 +1149,86 @@ function render() {
         row.setAttribute('data-key', key);
         row.innerHTML = `
             <div class="remove-x" onclick="removeItem('${key}')">X</div>
+            
             <div class="preview-section">
-                <div class="product-preview">
-                    <img src="${displayImg}" class="base-img">
-                    ${item.localImage ? `<img src="${item.localImage}" class="user-img-overlay">` : ''}
-                    <div class="preview-text" style=" color:${item.textColor || '#000'}; font-family:${item.fontFamily || 'sans-serif'}; font-size:${item.fontSize || 22}px;">${item.customText ?? ''}</div>
+                <div style="background: #FEE84A; border-left: 4px solid #2F6B64; padding: 12px; margin-bottom: 15px; font-size: 13px; color: #1a413d; line-height: 1.4; border-radius: 4px;">
+                    <strong>Note:</strong> We will compose your design and send final proof to your email for your approval before printing."
                 </div>
+
+                <div class="product-preview" style="background: #ffffff; border: 2px dashed #2F6B64; position: relative;">
+                    ${item.localImage ? `<img src="${item.localImage}" class="user-img-overlay">` : ''}
+                    <div class="preview-text" style="color:${item.textColor || '#000'}; font-family:${item.fontFamily || 'sans-serif'}; font-size:${item.fontSize || 22}px;">
+                        ${item.customText ?? ''}
+                    </div>
+                </div>
+                
                 <input type="file" id="file-input-${key}" style="display: none;" accept="image/*" onchange="handleImageUpload('${key}', this)">
                 <button class="btn-upload" onclick="document.getElementById('file-input-${key}').click()" style="width: auto; margin-top: 10px;">
                     ${item.localImage ? '✓ Image Loaded' : 'Upload Image'}
                 </button>
                 <button class="btn-clear" onclick="clearDesign('${key}')">Clear Design</button>
-                <div>
+                
+                <div style="margin-top: 15px;">
                     <label>Quantity</label>
-                    <input type="number" min="1" value="${item.quantity || 1}" oninput="updateQuantity('${key}', this.value)">
+                    <input type="number" min="1" value="${item.quantity || 1}" oninput="updateQuantity('${key}', this.value)" style="width: 60px; padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
                 </div>
-                <div style="font-weight:bold; color:#000000; margin-top:5px;">
-                        Item Total: $${itemSubtotal.toFixed(2)}
-                </div>
+                
+                <div style="font-weight:bold; color:#000000; margin-top:10px; font-size: 1.1rem;">
+                    Item Total: $${itemSubtotal.toFixed(2)}
                 </div>
             </div>
+            
             <div class="details" style="font-size: 16px; color:#000; font-weight: bold;">
-               <div>
-                    <h2 style="margin:0 0 5px 0; color:#000000;">${p.name}</h2>
-                    <div style="font-size:16px; font-weight: bold; margin-bottom:10px;">
-                        $${itemPrice.toFixed(2)} each
-                    </div>
-                    <div Style="font-size: 12px; color: blue;">(Discount calculated in final Total)</div>
+                <div style="display: flex; gap: 15px; align-items: stretch; margin-bottom: 10px;">
+                    <img src="${p.images[0]}" style="width: 80px; height: 80px; object-fit: contain; background: #fff; border-radius: 6px; border: 1px solid #ccc; flex-shrink: 0;">
                     
-                    <hr>
-                    <label>Option</label>
-                    ${p.variations ? `
-                            <select onchange="updateProp('${key}', 'variety', this.value)">
-                                ${p.variations.map(v => `<option value="${v.label}" ${item.variety === v.label ? 'selected' : ''}>${v.label} (+$${v.extra.toFixed(2)})</option>`).join('')}
-                            </select>
-                        ` : ''}
-
-                        ${p.styles ? `
-                            
-                            <select onchange="updateProp('${key}', 'style', this.value)">
-                                ${p.styles.map(s => `<option value="${s.label}" ${item.style === s.label ? 'selected' : ''}>${s.label} (+$${s.extra.toFixed(2)})</option>`).join('')}
-                            </select>
-                        ` : ''}
+                    <div style="display: flex; flex-direction: column; justify-content: center;">
+                        <h2 style="margin:0 0 5px 0; color:#000000; font-size: 1.2rem;">${p.name}</h2>
+                        <div style="font-size:16px; font-weight: bold; margin-bottom: 2px;">
+                            $${itemPrice.toFixed(2)} each
+                        </div>
+                        <div style="font-size: 12px; color: blue;">(Discount calculated in final Total)</div>
+                    </div>
                 </div>
+                
+                <hr>
+
+                <label>Option</label>
+                ${p.variations ? `
+                        <select onchange="updateProp('${key}', 'variety', this.value)" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+                            ${p.variations.map(v => `<option value="${v.label}" ${item.variety === v.label ? 'selected' : ''}>${v.label} (+$${v.extra.toFixed(2)})</option>`).join('')}
+                        </select>
+                    ` : ''}
+
+                ${p.styles ? `
+                        <select onchange="updateProp('${key}', 'style', this.value)" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+                            ${p.styles.map(s => `<option value="${s.label}" ${item.style === s.label ? 'selected' : ''}>${s.label} (+$${s.extra.toFixed(2)})</option>`).join('')}
+                        </select>
+                    ` : ''}
+                
                 <div><label>Add Text</label></div>
-                <div><input type="text" value="${item.customText ?? ''}" oninput="updateProp('${key}', 'customText', this.value)" placeholder="Enter text here..."></div>
+                <div><input type="text" value="${item.customText ?? ''}" oninput="updateProp('${key}', 'customText', this.value)" placeholder="Enter text here..." style="width: 100%; padding: 8px; margin-bottom: 10px;"></div>
+                
                 <div><label>Text Color</label></div>
-                <div class="color-swatches">${colorSwatches.map(c => `<div class="color-sq ${item.textColor === c ? 'active' : ''}" style="background:${c}" onclick="updateProp('${key}', 'textColor', '${c}')"></div>`).join('')}</div>
-                <div style="font-size:16px; margin-bottom:10px;"><label>Font Size</label>
-                <input type="range" min="10" max="80" value="${item.fontSize || 22}" oninput="updateProp('${key}', 'fontSize', this.value)">${item.fontSize || 22}px</div>
+                <div class="color-swatches" style="display: flex; gap: 5px; margin-bottom: 10px;">
+                    ${colorSwatches.map(c => `<div class="color-sq ${item.textColor === c ? 'active' : ''}" style="background:${c}; width: 25px; height: 25px; cursor: pointer; border: 1px solid #ccc;" onclick="updateProp('${key}', 'textColor', '${c}')"></div>`).join('')}
+                </div>
+                
+                <div style="font-size:16px; margin-bottom:10px;">
+                    <label>Font Size</label>
+                    <input type="range" min="10" max="80" value="${item.fontSize || 22}" oninput="updateProp('${key}', 'fontSize', this.value)">
+                    ${item.fontSize || 22}px
+                </div>
+                
                 <div><label>Font Style</label>
-                <select onchange="updateProp('${key}', 'fontFamily', this.value)">${fontOptions.map(f => `<option value="${f.family}" style="font-family:${f.family}" ${item.fontFamily === f.family ? 'selected' : ''}>${f.name}</option>`).join('')}</select></div>
+                    <select onchange="updateProp('${key}', 'fontFamily', this.value)" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+                        ${fontOptions.map(f => `<option value="${f.family}" style="font-family:${f.family}" ${item.fontFamily === f.family ? 'selected' : ''}>${f.name}</option>`).join('')}
+                    </select>
+                </div>
+                
                 <div><label>Special Instructions</label>
-                <textarea rows="3" oninput="updateProp('${key}', 'notes', this.value)">${item.notes || ''}</textarea></div>
+                    <textarea rows="3" oninput="updateProp('${key}', 'notes', this.value)" style="width: 100%; padding: 8px;">${item.notes || ''}</textarea>
+                </div>
             </div>
         `;
       
@@ -1152,19 +1290,25 @@ function toggleFooter() {
     const content = document.getElementById('footer-content');
     const text = document.getElementById('toggle-text');
     const arrow = document.getElementById('toggle-arrow');
+    const wrapper = document.querySelector('.wrapper');
     
+    // Check if we are on mobile (less than 768px wide)
+    const isMobile = window.innerWidth <= 768;
+
     if (content.style.display === "none") {
         content.style.display = "block";
         text.textContent = "Hide Checkout";
         arrow.textContent = "▲";
-        // Reset wrapper margin when shown
-        document.querySelector('.wrapper').style.marginTop = "210px";
+        
+        // MOBILE: Header is taller (needs ~280px) | DESKTOP: Original 210px
+        wrapper.style.marginTop = isMobile ? "280px" : "210px";
     } else {
         content.style.display = "none";
         text.textContent = "Show Checkout";
         arrow.textContent = "▼";
-        // Shrink wrapper margin when hidden so there isn't a huge gap
-        document.querySelector('.wrapper').style.marginTop = "60px";
+        
+        // MOBILE: Still needs a bit of space | DESKTOP: Original 60px
+        wrapper.style.marginTop = isMobile ? "80px" : "60px";
     }
 }
 // --- 4. CORE FUNCTIONS ---

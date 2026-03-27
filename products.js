@@ -26,31 +26,31 @@ const productList = [
       ]
     },
 
-    {
-      id: "AP-ACSVM2",
-      name: "Adult Cotton T-Shirt",
-      category: "Apparel & Wearables",
-      description: "Premium polyester shirt with multiple design styles.",
-      basePrice: 15.99,
+    // {
+    //   id: "AP-ACSVM2",
+    //   name: "Adult Cotton T-Shirt",
+    //   category: "Apparel & Wearables",
+    //   description: "Premium polyester shirt with multiple design styles.",
+    //   basePrice: 15.99,
 
-      images:["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"],
+    //   images:["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"],
 
-      sizes:[
-      {label:"S", extra:0},
-      {label:"M", extra:0},
-      {label:"L", extra:0},
-      {label:"XL", extra:0},
-      {label:"2XL", extra:0},
-      {label:"3XL", extra:0}
-      ],
+    //   sizes:[
+    //   {label:"S", extra:0},
+    //   {label:"M", extra:0},
+    //   {label:"L", extra:0},
+    //   {label:"XL", extra:0},
+    //   {label:"2XL", extra:0},
+    //   {label:"3XL", extra:0}
+    //   ],
 
-      styles:[
-      {label:"Logo Front", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
-      {label:"Large Front", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"},
-      {label:"Large Back", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"},
-      {label:"Logo Front & Large Back", extra:6, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"}
-      ]
-    },
+    //   styles:[
+    //   {label:"Logo Front", extra:0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/SUBSHIRT%20s%20xx%20xxx.png"},
+    //   {label:"Large Front", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"},
+    //   {label:"Large Back", extra:3, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"},
+    //   {label:"Logo Front & Large Back", extra:6, image:"https://raw.githubusercontent.com/diminfomacon-beep/new-design-studio/main/studio-mockups/Shirt.png"}
+    //   ]
+    // },
     
     {
       id: "BA-TV3001",
@@ -91,20 +91,20 @@ const productList = [
     },
      {
       id: "AP-BHVN01",
-      name: "Baby Hat", 
+      name: "Baby Hat and Mitten", 
       category: "Apparel & Wearables",
       description:  "Cotton baby hat to keep their little head warm. Soft and comfortable and custom printable.",
-      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/babybib.png"],
-      basePrice: 2.99,
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/custom-bundles/main/Pics/baby%20hat%20and%20mit.png"],
+      basePrice: 5.99,
     },
     
     {
       id: "AP-BMVN01",
-      name: "Baby Mittens", 
+      name: "Baby Bib", 
       category: "Apparel & Wearables",
-      description:  "Cotton baby hat to keep their little head warm. Soft and comfortable and custom printable.",
-      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/babybib.png"],
-      basePrice: 2.99,
+      description:  "Simple baby bib with, fully customizable",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/custom-bundles/main/Pics/baby%20bib.png"],
+      basePrice: 5.99,
     },
 
     {
@@ -112,7 +112,7 @@ const productList = [
       name: "Baby Socks", 
       category: "Apparel & Wearables",
       description:  "Cotton baby hat to keep their little head warm. Soft and comfortable and custom printable.",
-      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/babybib.png"],
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/custom-bundles/main/Pics/baby%20socks.png"],
       basePrice: 2.99,
     },
     
@@ -120,8 +120,8 @@ const productList = [
       id: "AP-BBCVN1",
       name: "Baby Burp Cloth", 
       category: "Apparel & Wearables",
-      description:  "Soft and comfortable baby burp cloth and fully customizable.",
-      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/babybib.png"],
+      description:  "Soft and comfortable baby burp cloth and fully customizable - 16x12 inches",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/custom-bundles/main/Pics/Baby%20Burp%20Cloth.png"],
       basePrice: 5.99,
     },   
             // ***************CATEGORY - Drinkware & Kitchenware******************
@@ -311,7 +311,6 @@ const productList = [
         { label: "25oz Hydro", extra: 1, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/25SUBHYHA1_9dc7a375-5863-418a-b865-0e1b4f49ffc8.png"},
         { label: "40oz Hydro", extra: 5, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBHYHA1_d76affb2-b7ee-4d97-8e44-4d9c23ff96a9.png"},
         { label: "32oz Metallic Glitter Hydro", extra: 3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/32SUBHYDROMETALGLITWHITE.png"},
-        { label: "32oz Hydro Hound", extra: 4, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/hydro%20hound.png"},
         { label: "30oz Clipmate Hydro", extra: 3, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBCLIPMATE1_large.png"},
         { label: "30oz Holographic Clipmate Hydro", extra: 8, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBCLIPMATEHOLO.png"},
         { label: "18oz Duo Hydro - 2 Lids", extra: 1, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/18oz%20hydro.png"},
@@ -327,7 +326,7 @@ const productList = [
       name: "Hydro Hound Tumbler - 32oz", 
       category: "Drinkware & Kitchenware",
       description: "32oz hydro hound tumbler with an attached portable bowl, perfect for custom designs for pet lovers.",
-      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/Duo%20Hydro%20group.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/25SUBHYHA1_9dc7a375-5863-418a-b865-0e1b4f49ffc8.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40SUBHYHA1_d76affb2-b7ee-4d97-8e44-4d9c23ff96a9.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/32SUBHYDROMETALGLITWHITE.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/hydro%20hound.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBCLIPMATE1_large.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/30SUBCLIPMATEHOLO.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/18oz%20hydro.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/5oz%20hydro.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/32oz%20hydro.png","https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/40oz%20hydro.png"],
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/hydro%20hound.png"],
       basePrice: 43.99,
       variations: [
         { label: "Two Tone", extra: 0, image:"https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/hydro%20hound.png"},
@@ -386,7 +385,7 @@ const productList = [
       name: "Baby Bottle", 
       category: "Drinkware & Kitchenware",
       description: "Fully customizable baby bottle with colic deterent straw.",
-      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/Flask.png"],
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/custom-bundles/main/Pics/baby%20bottle.png"],
       basePrice: 17.99,
     },
 
@@ -465,7 +464,7 @@ const productList = [
       name: "Candle Jar", 
       category: "Home & Living",
       description: "10oz glass candle jar ready for custom designs, perfect for gifts or decorative use.",
-      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/HOGG-440.png"],
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/Candle%20Jar.png"],
       basePrice:8.99
     },
 
@@ -479,11 +478,20 @@ const productList = [
     },
        
     {
-      id: "HO-WBVN01",
-      name: "Wooden Box", 
-      category: "Apparel & Wearables",
+      id: "HO-PWBVN1",
+      name: "Patterned Wooden Box with Transparent Top", 
+      category: "Home & Living",
       description:  "Customizable wood burned keepsake box for all you precious memories.",
-      images: ["https://raw.githubusercontent.com/diminfomacon-beep/store-app-full-checkout/main/product-pics/babybib.png"],
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/custom-bundles/main/Pics/Patterned%20Wooden%20box.png"],
+      basePrice: 26.99,
+    }, 
+    
+     {
+      id: "HO-WBVN01",
+      name: "Plain Wooden Box", 
+      category: "Home & Living",
+      description:  "Customizable wood burned keepsake box for all you precious memories.",
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/custom-bundles/main/Pics/Plain%20Wooden%20Box.png"],
       basePrice: 26.99,
     },   
        
@@ -504,7 +512,7 @@ const productList = [
       name: "Custom Cards ",
       category: "Games & Gifts",
       description: "Versatile custom card that can be used for business cards, playing cards, invitations, and more.",
-      images: [""],
+      images: ["https://raw.githubusercontent.com/diminfomacon-beep/custom-bundles/main/Pics/playing%20cards.png"],
       basePrice: 17.99
     }
     
